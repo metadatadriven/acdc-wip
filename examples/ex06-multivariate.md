@@ -1,6 +1,8 @@
 # Example 6: Multivariate Analysis of Variance
 
-This example is taken from page 34 of the [ADaM Examples](../docs/adam_examples_final.pdf) source document.
+The Analysis Derivation and Analysis Results sections of this document are taken from page 34 of the [ADaM Examples](../docs/adam_examples_final.pdf) source document.
+
+The second half of this document describes how this example can be modelled using [Statistical Data and Metadata eXchange](https://sdmx.org/) (SDMX)
 
 ## Analysis Derivation
 
@@ -59,3 +61,6 @@ Multivariate Analysis of Variance Testing the Hypothesis of No Overall Treatment
   [2] Wilks' Lambda multivariate test of treatment effect, with the six mood subscale scores as the dependent
       variables in the model and treatment the only independent variable.
 ```
+
+# SDMX Information Model
+
