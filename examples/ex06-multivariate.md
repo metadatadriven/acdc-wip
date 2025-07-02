@@ -62,5 +62,50 @@ Multivariate Analysis of Variance Testing the Hypothesis of No Overall Treatment
       variables in the model and treatment the only independent variable.
 ```
 
-# SDMX Information Model
+# SDMX Modelling
 
+Modelling the analysis using SDMX is split into two parts - first we define the informational model foundational parts - Concepts, Codelists and Data Formats, and second we define the structure (Dimensions, Measures and Attributes) with reference to the Concepts, Codelists and Formats.
+
+## Concepts
+
+- Multivariate Variance (codelist STATO:MANOVA)
+- Profile of Mood (codelist SNOWMED-CT:POMS)
+- Profile of Mood Subscale (codelist POMS-Subscale)
+- Subscale score (format Integer)
+- Total score (format Total_score)
+
+## Codelists
+- Likert scale [0,4]
+- Visit [Baseline, Week6]
+- STATO [MANOVA]
+- SNOWMED-CT [POMS]
+- CDISC-CT [Likert]
+- POMS-Subscale [
+    - tension-anxiety
+    - depression
+    - anger-hostility
+    - vigor-activity
+    - fatigue
+    - confusion-bewilderment
+    ]
+
+## Data Formats
+- Integer
+- total_score [Range -32,200]
+
+## Dimenstions
+
+- Subject
+- Scale
+- Visit
+- Measure
+
+## Measures
+
+- Score
+- Change from Baseline
+
+## Attributes
+
+- Treatment
+- Population
