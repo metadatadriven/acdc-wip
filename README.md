@@ -35,3 +35,6 @@ The data structure defines the 'cube' structure that allows the data to be navig
 ## References
 
 - [RDF Data Cube Structure](https://phuse.s3.eu-central-1.amazonaws.com/Deliverables/Emerging+Trends+%26+Technologies/Clinical+Research+and+Development+RDF+Data+Cube+Structure+Technical+Guidance.pdf), PhUSE CS Semantic Technology Working Group
+
+## Training
+- [SDMX Vocabilary for Beginners](https://academy.siscc.org/courses/sdmx-vocabulary-for-beginners/)
