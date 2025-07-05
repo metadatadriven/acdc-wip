@@ -32,9 +32,40 @@ The data structure defines the 'cube' structure that allows the data to be navig
 - [ ] Measures
 - [ ] Values
 
+## SDMX tools
+
+### .stat suite data explorer
+
+This is a web-based SDMX data explorer. It is part of a wider [suite of open-source SDMX tools](https://siscc.org/stat-suite/) maintained by .Stat project.
+
+*TLDR;* The app runs ok but doesnt have any data out the box! Maybe need full suite of tools?
+
+Notes:
+- Clone [gitlab repo](https://gitlab.com/sis-cc/.stat-suite/dotstatsuite-data-explorer)
+- build following `yarn` commands described in README
+- Access using `http://localhost:7000/?tenant=oecd` (default tenant didnt work for me!)
+
+### CubeViz.js 
+
+According to the [README](https://github.com/AKSW/cubevizjs) "CubeViz is generating a faceted browsing widget that can be used to filter interactively observations to be visualized in charts."
+
+There is an [example application here](https://smartdataua.github.io/rdfdatacube/) with links to [SDMX data in RDF format](https://raw.githubusercontent.com/hibernator11/datacuberdf/master/rdf-02-2017.n3).
+
+Notes:
+- clone [github repo](https://github.com/AKSW/cubevizjs#)
+- THIS IS A VERY OLD PROJECT
+- Roll back to node v8 using `nvm install 8` and `nvm use 8`
+- Install with `npm install`
+- run with `npm start`
+- access demo at [http://localhost:8080/](http://localhost:8080/)
+
 ## References
 
-- [RDF Data Cube Structure](https://phuse.s3.eu-central-1.amazonaws.com/Deliverables/Emerging+Trends+%26+Technologies/Clinical+Research+and+Development+RDF+Data+Cube+Structure+Technical+Guidance.pdf), PhUSE CS Semantic Technology Working Group
+- PHUSE [RDF Data Cube Structure](https://phuse.s3.eu-central-1.amazonaws.com/Deliverables/Emerging+Trends+%26+Technologies/Clinical+Research+and+Development+RDF+Data+Cube+Structure+Technical+Guidance.pdf), PhUSE CS Semantic Technology Working Group
+- Article on [mapping SDMX (xml) to RDF](https://csarven.ca/linked-sdmx-data)
+- [BioPortal](https://www.bioontology.org/) comprehensive repository of biomedical ontologies
+- w3c article on [Use Cases and Lessons for the Data Cube Vocabulary](https://www.w3.org/TR/vocab-data-cube-use-cases/)
 
 ## Training
 - [SDMX Vocabilary for Beginners](https://academy.siscc.org/courses/sdmx-vocabulary-for-beginners/)
+
