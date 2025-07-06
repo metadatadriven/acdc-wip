@@ -205,3 +205,9 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+#
+# Ignore all zone.identifier files (metadata on where file was downloaded from, etc.)
+#
+**/*Zone.Identifier
+
