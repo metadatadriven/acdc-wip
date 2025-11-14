@@ -1,4 +1,4 @@
-# ⚡️ Thunderstruck DSL — Language of Plans (LOP)
+# ⚡️ Thunderstruck DSL 
 
 > **Purpose:** A strongly typed, functional domain-specific language for expressing a **Statistical Analysis Plan (SAP)** as a **W3C Data Cube**—linking **Endpoints**, **Estimands**, and **Displays** (Tables, Figures, Listings) to well-defined **Concepts**.
 
