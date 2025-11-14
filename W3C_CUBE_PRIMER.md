@@ -1,6 +1,3 @@
-Sure! Here's the markdown document titled `W3C_CUBE_PRIMER.md` based on the research findings:
-
-````markdown
 # W3C_CUBE_PRIMER.md
 
 ## Applying the W3C Data Cube Vocabulary to Clinical Trial Statistical Outputs
