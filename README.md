@@ -6,7 +6,7 @@ This repository contains work-in-progress on **Language-Oriented Programming** a
 
 ## Language-Oriented Programming Approach
 
-This project explores using **domain-specific languages (DSLs)** and **formal language design** to capture Statistical Analysis Plans as typed, executable specifications. Three complementary approaches have been developed:
+This project explores using **domain-specific languages (DSLs)** and **formal language design** to capture Statistical Analysis Plans as typed, executable specifications. Three alternative approaches have been considered:
 
 ### 1. Concept-Centric Approach
 **Document:** [LOP-PROPOSAL-CC.md](LOP-PROPOSAL-CC.md)
@@ -48,6 +48,8 @@ A more compact DSL specification with:
 | **Strength** | Rich type system | Interoperability | Simplicity |
 
 **Recommended Strategy:** Combine approaches with **concept-centric authoring** that compiles to **cube-centric intermediate representation** for tooling and export.
+
+Thunderstruck is an implementation of the **cube-centric intermediate representation**. An implementation of **concept-centric authoring** will be condidered later in this project and is OUT OF SCOPE currently.
 
 ---
 
