@@ -1,0 +1,32 @@
+// Example 1: Simple Cube Definition
+// This example demonstrates the basic structure of a Thunderstruck cube definition
+
+cube ADADAS "Analysis Dataset for ADAS-Cog Total Score" {
+    namespace: "http://example.org/study/xyz#",
+
+    structure: {
+        // Dimensions identify the observations
+        dimensions: [
+            USUBJID: Identifier,
+            AVISITN: Integer,
+            AVISIT: Text,
+            TRT01A: CodedValue,
+            TRT01AN: Integer
+        ],
+
+        // Measures are the observed or computed values
+        measures: [
+            AVAL: Numeric unit: "points",
+            BASE: Numeric unit: "points",
+            CHG: Numeric unit: "points"
+        ],
+
+        // Attributes provide metadata about observations
+        attributes: [
+            PARAMCD: CodedValue,
+            PARAM: Text,
+            EFFFL: Flag,
+            ITTFL: Flag
+        ]
+    }
+}

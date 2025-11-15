@@ -1,0 +1,59 @@
+// Example 2: Using Imports
+// This example shows how to import and reference standard CDISC definitions
+
+// Import standard CDISC definitions (future functionality)
+import CDISC.ADaM.ADSL;
+import CDISC.SDTM.DM as Demographics;
+
+/*
+ * Adverse Events Analysis Dataset
+ * Following CDISC ADaM Basic Data Structure (BDS)
+ */
+cube ADAE "Adverse Events Analysis Dataset" {
+    namespace: "http://example.org/study/abc123#",
+
+    structure: {
+        dimensions: [
+            // Subject identifier
+            USUBJID: Identifier,
+
+            // Adverse event term
+            AEDECOD: Text,
+
+            // System organ class
+            AESOC: CodedValue,
+
+            // Treatment
+            TRT01A: CodedValue,
+            TRTA: CodedValue
+        ],
+
+        measures: [
+            // Start day of AE relative to treatment
+            ASTDY: Integer,
+
+            // End day of AE relative to treatment
+            AENDY: Integer,
+
+            // Duration of AE
+            ADURN: Integer unit: "days"
+        ],
+
+        attributes: [
+            // Severity
+            AESEV: CodedValue,
+
+            // Serious event flag
+            AESER: Flag,
+
+            // Related to study treatment
+            AEREL: CodedValue,
+
+            // Action taken
+            AEACN: CodedValue,
+
+            // Outcome
+            AEOUT: CodedValue
+        ]
+    }
+}

@@ -1,0 +1,60 @@
+{
+  "name": "thunderstruck-vscode",
+  "displayName": "Thunderstruck",
+  "description": "VS Code extension for Thunderstruck DSL - Statistical Analysis Plans for Clinical Trials",
+  "version": "0.1.0",
+  "publisher": "thunderstruck",
+  "engines": {
+    "vscode": "^1.80.0",
+    "node": ">=18.0.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "clinical-trials",
+    "statistical-analysis",
+    "CDISC",
+    "DSL"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "thunderstruck",
+        "aliases": ["Thunderstruck", "thunderstruck"],
+        "extensions": [".tsk", ".thunderstruck"],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./icons/thunderstruck-icon.png",
+          "dark": "./icons/thunderstruck-icon.png"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "thunderstruck",
+        "scopeName": "source.thunderstruck",
+        "path": "./syntaxes/thunderstruck.tmLanguage.json"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "tsc -b tsconfig.json && node ./scripts/copy-grammar.js",
+    "watch": "tsc -b tsconfig.json --watch",
+    "clean": "rm -rf out",
+    "vscode:prepublish": "npm run build",
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1",
+    "thunderstruck-language": "^0.1.0"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "@vscode/vsce": "^3.2.1",
+    "esbuild": "^0.24.2"
+  },
+  "author": "Statistical Computing & Data Science Team",
+  "license": "MIT"
+}

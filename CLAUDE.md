@@ -1,0 +1,2 @@
+- git branch naming convention is dev/<username>/issue-# where <username> is the shell username, and # is the github issue number being worked on
+- before working on a project increment, read and understand the relevent PRD and PLAN documents

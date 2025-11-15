@@ -1,0 +1,35 @@
+{
+  "name": "thunderstruck-language",
+  "version": "0.1.0",
+  "description": "Thunderstruck language definition using Langium",
+  "type": "module",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc -b tsconfig.json && node ./scripts/copy-grammar.js",
+    "watch": "tsc -b tsconfig.json --watch",
+    "langium:generate": "langium generate",
+    "langium:watch": "langium generate --watch",
+    "clean": "rm -rf lib",
+    "test": "jest"
+  },
+  "keywords": [
+    "langium",
+    "dsl",
+    "clinical-trials",
+    "statistical-analysis"
+  ],
+  "author": "Statistical Computing & Data Science Team",
+  "license": "MIT",
+  "dependencies": {
+    "langium": "^3.3.0",
+    "vscode-languageserver": "^9.0.1"
+  },
+  "devDependencies": {
+    "langium-cli": "^3.3.0"
+  }
+}
