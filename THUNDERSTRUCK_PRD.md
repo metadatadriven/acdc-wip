@@ -49,10 +49,11 @@ Currently, SAPs are written in natural language prose, leading to:
 Thunderstruck provides:
 - **Formal language** for specifying analyses using W3C Data Cube vocabulary
 - **Automatic validation** against CDISC standards and cube integrity constraints
-- **Multi-target code generation** (R, Python, SAS) from single specification
-- **Semantic interoperability** via RDF export
+- **Multi-target code generation** (R, SAS) from single specification
+- **Semantic interoperability** via RDF export enabling integration with multiple standards (CDISC, W3C, OMOP, FHIR)
 - **Rich IDE support** in VS Code with syntax highlighting and validation
 - **Provenance tracking** from raw data through all transformations to results
+- **LLM integration** via MCP server for AI-assisted SAP authoring
 
 ### Value Proposition
 
@@ -73,7 +74,7 @@ Thunderstruck provides:
 Clinical trial Statistical Analysis Plans are currently authored as:
 
 1. **Natural language documents** (Word/PDF) describing intended analyses
-2. **Separate implementation** in R, SAS, or Python by statistical programmers
+2. **Separate implementation** in R or SAS by statistical programmers
 3. **Manual verification** that code matches SAP intent
 4. **Proprietary data formats** (SAS datasets, R objects) for results
 5. **Separate documentation** for regulatory submission (ARM/ARS)
@@ -549,16 +550,17 @@ display table "Table 14.3.01: Dose Response Analysis" {
 
 ---
 
-#### Story 3.2: Generate Python Code
-**As a** data scientist
-**I want to** generate Python code from my SAP specification
-**So that** I can integrate with Python-based workflows
+#### Story 3.2: Generate SAS Code
+**As a** statistical programmer
+**I want to** generate SAS code from my SAP specification
+**So that** I can execute analyses in SAS
 
 **Acceptance Criteria:**
-- Generates pandas, statsmodels, matplotlib code
-- Code follows Python conventions (PEP 8)
-- Handles type conversions appropriately
+- Generates BASE SAS 9.4 code with PROC SQL, DATA steps
+- Uses SAS/STAT procedures (PROC MIXED, PROC GLM, etc.)
+- Code follows SAS coding conventions
 - Produces same results as R code
+- Generates appropriate formats and macros
 
 ---
 
@@ -644,16 +646,23 @@ display table "Table 14.3.01: Dose Response Analysis" {
 
 ---
 
-#### Story 5.2: Import CDISC Standard Definitions
+#### Story 5.2: Import CDISC Standard Definitions with Version Control
 **As a** data manager
-**I want to** import standard SDTM/ADaM cube definitions
-**So that** I don't have to redefine standard structures
+**I want to** import standard SDTM/ADaM cube definitions with specific version information
+**So that** I can ensure compliance with the correct standard versions and maintain traceability
 
 **Acceptance Criteria:**
 - Standard library includes all SDTM domains
 - Standard library includes common ADaM datasets
 - Can extend standard definitions
-- Can validate against CDISC versions (SDTM 3.2, ADaM 1.1, etc.)
+- Can specify and validate against specific CDISC versions:
+  - SDTM (e.g., v3.2, v3.3, v3.4)
+  - ADaM (e.g., v1.0, v1.1, v1.2)
+  - CDISC Controlled Terminology version
+- Can specify SAP version and track amendments
+- Can reference protocol version (linked to USDM model)
+- Version information included in generated RDF metadata
+- Can query "what standards versions were used?"
 
 ---
 
@@ -677,11 +686,14 @@ display table "Table 14.3.01: Dose Response Analysis" {
 **I want to** trace results back to their data sources
 **So that** I can demonstrate analysis validity
 
+**Note:** PROV-O is the W3C Provenance Ontology, a standard RDF vocabulary for representing provenance information. It captures who created what, when, and how data was derived.
+
 **Acceptance Criteria:**
 - Every result cube has provenance metadata
 - Can query: "Where did this number come from?"
 - Lineage graph from SDTM → ADaM → Analysis → Results
-- Export provenance as PROV-O RDF
+- Export provenance as PROV-O RDF (see [W3C PROV-O](https://www.w3.org/TR/prov-o/))
+- Track transformations, agents (who), activities (how), and entities (what)
 
 ---
 
@@ -690,6 +702,7 @@ display table "Table 14.3.01: Dose Response Analysis" {
 ### FR-1: Language Features
 
 #### FR-1.1: Core Language Constructs
+- **MUST** support concept definitions (biomedical, derivation, analysis concepts) as first-class constructs
 - **MUST** support cube definitions with dimensions, measures, attributes
 - **MUST** support slice definitions (fixing and varying dimensions)
 - **MUST** support transform definitions (cube → cube mappings)
@@ -719,7 +732,10 @@ display table "Table 14.3.01: Dose Response Analysis" {
 #### FR-1.4: Comments and Documentation
 - **MUST** support single-line comments (//)
 - **MUST** support multi-line comments (/* */)
-- **SHOULD** support documentation comments (/** */) for generating docs
+- **MUST** support documentation strings (like Common Lisp) as part of language constructs
+  - Inline documentation attached directly to definitions (cube, model, concept, etc.)
+  - Example: `cube ADADAS "Analysis dataset for ADAS-Cog scores" { ... }`
+- **SHOULD** support documentation comments (/** */) for additional annotations
 
 ---
 
@@ -738,7 +754,11 @@ display table "Table 14.3.01: Dose Response Analysis" {
 - **MUST** validate ADaM Basic Data Structure rules
 - **MUST** validate controlled terminology against CDISC CT
 - **MUST** validate ISO 8601 date formats
-- **SHOULD** validate against specific CDISC versions
+- **MUST** support CDISC CORE conformance rules validation
+  - SDTM conformance rules
+  - ADaM conformance rules
+  - Programmable and configurable rule engine
+- **MUST** validate against specific CDISC versions (version-aware validation)
 
 #### FR-2.3: Type Validation
 - **MUST** detect type mismatches
@@ -765,13 +785,16 @@ display table "Table 14.3.01: Dose Response Analysis" {
 - **MUST** generate readable, commented code
 - **MUST** include data loading and validation
 
-#### FR-3.2: Python Code Generation
-- **MUST** generate valid Python code
-- **MUST** support pandas for data manipulation
-- **MUST** support statsmodels for linear/mixed models
-- **MUST** support matplotlib or seaborn for plots
-- **MUST** follow PEP 8 conventions
-- **SHOULD** support scikit-learn
+#### FR-3.2: SAS Code Generation
+- **MUST** generate valid BASE SAS 9.4 code
+- **MUST** support SAS DATA steps and PROC SQL for data manipulation
+- **MUST** support SAS/STAT procedures (PROC MIXED, PROC GLM, PROC PHREG, etc.)
+- **MUST** support SAS/GRAPH or ODS Graphics for visualizations
+- **MUST** follow SAS coding conventions
+- **MUST** generate appropriate SAS formats and macros
+- **MUST** support SAS datasets (.sas7bdat, .xpt)
+- **MUST** generate readable, commented code
+- **MUST** include data loading and validation
 
 #### FR-3.3: RDF Export
 - **MUST** generate valid Turtle syntax
@@ -780,10 +803,6 @@ display table "Table 14.3.01: Dose Response Analysis" {
 - **MUST** include provenance metadata (PROV-O)
 - **SHOULD** include CDISC SHARE metadata
 - **MUST** validate generated RDF against spec
-
-#### FR-3.4: SAS Code Generation (Optional)
-- **SHOULD** generate SAS code (PROC SQL, PROC MIXED, etc.)
-- **SHOULD** support SAS datasets (.sas7bdat, .xpt)
 
 ---
 
@@ -806,9 +825,9 @@ display table "Table 14.3.01: Dose Response Analysis" {
 - **SHOULD** semantic highlighting for dimensions/measures/attributes
 
 #### FR-4.3: Visualizations
-- **SHOULD** provide cube structure visualizer
-- **SHOULD** provide pipeline DAG visualizer
-- **SHOULD** provide lineage graph visualizer
+- **MUST** provide cube structure visualizer (VS Code extension)
+- **MUST** provide pipeline DAG visualizer (VS Code extension)
+- **MUST** provide lineage graph visualizer (VS Code extension)
 
 ---
 
@@ -846,6 +865,19 @@ display table "Table 14.3.01: Dose Response Analysis" {
 - **MUST** export provenance as RDF (PROV-O)
 - **SHOULD** visualize lineage graph
 
+#### FR-6.3: MCP Server for LLM Integration
+- **MUST** provide Model Context Protocol (MCP) server implementation
+- **MUST** support reading Thunderstruck DSL programs via MCP
+- **MUST** support writing/modifying Thunderstruck DSL programs via MCP
+- **MUST** enable LLMs to interact with SAPs defined in Thunderstruck
+- **MUST** provide structured access to:
+  - Cube definitions and metadata
+  - Analysis specifications
+  - Validation results
+  - Code generation capabilities
+- **SHOULD** support conversational SAP authoring via LLM
+- **SHOULD** provide SAP querying capabilities (e.g., "What analyses are defined?", "Show me the efficacy analyses")
+
 ---
 
 ### FR-7: CLI & Build System
@@ -861,6 +893,73 @@ display table "Table 14.3.01: Dose Response Analysis" {
 - **SHOULD** support project configuration file (thunderstruck.config.json)
 - **SHOULD** support output directory configuration
 - **SHOULD** support target language preferences
+
+---
+
+### FR-8: Concept Management
+
+#### FR-8.1: Concept Definitions as First-Class Constructs
+- **MUST** support concept definitions as first-class language elements
+- **MUST** support different concept types:
+  - **Biomedical Concepts** - clinical observations and measurements (e.g., "Systolic Blood Pressure", "ADAS-Cog Total Score")
+  - **Derivation Concepts** - computed or derived values (e.g., "Change from Baseline", "Percent Change")
+  - **Analysis Concepts** - analytical constructs (e.g., "Efficacy Endpoint", "Safety Parameter")
+- **MUST** allow concepts to have:
+  - Unique identifier
+  - Human-readable label
+  - Description/definition
+  - Type/category
+  - Associated code lists or value domains
+  - Links to external ontologies (CDISC, SNOMED CT, LOINC, etc.)
+
+#### FR-8.2: Concept Namespaces
+- **MUST** provide namespace mechanism for concepts
+- **MUST** support importing concepts from standard namespaces:
+  - CDISC Glossary
+  - SDMX concepts
+  - BRIDG model
+  - Custom organization-specific concept libraries
+- **MUST** prevent concept name collisions across namespaces
+- **SHOULD** support concept versioning within namespaces
+
+#### FR-8.3: Linking Concepts to Cube Components
+- **MUST** allow dimensions, measures, and attributes to reference concepts
+- **MUST** follow SDMX pattern where cube components link to concepts
+- **MUST** enable querying: "What concept does this dimension represent?"
+- **MUST** support semantic validation based on concept types
+- **SHOULD** support concept hierarchies and relationships
+
+#### FR-8.4: Concept Interoperability
+- **MUST** export concept definitions to RDF using W3C Data Cube and SDMX vocabularies
+- **MUST** support mapping concepts to external standards:
+  - CDISC Controlled Terminology
+  - SNOMED CT codes
+  - LOINC codes
+  - MedDRA codes
+- **SHOULD** import concepts from external ontologies/vocabularies
+- **SHOULD** support concept harmonization across studies
+
+**Example Concept Definition:**
+```thunderstruck
+concept SystolicBP "Systolic Blood Pressure" {
+    type: BiomedicalConcept
+    category: VitalSign
+    definition: "Maximum blood pressure during contraction of the ventricles"
+    unit: "mmHg"
+    codeLists: [
+        CDISC.CT.VSTESTCD: "SYSBP",
+        LOINC: "8480-6",
+        SNOMED: "271649006"
+    ]
+}
+
+// Link concept to cube dimension
+cube SDTM_VS {
+    dimensions: [
+        VSTESTCD: CodedTest concept: SystolicBP
+    ]
+}
+```
 
 ---
 
@@ -937,8 +1036,7 @@ display table "Table 14.3.01: Dose Response Analysis" {
 #### NFR-5.2: Output Portability
 - **MUST** generate code compatible with:
   - R 4.0+
-  - Python 3.9+
-- **SHOULD** generate SAS 9.4+ code
+  - BASE SAS 9.4+ (using BASE SAS language features and SAS/STAT procedures)
 
 ---
 
@@ -957,7 +1055,14 @@ display table "Table 14.3.01: Dose Response Analysis" {
 - **MUST** conform to W3C Data Cube specification
 - **MUST** support CDISC SDTM 3.2+
 - **MUST** support CDISC ADaM 1.1+
+- **MUST** support USDM (Unified Study Definitions Model) v4.0+
+  - Provide reference mechanism to link to external USDM model elements
+  - Support referencing: populations, study design elements, estimands, endpoints, biomedical concepts
+  - Enable traceability: Protocol (USDM) → SAP (Thunderstruck) → Analysis → Results
+  - Do NOT import/parse USDM files directly; use URI-based references
+  - Example: `protocol.population.efficacy` references USDM population definition
 - **SHOULD** align with ICH E9(R1) estimand framework
+- **SHOULD** support ICH M11 protocol standard (aligned with USDM)
 
 #### NFR-7.2: Open Source
 - **MUST** use open-source license (MIT or Apache 2.0)
@@ -967,16 +1072,6 @@ display table "Table 14.3.01: Dose Response Analysis" {
 ---
 
 ## Success Metrics
-
-### Adoption Metrics
-
-| Metric | Target (6 months) | Target (12 months) |
-|--------|------------------|-------------------|
-| **VS Code Extension Downloads** | 500 | 2,000 |
-| **GitHub Stars** | 100 | 500 |
-| **Active Users** | 50 | 200 |
-| **Organizations Piloting** | 3 | 10 |
-| **Community Contributors** | 5 | 20 |
 
 ### Quality Metrics
 
@@ -1005,14 +1100,6 @@ display table "Table 14.3.01: Dose Response Analysis" {
 | **Implementation Errors Found in QC** | 15-25 per SAP | <5 per SAP | 75% reduction |
 | **CDISC Compliance Issues** | 10-20 per dataset | <2 per dataset | 85% reduction |
 
-### User Satisfaction
-
-| Metric | Measurement | Target |
-|--------|------------|--------|
-| **Net Promoter Score (NPS)** | User survey | >40 |
-| **System Usability Scale (SUS)** | User survey | >70 |
-| **Would Recommend** | User survey | >80% |
-
 ---
 
 ## Assumptions & Constraints
@@ -1030,13 +1117,14 @@ display table "Table 14.3.01: Dose Response Analysis" {
    - Metadata available (Define.xml or equivalent)
 
 3. **Infrastructure**
-   - Users have access to R or Python environment
+   - Users have access to R or SAS environment
    - Users can install VS Code extensions
    - Network access for downloading packages
 
 4. **Standards Stability**
    - W3C Data Cube standard remains stable
    - CDISC standards have predictable evolution
+   - ICH M11 protocol standard (aligned with USDM) is stable and adopted
    - No major breaking changes in ICH guidelines
 
 ### Constraints
@@ -1050,8 +1138,8 @@ display table "Table 14.3.01: Dose Response Analysis" {
 
 2. **Target Languages**
    - R code generation limited by supported packages
-   - Python code generation limited by statsmodels capabilities
-   - SAS code generation may have limitations
+   - SAS code generation limited to BASE SAS 9.4 language features and SAS/STAT procedures
+   - Cannot rely on advanced SAS features beyond BASE SAS and SAS/STAT
 
 3. **Performance**
    - Language Server must run in VS Code (single-threaded JavaScript)
@@ -1059,15 +1147,7 @@ display table "Table 14.3.01: Dose Response Analysis" {
 
 #### Business Constraints
 
-1. **Timeline**
-   - MVP must be ready in 6 months
-   - Full v1.0 in 12 months
-
-2. **Resources**
-   - Limited development team (1-3 developers)
-   - Limited budget for external tools/services
-
-3. **Regulatory**
+1. **Regulatory**
    - Must not make claims about regulatory acceptance
    - Must not guarantee compliance (tool assists, doesn't certify)
 
@@ -1382,18 +1462,29 @@ display table "Table 14.3.01: Dose Response Analysis" {
 
 **Thunderstruck is positioned as:**
 
-> A **language-oriented programming approach** to clinical trial statistical analysis that provides **formal, unambiguous SAP specifications** with **automatic validation** and **multi-target code generation**, enabling **semantic interoperability** through W3C standards.
+> A **language-oriented programming approach** to clinical trial statistical analysis that provides **formal, unambiguous SAP specifications** with **automatic validation** and **multi-target code generation**, enabling **semantic interoperability** across multiple standards ecosystems including **CDISC, W3C Data Cube, OMOP, FHIR, and USDM**.
+
+**Key Value Proposition:**
+
+Thunderstruck is **standards-agnostic** and designed for **maximum interoperability**. Rather than locking users into a single standard, it:
+- Leverages W3C Data Cube as an internal representation for flexibility
+- Exports to and imports from multiple standard formats
+- Bridges clinical research standards (CDISC), healthcare standards (FHIR, OMOP), protocol standards (USDM), and semantic web standards (W3C)
+- Enables organizations to work seamlessly across different standards environments
 
 **Target Market:**
 - Forward-thinking pharmaceutical/biotech companies
 - Academic clinical trial units
 - Contract research organizations (CROs)
 - Regulatory-focused organizations
+- Health systems conducting clinical research
 
 **Differentiation:**
 - Only solution with formal DSL for SAPs
-- Only solution with W3C Data Cube as foundation
-- Only solution with semantic RDF export
+- Only solution with native support for multiple standards (CDISC, W3C, OMOP, FHIR, USDM)
+- Standards-agnostic architecture enabling maximum interoperability
+- Only solution with semantic RDF export for linked data integration
+- First-class concept management aligned with SDMX and W3C patterns
 - Open source with commercial support option
 
 ---
@@ -1505,11 +1596,29 @@ display table "Table 14.3.01: Dose Response Analysis" {
 3. **ICH E9(R1) Estimands and Sensitivity Analysis**
    https://www.ema.europa.eu/en/ich-e9-statistical-principles-clinical-trials
 
-4. **Langium Documentation**
+4. **W3C PROV-O: The PROV Ontology**
+   https://www.w3.org/TR/prov-o/
+   (W3C Provenance Ontology for representing provenance information in RDF)
+
+5. **CDISC CORE Conformance Rules**
+   https://www.cdisc.org/standards/foundational/conformance-rules
+
+6. **USDM (Unified Study Definitions Model)**
+   https://www.cdisc.org/standards/foundational/usdm
+
+7. **SDMX (Statistical Data and Metadata eXchange)**
+   https://sdmx.org/
+   (Reference for concept management patterns)
+
+8. **Langium Documentation**
    https://langium.org/docs/
 
-5. **Language Server Protocol**
+9. **Language Server Protocol**
    https://microsoft.github.io/language-server-protocol/
+
+10. **Model Context Protocol (MCP)**
+    https://modelcontextprotocol.io/
+    (Protocol for LLM integration)
 
 ### Appendix C: Example SAP Specification (Thunderstruck)
 
@@ -1590,6 +1699,164 @@ display table "Table 14.3.01: Dose-Response Analysis" {
     ]
 }
 ```
+
+**Note on Formula Syntax:**
+
+The formula syntax `CHG ~ TRTDOSE + SITEGR1 + BASE` in the `PrimaryEfficacyModel` uses **Wilkinson notation**, a standard for specifying statistical models. This notation is widely used across multiple statistical programming environments including R, Python (statsmodels, patsy), Julia (StatsModels.jl), and SAS (partially).
+
+---
+
+### Appendix D: Formula Syntax Language Reference
+
+#### Overview
+
+Thunderstruck uses **Wilkinson notation** (also called **Wilkinson-Rogers notation**) for specifying statistical model formulas. This notation was introduced by Wilkinson & Rogers (1973) and has become the de facto standard for formula specification in statistical software.
+
+#### Basic Formula Structure
+
+```
+response ~ predictors
+```
+
+- **Left side (response)**: The dependent variable or outcome
+- **`~` (tilde)**: Separates response from predictors, reads as "is modeled by"
+- **Right side (predictors)**: Independent variables and their relationships
+
+#### Operators
+
+| Operator | Meaning | Example | Interpretation |
+|----------|---------|---------|----------------|
+| `+` | Addition | `y ~ x1 + x2` | Include both x1 and x2 as main effects |
+| `-` | Removal | `y ~ x1 + x2 - 1` | Include x1 and x2, but remove intercept |
+| `:` | Interaction | `y ~ x1:x2` | Include only the interaction between x1 and x2 |
+| `*` | Crossing | `y ~ x1*x2` | Equivalent to `x1 + x2 + x1:x2` (main effects + interaction) |
+| `/` | Nesting | `y ~ x1/x2` | Equivalent to `x1 + x1:x2` (x2 nested within x1) |
+| `^` | Crossing to depth | `y ~ (x1+x2+x3)^2` | All main effects and 2-way interactions |
+| `\|` | Conditioning | `y ~ x \| group` | Model y ~ x separately for each group (context-dependent) |
+| `1` | Intercept | `y ~ 1 + x` | Explicitly include intercept (usually implicit) |
+| `0` or `-1` | No intercept | `y ~ 0 + x` or `y ~ x - 1` | Force model through origin |
+
+#### Examples
+
+**Simple Linear Regression:**
+```thunderstruck
+formula: CHG ~ TRTDOSE
+// Change is modeled by treatment dose
+// Equivalent to: CHG = β₀ + β₁×TRTDOSE + ε
+```
+
+**Multiple Regression:**
+```thunderstruck
+formula: CHG ~ TRTDOSE + SITEGR1 + BASE
+// Change modeled by dose, site group, and baseline
+// Equivalent to: CHG = β₀ + β₁×TRTDOSE + β₂×SITEGR1 + β₃×BASE + ε
+```
+
+**Interaction Model:**
+```thunderstruck
+formula: CHG ~ TRT01A * AVISIT
+// Treatment by visit interaction (includes main effects)
+// Expanded to: CHG ~ TRT01A + AVISIT + TRT01A:AVISIT
+// Equivalent to: CHG = β₀ + β₁×TRT01A + β₂×AVISIT + β₃×(TRT01A×AVISIT) + ε
+```
+
+**Model Without Intercept:**
+```thunderstruck
+formula: CHG ~ 0 + TRT01A
+// Force through origin, estimate separate mean for each treatment
+```
+
+**Nested Effects:**
+```thunderstruck
+formula: AVAL ~ TRT01A/SITEID
+// Site nested within treatment
+// Expanded to: AVAL ~ TRT01A + TRT01A:SITEID
+```
+
+**Polynomial Terms:**
+```thunderstruck
+formula: AVAL ~ TRTDOSE + I(TRTDOSE^2)
+// Quadratic dose-response
+// Note: I() is the "as-is" function to prevent ^ from being interpreted as interaction-to-depth
+```
+
+#### Categorical Variables
+
+Categorical (factor) variables are automatically coded using contrast coding:
+
+```thunderstruck
+formula: CHG ~ TRT01A
+// If TRT01A has levels: "Placebo", "25mg", "50mg", "100mg"
+// Generates 3 dummy variables (treatment coding by default)
+```
+
+Common contrast schemes:
+- **Treatment/Dummy coding**: Compare each level to reference
+- **Sum coding**: Compare each level to grand mean
+- **Helmert coding**: Compare each level to mean of subsequent levels
+- **Polynomial coding**: For ordered factors
+
+Specify contrast in model:
+```thunderstruck
+model MyModel {
+    formula: CHG ~ TRT01A + SITEGR1
+    contrasts: {
+        TRT01A: Treatment,  // Default
+        SITEGR1: Sum        // Deviation coding
+    }
+}
+```
+
+#### Transformation Functions
+
+Common transformations (exact syntax may vary by target language):
+
+```thunderstruck
+formula: log(AVAL) ~ TRTDOSE                 // Log transformation
+formula: sqrt(AVAL) ~ TRT01A                 // Square root
+formula: AVAL ~ poly(TRTDOSE, 2)             // Orthogonal polynomial (degree 2)
+formula: AVAL ~ ns(TRTDOSE, df=3)            // Natural spline
+```
+
+#### Random Effects (Mixed Models)
+
+For mixed models, random effects specified separately:
+
+```thunderstruck
+model MMRMAnalysis {
+    formula: CHG ~ TRT01A * AVISIT + BASE + SITEGR1
+    random: {
+        subject: USUBJID,
+        structure: Unstructured(AVISIT)
+    }
+}
+```
+
+This is equivalent to:
+- **Fixed effects**: `CHG ~ TRT01A * AVISIT + BASE + SITEGR1`
+- **Random effects**: Random intercept and slopes for each subject across visits
+
+#### Offset Terms
+
+For models with known offset (e.g., Poisson regression with exposure time):
+
+```thunderstruck
+formula: AE_COUNT ~ TRT01A + offset(log(EXPOSURE_DAYS))
+```
+
+#### Special Notes for Thunderstruck
+
+1. **Type Safety**: Thunderstruck validates that variables in formulas exist in the input cube/slice
+2. **Unit Checking**: Operations on variables with units are validated for compatibility
+3. **Code Generation**: Same formula generates appropriate syntax for R (`lm()`, `glm()`, `lmer()`), SAS (`PROC GLM`, `PROC MIXED`), etc.
+4. **Documentation**: Formulas are included in generated documentation with interpretation
+
+#### References
+
+- Wilkinson, G. N., & Rogers, C. E. (1973). "Symbolic Description of Factorial Models for Analysis of Variance." *Applied Statistics*, 22(3), 392-399.
+- Chambers, J. M., & Hastie, T. J. (1992). *Statistical Models in S*. Chapman & Hall.
+- R Core Team. *An Introduction to R*. Chapter 11: Statistical models in R.
+- SAS Institute. *SAS/STAT User's Guide*. MODEL statement documentation.
 
 ---
 
