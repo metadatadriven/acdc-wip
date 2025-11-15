@@ -1,2 +1,4 @@
-- git branch naming convention is dev/<username>/issue-# where <username> is the shell username, and # is the github issue number being worked on
+- git branch naming convention is: dev/username/issue-# for example dev/stuart/issue-4 or dev/claude/issue-123 (using github issue number)
 - before working on a project increment, read and understand the relevent PRD and PLAN documents
+- When working on Thunderstruck, understand LOP_PROPOSAL_CC_CUBE.md, THUNDERSTRUCK_PRD.md and THUNDERSTRUCK_PLAN.md
+- 
