@@ -56,7 +56,7 @@ thunderstruck/
 ### Deliverables
 
 #### 1.1 Project Setup
-- [ ] Initialize monorepo with npm workspaces or Lerna
+- [ ] Initialize monorepo with Lerna (follow Theia 1.66.0 monorepo setup as reference)
 - [ ] Set up TypeScript configuration
 - [ ] Configure ESLint and Prettier
 - [ ] Set up Jest for testing
@@ -94,6 +94,7 @@ thunderstruck/
 #### 1.5 Documentation
 - [ ] README with project overview
 - [ ] Getting started guide for developers
+- [ ] Documentation on how to install the VS Code extension
 - [ ] Example `.tsk` file with basic cube definition
 
 ### Testing & Validation
@@ -456,39 +457,47 @@ thunderstruck/
 - [ ] Implement ADaM standard cubes:
   - ADSL (Subject-Level Analysis Dataset)
   - BDS template (Basic Data Structure)
+  - OCCDS template (Occurrence Data Structure)
   - ADAE (Adverse Events Analysis)
   - ADTTE (Time-to-Event Analysis)
+  - ADEVENT (Event Dataset for time-to-event analysis)
+- [ ] Implement CDASH standard cubes:
+  - Common clinical data acquisition standards
+  - Map to SDTM domain structures
 - [ ] Include CDISC metadata:
   - Variable labels
   - Value level metadata
   - Controlled terminology references
 
 #### 6.2 Standard Transformations
-- [ ] Implement common transformations:
+- [ ] Implement common transformations in standard library (as `.tsk` files, not built into language):
   - `ChangeFromBaseline(cube, baseline_condition, value_var)`
   - `PercentChangeFromBaseline(...)`
   - `LOCF(cube, time_var, carry_forward_vars)`
   - `BOCF(cube, time_var, baseline_vars)`
   - `LastObservation(cube, subject_var, time_var, where_clause)`
   - `DeriveBaseline(cube, baseline_definition)`
+- [ ] Users import transformations: `from CDISC.Transformations import ChangeFromBaseline;`
 
 #### 6.3 Built-in Functions
-- [ ] Aggregation functions:
-  - `mean()`, `median()`, `stddev()`, `variance()`
-  - `count()`, `sum()`, `min()`, `max()`
-  - `quantile(p)`, `iqr()`
-- [ ] Statistical functions:
-  - `ci_lower(alpha)`, `ci_upper(alpha)`
-  - `se()` (standard error)
-  - `cv()` (coefficient of variation)
-- [ ] Date/time functions:
-  - `date_diff()`, `add_days()`, `add_months()`
-  - `year()`, `month()`, `day()`
-- [ ] String functions:
-  - `concat()`, `substring()`, `upper()`, `lower()`
+- [ ] Implement functions in standard library (as `.tsk` files, not built into language):
+  - Aggregation functions:
+    - `mean()`, `median()`, `stddev()`, `variance()`
+    - `count()`, `sum()`, `min()`, `max()`
+    - `quantile(p)`, `iqr()`
+  - Statistical functions:
+    - `ci_lower(alpha)`, `ci_upper(alpha)`
+    - `se()` (standard error)
+    - `cv()` (coefficient of variation)
+  - Date/time functions:
+    - `date_diff()`, `add_days()`, `add_months()`
+    - `year()`, `month()`, `day()`
+  - String functions:
+    - `concat()`, `substring()`, `upper()`, `lower()`
+- [ ] Users import functions: `from CDISC.Functions import mean, stddev;`
 
 #### 6.4 Comprehensive Examples
-- [ ] Create example SAPs:
+- [ ] Create example SAPs (heavily commented with full documentation strings):
   - `example-01-demographics.tsk` - Basic demographics analysis
   - `example-02-adverse-events.tsk` - AE summary tables
   - `example-03-efficacy-mmrm.tsk` - MMRM analysis
@@ -497,7 +506,8 @@ thunderstruck/
   - `example-06-subgroup-analysis.tsk` - Subgroup analyses
   - `example-07-sensitivity-analysis.tsk` - Sensitivity analyses
   - `example-08-integrated-safety.tsk` - ISS tables
-- [ ] Include detailed comments in examples
+- [ ] Ensure examples are clear and easy for new readers to understand
+- [ ] Include detailed inline comments and documentation strings throughout
 - [ ] Add README explaining each example
 
 #### 6.5 Library Documentation
@@ -579,8 +589,9 @@ thunderstruck/
 - [ ] Implement namespace mechanism
 - [ ] Support standard namespaces:
   - CDISC.Glossary
-  - SDMX.Concepts
-  - BRIDG
+  - USDM.Concepts
+  - STATO.Concepts
+  - NCI.Concepts
 - [ ] Prevent name collisions
 - [ ] Support custom namespaces
 
@@ -600,8 +611,13 @@ thunderstruck/
 
 #### 7.5 Concept Interoperability
 - [ ] Define RDF export structure for concepts
-- [ ] Link to SDMX concept vocabulary
-- [ ] Support concept import from external sources
+- [ ] Link to CDISC Biomedical Concepts library
+- [ ] Support concept import from external sources:
+  - STATO (Statistical Methods Ontology)
+  - NCI Thesaurus (National Cancer Institute)
+  - CDISC Library (CDISC standards and terminology)
+  - BioPortal (biomedical ontology repository)
+  - Other publicly available biomedical concept repositories
 
 #### 7.6 Tests
 - [ ] Test concept definitions
