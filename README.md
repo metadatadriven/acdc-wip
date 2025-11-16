@@ -1,71 +1,133 @@
 # Analysis Concepts / Derivation Concepts Work-In-Progress
 
-This repo contains work-in-progress related to CDISC Analysis/Derivation Concepts.
+This repository contains work-in-progress on **Language-Oriented Programming** approaches for CDISC Analysis/Derivation Concepts, with a focus on the **Thunderstruck DSL** for authoring Statistical Analysis Plans (SAPs) in clinical trials.
 
-## Statistical Data and Metadata eXchange (SDMX)
+---
 
-The following files contain SAP extracts which are modelled using SDMX. The examples are taken from the [CDSIC ADaM Examples](./docs/adam_examples_final.pdf) document.
+## Language-Oriented Programming Approach
 
-See the [SDMX Information Model](./docs/SDMX_2-1_SECTION_2_InformationModel_2020-07.pdf) version 2.1 documentation for detailed reference of the model.
+This project explores using **domain-specific languages (DSLs)** and **formal language design** to capture Statistical Analysis Plans as typed, executable specifications. Three alternative approaches have been considered:
 
-### Examples
+### 1. Concept-Centric Approach
+**Document:** [LOP-PROPOSAL-CC.md](LOP-PROPOSAL-CC.md)
 
-- [Example 6](./examples/ex06-multivariate.md) Multivariate Analysis of Variance (Mood)
+A comprehensive language design treating **concepts as first-class types**:
+- **BiomedicalConcept**: Clinical/biological meaning (e.g., ADAS-Cog Total Score)
+- **AnalysisConcept**: Analysis-space quantities (e.g., Change from Baseline)
+- **DerivationConcept**: Computable transformations (e.g., LOCF Imputation)
 
-## How to create an SDMX model
+Built on **Langium** with strong typing, functional paradigm, and multi-target code generation (R, SAS, Python). Emphasizes type safety, immutability, pure functions, and composability.
 
-The following checklist can be used to simplify the process of creating an SDMX model from source documentation (e.g. SAP and Shells).
+### 2. W3C Data Cube-Centric Approach
+**Document:** [LOP_PROPOSAL_CC_CUBE.md](LOP_PROPOSAL_CC_CUBE.md)
 
-### Step 1 - define information model basics
+Makes the **W3C Data Cube standard the primary organizing principle**:
+- All data structures are cubes (SDTM, ADaM, Results)
+- Operations are typed cube transformations
+- Native RDF representation for interoperability
+- Automatic validation via W3C integrity constraints (IC-1 through IC-21)
 
-This step defines the foundational elements that the data structure builds on (step 2)
+Provides semantic precision, provenance tracking, SPARQL queryability, and seamless integration with CDISC standards.
 
-- [ ] Identify Concepts - these are all "abstract units of knowledge". Each Conceptwill have a codelist or format associated with it - see next steps
-- [ ] Identify Codelists. These can be enumerations defined in the source document, numeric ranges, references to external codelists, ontologies, etc.
-- [ ] Identify data formats.
+### 3. Streamlined DSL Approach
+**Document:** [LOP-PROPOSAL-GPT5.md](LOP-PROPOSAL-GPT5.md)
 
-### Step 2 - define the data structure
+A more compact DSL specification with:
+- Clean separation of concerns (concepts, cubes, derivations, analyses, displays)
+- Functional pipelines using `|>` operator
+- Module system for reusability
+- Emphasis on pragmatic syntax for statistician authoring
 
-The data structure defines the 'cube' structure that allows the data to be navigated independently of the contents.
+### Comparison of Approaches
 
-- [ ] Dimensions
-- [ ] Measures
-- [ ] Values
+| Aspect | Concept-Centric | Cube-Centric | Streamlined |
+|--------|-----------------|--------------|-------------|
+| **Primary Focus** | Type hierarchy | Data structure | Pragmatic syntax |
+| **Standard Basis** | Custom concepts | W3C Data Cube | Hybrid |
+| **Best For** | Clinicians/statisticians | Data engineers | Quick authoring |
+| **Strength** | Rich type system | Interoperability | Simplicity |
 
-## SDMX tools
+**Recommended Strategy:** Combine approaches with **concept-centric authoring** that compiles to **cube-centric intermediate representation** for tooling and export.
 
-### .stat suite data explorer
+Thunderstruck is an implementation of the **cube-centric intermediate representation**. An implementation of **concept-centric authoring** will be condidered later in this project and is OUT OF SCOPE currently.
 
-This is a web-based SDMX data explorer. It is part of a wider [suite of open-source SDMX tools](https://siscc.org/stat-suite/) maintained by .Stat project.
+---
 
-*TLDR;* The app runs ok but doesnt have any data out the box! Maybe need full suite of tools?
+## Thunderstruck: Analysis Concepts / Derivation Concept Specification Language
 
-Notes:
-- Clone [gitlab repo](https://gitlab.com/sis-cc/.stat-suite/dotstatsuite-data-explorer)
-- build following `yarn` commands described in README
-- Access using `http://localhost:7000/?tenant=oecd` (default tenant didnt work for me!)
+**Thunderstruck** is a domain-specific language for authoring Statistical Analysis Plans using the W3C Data Cube standard. It enables statisticians to:
 
-### CubeViz.js 
+- Define analyses as **typed cube operations** with automatic validation
+- Generate multi-format outputs (R, SAS, Python code; RDF/Turtle metadata)
+- Ensure traceability from Protocol → Estimand → Endpoint → Data → Results
+- Leverage W3C standards for semantic interoperability
 
-According to the [README](https://github.com/AKSW/cubevizjs) "CubeViz is generating a faceted browsing widget that can be used to filter interactively observations to be visualized in charts."
+### Project Status
 
-There is an [example application here](https://smartdataua.github.io/rdfdatacube/) with links to [SDMX data in RDF format](https://raw.githubusercontent.com/hibernator11/datacuberdf/master/rdf-02-2017.n3).
+**Current Phase:** Increment 1 - Basic Language Foundation + VS Code Authoring (Complete ✅)
 
-Notes:
-- clone [github repo](https://github.com/AKSW/cubevizjs#)
-- THIS IS A VERY OLD PROJECT
-- Roll back to node v8 using `nvm install 8` and `nvm use 8`
-- Install with `npm install`
-- run with `npm start`
-- access demo at [http://localhost:8080/](http://localhost:8080/)
+**Key Deliverables:**
+- Langium-based grammar for core constructs (cubes, dimensions, measures)
+- VS Code extension with syntax highlighting
+- Type system and validation infrastructure
+- Example `.tsk` files demonstrating syntax
 
-## References
+### Quick Links
 
-- PHUSE [RDF Data Cube Structure](https://phuse.s3.eu-central-1.amazonaws.com/Deliverables/Emerging+Trends+%26+Technologies/Clinical+Research+and+Development+RDF+Data+Cube+Structure+Technical+Guidance.pdf), PhUSE CS Semantic Technology Working Group
-- Article on [mapping SDMX (xml) to RDF](https://csarven.ca/linked-sdmx-data)
-- [BioPortal](https://www.bioontology.org/) comprehensive repository of biomedical ontologies
-- w3c article on [Use Cases and Lessons for the Data Cube Vocabulary](https://www.w3.org/TR/vocab-data-cube-use-cases/)
+- **Full Documentation:** [README.thunderstruck.md](README.thunderstruck.md)
+- **Product Requirements:** [THUNDERSTRUCK_PRD.md](THUNDERSTRUCK_PRD.md)
+- **Implementation Plan:** [THUNDERSTRUCK_PLAN.md](THUNDERSTRUCK_PLAN.md)
+- **W3C Data Cube Primer:** [W3C_CUBE_PRIMER.md](W3C_CUBE_PRIMER.md)
 
-## Training
-- [SDMX Vocabilary for Beginners](https://academy.siscc.org/courses/sdmx-vocabulary-for-beginners/)
+### Example Syntax
+
+```thunderstruck
+cube ADADAS {
+    namespace: "http://example.org/study/xyz#"
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            AVISITN: Integer,
+            TRT01A: CodedValue
+        ],
+        measures: [
+            AVAL: Numeric unit: "points",
+            CHG: Numeric unit: "points"
+        ],
+        attributes: [
+            EFFFL: Flag,
+            PARAMCD: CodedValue
+        ]
+    }
+}
+```
+
+See [examples/](examples/) directory for complete analysis specifications.
+
+---
+
+## Repository Structure
+
+```
+acdc-wip/
+├── packages/
+│   ├── thunderstruck-language/    # Langium language definition
+│   └── thunderstruck-vscode/      # VS Code extension
+├── examples/                       # Example .tsk files
+├── docs/                           # Supporting documentation
+├── LOP-PROPOSAL-CC.md             # Concept-centric approach
+├── LOP_PROPOSAL_CC_CUBE.md        # Cube-centric approach
+├── LOP-PROPOSAL-GPT5.md           # Streamlined DSL approach
+├── THUNDERSTRUCK_PRD.md           # Product requirements
+├── THUNDERSTRUCK_PLAN.md          # Implementation plan
+└── README.thunderstruck.md        # Full Thunderstruck documentation
+```
+
+## Contributing
+
+This project is in early development. See [THUNDERSTRUCK_PLAN.md](THUNDERSTRUCK_PLAN.md) for the implementation roadmap and current status.
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details
 

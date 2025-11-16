@@ -1,0 +1,63 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Thunderstruck",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#keywords" },
+    { "include": "#types" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#operators" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.thunderstruck",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.thunderstruck",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.thunderstruck",
+          "match": "\\b(cube|slice|model|transform|aggregate|display|pipeline|concept|import|as|from|namespace|structure|dimensions|measures|attributes|input|output|formula|family|link|vary|fix|unit)\\b"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "name": "support.type.primitive.thunderstruck",
+          "match": "\\b(Numeric|Integer|Text|DateTime|Date|Flag|Identifier|CodedValue)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "name": "string.quoted.double.thunderstruck",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "constant.character.escape.thunderstruck",
+          "match": "\\\\."
+        }
+      ]
+    },
+    "numbers": {
+      "name": "constant.numeric.thunderstruck",
+      "match": "\\b\\d+(\\.\\d+)?\\b"
+    },
+    "operators": {
+      "name": "keyword.operator.thunderstruck",
+      "match": "[:=\\[\\]{}(),;]"
+    }
+  },
+  "scopeName": "source.thunderstruck"
+}

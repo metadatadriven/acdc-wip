@@ -1,0 +1,51 @@
+{
+  "name": "thunderstruck",
+  "version": "1.0.0",
+  "description": "Thunderstruck DSL for authoring Statistical Analysis Plans in clinical trials",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "lerna run build",
+    "test": "lerna run test",
+    "clean": "lerna run clean && lerna clean -y"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/metadatadriven/acdc-wip.git"
+  },
+  "keywords": [
+    "clinical-trials",
+    "statistical-analysis",
+    "CDISC",
+    "W3C",
+    "data-cube",
+    "DSL",
+    "langium"
+  ],
+  "author": "Statistical Computing & Data Science Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/metadatadriven/acdc-wip/issues"
+  },
+  "homepage": "https://github.com/metadatadriven/acdc-wip#readme",
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.10.1",
+    "@typescript-eslint/eslint-plugin": "^8.46.4",
+    "@typescript-eslint/parser": "^8.46.4",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "jest": "^30.2.0",
+    "lerna": "^9.0.1",
+    "prettier": "^3.6.2",
+    "ts-jest": "^29.4.5",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

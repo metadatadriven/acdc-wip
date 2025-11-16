@@ -1,0 +1,10 @@
+{
+  "projectName": "Thunderstruck",
+  "languages": [{
+    "id": "thunderstruck",
+    "grammar": "src/grammar/thunderstruck.langium",
+    "fileExtensions": [".tsk", ".thunderstruck"]
+  }],
+  "out": "src/generated",
+  "mode": "production"
+}
