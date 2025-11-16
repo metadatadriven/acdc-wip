@@ -40,15 +40,13 @@
     ]
   },
   "scripts": {
-    "build": "tsc -b tsconfig.json && node ./scripts/copy-grammar.js",
+    "build": "tsc -b tsconfig.json",
     "watch": "tsc -b tsconfig.json --watch",
     "clean": "rm -rf out",
     "vscode:prepublish": "npm run build",
-    "package": "vsce package"
+    "package": "vsce package --no-dependencies"
   },
   "dependencies": {
-    "vscode-languageclient": "^9.0.1",
-    "thunderstruck-language": "^0.1.0"
   },
   "devDependencies": {
     "@types/vscode": "^1.80.0",
@@ -56,5 +54,10 @@
     "esbuild": "^0.24.2"
   },
   "author": "Statistical Computing & Data Science Team",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/metadatadriven/acdc-wip.git",
+    "directory": "packages/thunderstruck-vscode"
+  }
 }
