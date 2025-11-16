@@ -1,0 +1,246 @@
+// Example 6: Multivariate Analysis of Variance (MANOVA)
+// Based on ADaM Examples page 34 - Profile of Mood States (POMS) Analysis
+//
+// This example demonstrates:
+// - Analysis dataset with multiple subscale scores
+// - Multivariate analysis testing overall treatment effect
+// - Structured representation of POMS assessment instrument
+// - Change from baseline calculations for mood subscales
+
+// Import standard CDISC definitions (future functionality)
+// import CDISC.ADaM.ADSL;
+// import CDISC.CT.Visit;
+// import CDISC.CT.Treatment;
+
+/*
+ * ADMOOD: Analysis Dataset for Mood Assessment
+ *
+ * Contains Profile of Mood States (POMS) subscale scores and total mood
+ * disturbance score. The POMS instrument consists of 65 items rated on a
+ * 5-point Likert scale (0=Not at all, 1=A little, 2=Moderately,
+ * 3=Quite a bit, 4=Extremely).
+ *
+ * Six subscales:
+ * - Tension-Anxiety (9 items, range 0-36)
+ * - Depression (15 items, range 0-60)
+ * - Anger-Hostility (12 items, range 0-48)
+ * - Vigor-Activity (8 items, range 0-32)
+ * - Fatigue (7 items, range 0-28)
+ * - Confusion-Bewilderment (7 items, range 0-28)
+ *
+ * Total Mood Disturbance Score (range 0-200):
+ *   = Tension + Depression + Anger + Fatigue + Confusion - Vigor
+ */
+cube ADMOOD "Profile of Mood States Analysis Dataset" {
+    namespace: "http://example.org/study/poms#",
+
+    structure: {
+        // Dimensions - identify the observations
+        dimensions: [
+            // Subject identifier
+            USUBJID: Identifier,
+
+            // Visit identifier
+            AVISITN: Integer,
+            AVISIT: Text,
+
+            // Assessment parameter code
+            // Values: TENSION, DEPRESS, ANGER, VIGOR, FATIGUE, CONFUSE, TOTMOOD
+            PARAMCD: CodedValue,
+
+            // Assessment parameter description
+            PARAM: Text,
+
+            // Treatment assignment
+            TRT01A: CodedValue,
+            TRT01AN: Integer
+        ],
+
+        // Measures - observed or computed values
+        measures: [
+            // Analysis value (subscale or total score)
+            AVAL: Integer unit: "points",
+
+            // Baseline value
+            BASE: Integer unit: "points",
+
+            // Change from baseline
+            CHG: Integer unit: "points"
+        ],
+
+        // Attributes - metadata about observations
+        attributes: [
+            // Analysis flag - Intent-to-Treat population
+            ITTFL: Flag,
+
+            // Analysis visit flag
+            ANL01FL: Flag,
+
+            // Parameter category
+            // Values: "SUBSCALE" or "TOTAL"
+            PARCAT1: Text,
+
+            // Assessment form name
+            QSCAT: Text
+        ]
+    }
+}
+
+/*
+ * Week 6 ITT Population Slice
+ *
+ * Subset of ADMOOD for the primary analysis:
+ * - Week 6 visit only
+ * - Intent-to-Treat population
+ * - All six subscales plus total mood disturbance score
+ */
+cube Week6_ITT_POMS "Week 6 ITT POMS Scores" {
+    namespace: "http://example.org/study/poms#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            PARAMCD: CodedValue,
+            PARAM: Text,
+            TRT01A: CodedValue
+        ],
+
+        measures: [
+            // Baseline score
+            BASE: Integer unit: "points",
+
+            // Week 6 score
+            AVAL: Integer unit: "points",
+
+            // Change from baseline to Week 6
+            CHG: Integer unit: "points"
+        ],
+
+        attributes: [
+            // Subscale category for grouping
+            PARCAT1: Text,
+
+            // Sample size for treatment group
+            N: Integer
+        ]
+    }
+}
+
+/*
+ * MANOVA Results Cube
+ *
+ * Contains the results of the Multivariate Analysis of Variance testing
+ * the hypothesis of no overall treatment effect at Week 6.
+ *
+ * Statistical Model:
+ *   Subscale Scores ~ Treatment
+ *
+ * Method: Mixed Model Repeated Measures (MMRM)
+ * Test: Wilks' Lambda for overall treatment effect
+ */
+cube MANOVA_Results "Multivariate Analysis Results - Week 6" {
+    namespace: "http://example.org/study/poms/results#",
+
+    structure: {
+        dimensions: [
+            // Statistical parameter being estimated
+            // Values:
+            //   - "TENSION_EFFECT" (Tension-Anxiety effect estimate)
+            //   - "DEPRESS_EFFECT" (Depression effect estimate)
+            //   - "ANGER_EFFECT" (Anger-Hostility effect estimate)
+            //   - "VIGOR_EFFECT" (Vigor-Activity effect estimate)
+            //   - "FATIGUE_EFFECT" (Fatigue effect estimate)
+            //   - "CONFUSE_EFFECT" (Confusion effect estimate)
+            //   - "WILKS_LAMBDA" (Overall test statistic)
+            //   - "PVALUE" (Overall test p-value)
+            Parameter: Text,
+
+            // Treatment group
+            Treatment: CodedValue
+        ],
+
+        measures: [
+            // Effect estimate (mean change from baseline)
+            Estimate: Numeric,
+
+            // Standard error of estimate
+            StdError: Numeric,
+
+            // Test statistic value
+            TestStatistic: Numeric,
+
+            // P-value
+            PValue: Numeric
+        ],
+
+        attributes: [
+            // Analysis method description
+            AnalysisMethod: Text,
+
+            // Statistical test type
+            TestType: Text,
+
+            // Population analyzed
+            Population: Text
+        ]
+    }
+}
+
+/*
+ * Display Specification: Table 2.6.3.1
+ *
+ * Multivariate Analysis of Variance Testing the Hypothesis of
+ * No Overall Treatment Effect at Week 6 (ITT Population)
+ *
+ * Table Structure:
+ * - Rows: Six mood subscales + overall test results
+ * - Columns: Placebo and Drug ZZZ groups
+ * - Values: Effect Estimate (SE) format
+ *
+ * Footnotes:
+ * [1] Mixed Model Repeated Measures Analysis
+ * [2] Wilks' Lambda multivariate test with six subscales as dependent
+ *     variables and treatment as independent variable
+ */
+cube Table_2_6_3_1 "MANOVA Summary Table - Week 6" {
+    namespace: "http://example.org/study/poms/displays#",
+
+    structure: {
+        dimensions: [
+            // Row identifier (subscale name)
+            RowLabel: Text,
+
+            // Treatment group column
+            TreatmentGroup: CodedValue
+        ],
+
+        measures: [
+            // Effect estimate for display
+            EffectEstimate: Numeric,
+
+            // Standard error for display
+            StandardError: Numeric,
+
+            // Sample size
+            N: Integer
+        ],
+
+        attributes: [
+            // Display order for rows
+            DisplayOrder: Integer,
+
+            // Row type: "SUBSCALE" or "TEST_RESULT"
+            RowType: Text,
+
+            // Formatting specification
+            DecimalPlaces: Integer
+        ]
+    }
+}
+
+// TODO: In Increment 2+, add:
+// - Slice definitions (fixing Week 6 and ITT population)
+// - Transform definitions (change from baseline calculation)
+// - Model definition (MMRM with subscales as dependent variables)
+// - Display formatting specifications
+// - Statistical test specifications (Wilks' Lambda)
