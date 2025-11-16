@@ -1,6 +1,6 @@
 import { EmptyFileSystem } from 'langium';
 import { parseDocument } from 'langium/test';
-import { createThunderstruckServices } from '../thunderstruck-module.js';
+import { createThunderstruckServices } from '../thunderstruck-module';
 
 const services = createThunderstruckServices({ ...EmptyFileSystem }).thunderstruck;
 
@@ -195,6 +195,456 @@ describe('Thunderstruck Parser Tests', () => {
               RACE: CodedValue<CDISC.CT.RACE>
             ]
           }
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+  });
+
+  describe('Expression Language', () => {
+    it('should parse arithmetic expressions', async () => {
+      const text = `
+        transform Test {
+          input: ADADAS,
+          output: Result,
+          transformations: [
+            CHG = AVAL - BASE,
+            PCHG = (AVAL - BASE) / BASE * 100
+          ]
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+
+    it('should parse comparison expressions', async () => {
+      const text = `
+        transform Test {
+          input: ADADAS,
+          output: Result,
+          transformations: [
+            FLAG1 = AVAL > BASE,
+            FLAG2 = CHG >= 10,
+            FLAG3 = PARAM == "ACTOT11"
+          ]
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+
+    it('should parse logical expressions', async () => {
+      const text = `
+        transform Test {
+          input: ADADAS,
+          output: Result,
+          transformations: [
+            FLAG = EFFFL == "Y" and ITTFL == "Y",
+            COND = CHG > 0 or BASE < 50
+          ]
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+
+    it('should parse function calls', async () => {
+      const text = `
+        transform Test {
+          input: ADADAS,
+          output: Result,
+          transformations: [
+            LOGVAL = log(AVAL),
+            SQRTVAL = sqrt(BASE)
+          ]
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+  });
+
+  describe('Concept Definitions', () => {
+    it('should parse basic concept definition', async () => {
+      const text = `
+        concept SystolicBP "Systolic Blood Pressure" {
+          type: BiomedicalConcept,
+          category: VitalSign,
+          definition: "Maximum blood pressure during contraction of the ventricles",
+          unit: "mmHg"
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+
+    it('should parse concept with code list mappings', async () => {
+      const text = `
+        concept SystolicBP {
+          type: BiomedicalConcept,
+          codeLists: [
+            CDISC.CT.VSTESTCD: "SYSBP",
+            LOINC: "8480-6",
+            SNOMED: "271649006"
+          ]
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+  });
+
+  describe('Slice Definitions', () => {
+    it('should parse slice with fixed and varying dimensions', async () => {
+      const text = `
+        cube ADADAS {
+          namespace: "http://example.org#",
+          structure: {
+            dimensions: [USUBJID: Identifier, AVISIT: Text, TRT01A: CodedValue],
+            measures: [CHG: Numeric, AVAL: Numeric]
+          }
+        }
+
+        slice Week24Efficacy from ADADAS {
+          fix: {
+            AVISIT: "Week 24",
+            EFFFL: "Y"
+          },
+          vary: [USUBJID, TRT01A],
+          measures: [CHG]
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+
+    it('should parse slice with where clause', async () => {
+      const text = `
+        cube ADADAS {
+          namespace: "http://example.org#",
+          structure: {
+            dimensions: [USUBJID: Identifier],
+            measures: [CHG: Numeric]
+          }
+        }
+
+        slice Efficacy from ADADAS {
+          vary: [USUBJID],
+          where: CHG > 0 and EFFFL == "Y"
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+  });
+
+  describe('Transform Definitions', () => {
+    it('should parse transform with transformations', async () => {
+      const text = `
+        cube Input {
+          namespace: "http://example.org#",
+          structure: {
+            dimensions: [ID: Identifier],
+            measures: [VAL: Numeric, BASE: Numeric]
+          }
+        }
+
+        cube Output {
+          namespace: "http://example.org#",
+          structure: {
+            dimensions: [ID: Identifier],
+            measures: [CHG: Numeric]
+          }
+        }
+
+        transform ChangeFromBaseline {
+          input: Input,
+          output: Output,
+          transformations: [
+            CHG = VAL - BASE
+          ]
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+  });
+
+  describe('Model Definitions', () => {
+    it('should parse model with Wilkinson formula', async () => {
+      const text = `
+        cube ADADAS {
+          namespace: "http://example.org#",
+          structure: {
+            dimensions: [USUBJID: Identifier],
+            measures: [CHG: Numeric]
+          }
+        }
+
+        slice Week24 from ADADAS {
+          vary: [USUBJID]
+        }
+
+        model DoseResponse {
+          input: Week24,
+          formula: CHG ~ TRTDOSE + SITEGR1 + BASE,
+          family: Gaussian,
+          link: Identity
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+
+    it('should parse model with interaction terms', async () => {
+      const text = `
+        cube Test {
+          namespace: "http://example.org#",
+          structure: {
+            dimensions: [ID: Identifier],
+            measures: [Y: Numeric]
+          }
+        }
+
+        slice TestSlice from Test {
+          vary: [ID]
+        }
+
+        model Interaction {
+          input: TestSlice,
+          formula: Y ~ TRT * AVISIT + BASE
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+
+    it('should parse model with random effects', async () => {
+      const text = `
+        cube Test {
+          namespace: "http://example.org#",
+          structure: {
+            dimensions: [ID: Identifier],
+            measures: [Y: Numeric]
+          }
+        }
+
+        slice TestSlice from Test {
+          vary: [ID]
+        }
+
+        model MMRM {
+          input: TestSlice,
+          formula: CHG ~ TRT * AVISIT + BASE,
+          random: {
+            subject: USUBJID,
+            structure: Unstructured(AVISIT)
+          }
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+  });
+
+  describe('Aggregate Definitions', () => {
+    it('should parse aggregate with statistics', async () => {
+      const text = `
+        cube Test {
+          namespace: "http://example.org#",
+          structure: {
+            dimensions: [TRT: CodedValue, VISIT: Text],
+            measures: [CHG: Numeric]
+          }
+        }
+
+        slice TestSlice from Test {
+          vary: [TRT, VISIT]
+        }
+
+        aggregate Summary {
+          input: TestSlice,
+          groupBy: [TRT, VISIT],
+          statistics: [
+            N = count(CHG),
+            MEAN = mean(CHG),
+            SD = stddev(CHG)
+          ]
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+  });
+
+  describe('Display Definitions', () => {
+    it('should parse table display', async () => {
+      const text = `
+        cube Results {
+          namespace: "http://example.org#",
+          structure: {
+            dimensions: [Parameter: Text],
+            measures: [Estimate: Numeric, PValue: Numeric]
+          }
+        }
+
+        display table "Table 14.3.01" "Efficacy Results" {
+          source: Results,
+          rows: [Parameter],
+          columns: [Estimate, PValue],
+          footnotes: ["Population: ITT", "Model: ANCOVA"]
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+
+    it('should parse figure display', async () => {
+      const text = `
+        cube Data {
+          namespace: "http://example.org#",
+          structure: {
+            dimensions: [TIME: Numeric, TRT: CodedValue],
+            measures: [MEAN: Numeric]
+          }
+        }
+
+        display figure "Figure 1" {
+          source: Data,
+          xAxis: TIME,
+          yAxis: MEAN,
+          groupBy: TRT
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+  });
+
+  describe('Pipeline Definitions', () => {
+    it('should parse pipeline with stages', async () => {
+      const text = `
+        pipeline AnalysisPipeline {
+          stages: [
+            LoadData: LoadDataTransform,
+            Analyze: AnalysisModel depends on [LoadData],
+            Summarize: SummaryAggregate depends on [Analyze]
+          ]
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+  });
+
+  describe('Complex Wilkinson Formulas', () => {
+    it('should parse formula with nesting', async () => {
+      const text = `
+        cube Test {
+          namespace: "http://example.org#",
+          structure: {
+            dimensions: [ID: Identifier],
+            measures: [Y: Numeric]
+          }
+        }
+
+        slice TestSlice from Test {
+          vary: [ID]
+        }
+
+        model Nested {
+          input: TestSlice,
+          formula: Y ~ TRT / SITE
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+
+    it('should parse formula with power', async () => {
+      const text = `
+        cube Test {
+          namespace: "http://example.org#",
+          structure: {
+            dimensions: [ID: Identifier],
+            measures: [Y: Numeric]
+          }
+        }
+
+        slice TestSlice from Test {
+          vary: [ID]
+        }
+
+        model Power {
+          input: TestSlice,
+          formula: Y ~ (A + B + C)^2
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+
+    it('should parse formula with functions', async () => {
+      const text = `
+        cube Test {
+          namespace: "http://example.org#",
+          structure: {
+            dimensions: [ID: Identifier],
+            measures: [Y: Numeric]
+          }
+        }
+
+        slice TestSlice from Test {
+          vary: [ID]
+        }
+
+        model WithFunctions {
+          input: TestSlice,
+          formula: log(Y) ~ poly(DOSE, 2) + ns(TIME, 3)
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+
+    it('should parse formula without intercept', async () => {
+      const text = `
+        cube Test {
+          namespace: "http://example.org#",
+          structure: {
+            dimensions: [ID: Identifier],
+            measures: [Y: Numeric]
+          }
+        }
+
+        slice TestSlice from Test {
+          vary: [ID]
+        }
+
+        model NoIntercept {
+          input: TestSlice,
+          formula: Y ~ 0 + TRT
         }
       `;
 
