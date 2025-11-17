@@ -1,0 +1,280 @@
+// Example: Concept Definitions
+// This example demonstrates how to define biomedical concepts with
+// standardized terminology mappings and metadata
+
+/*
+ * Concept 1: Simple Biomedical Concept
+ *
+ * A vital sign measurement with basic metadata.
+ */
+concept SystolicBloodPressure "Systolic Blood Pressure" {
+    type: BiomedicalConcept,
+    category: VitalSign,
+    definition: "The maximum arterial pressure during contraction of the left ventricle of the heart",
+    unit: "mmHg"
+}
+
+/*
+ * Concept 2: Concept with Code List Mappings
+ *
+ * A vital sign with mappings to multiple standard terminologies
+ * (CDISC, LOINC, SNOMED CT).
+ */
+concept DiastolicBloodPressure {
+    type: BiomedicalConcept,
+    category: VitalSign,
+    definition: "The minimum arterial pressure during relaxation and dilatation of the ventricles",
+    unit: "mmHg",
+    codeLists: [
+        CDISC.CT.VSTESTCD: "DIABP",
+        LOINC: "8462-4",
+        SNOMED: "271650006"
+    ]
+}
+
+/*
+ * Concept 3: Laboratory Test
+ *
+ * A clinical chemistry test with multiple code system mappings.
+ */
+concept HemoglobinA1c {
+    type: BiomedicalConcept,
+    category: LaboratoryTest,
+    definition: "Glycated hemoglobin test measuring average blood glucose over 2-3 months",
+    unit: "%",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "HBA1C",
+        LOINC: "4548-4",
+        SNOMED: "43396009",
+        UCUM: "%{Hemoglobin}"
+    ]
+}
+
+/*
+ * Concept 4: Cognitive Assessment Score
+ *
+ * A clinical outcome assessment instrument score.
+ */
+concept ADASCog11 "ADAS-Cog 11-item Total Score" {
+    type: BiomedicalConcept,
+    category: ClinicalOutcomeAssessment,
+    definition: "Alzheimer's Disease Assessment Scale - Cognitive Subscale, 11-item version. Measures cognitive function across multiple domains including memory, language, and praxis. Total score ranges from 0 to 70, with higher scores indicating greater impairment.",
+    unit: "points",
+    codeLists: [
+        CDISC.CT.QSTESTCD: "ACTOT11",
+        CDISC.CDASH: "ADAS-COG"
+    ]
+}
+
+/*
+ * Concept 5: Adverse Event Preferred Term
+ *
+ * An adverse event term from MedDRA hierarchy.
+ */
+concept Headache {
+    type: BiomedicalConcept,
+    category: AdverseEvent,
+    definition: "Pain or discomfort in the head, scalp, or neck",
+    codeLists: [
+        MedDRA.PT: "10019211",
+        SNOMED: "25064002",
+        ICD10: "R51"
+    ]
+}
+
+/*
+ * Concept 6: Treatment Concept
+ *
+ * An intervention or treatment in the study.
+ */
+concept StudyDrug {
+    type: BiomedicalConcept,
+    category: Treatment,
+    definition: "Experimental compound XYZ-123, a selective inhibitor targeting beta-amyloid aggregation",
+    codeLists: [
+        CDISC.CT.TRT01A: "XYZ-123",
+        WHO.ATC: "N06DX04",
+        RxNorm: "9999999"
+    ]
+}
+
+/*
+ * Concept 7: Derived Concept
+ *
+ * A calculated or derived clinical parameter.
+ */
+concept ChangeFromBaseline "Change from Baseline in ADAS-Cog" {
+    type: DerivationConcept,
+    category: DerivedParameter,
+    definition: "Change in ADAS-Cog total score from baseline to post-baseline visit, calculated as post-baseline value minus baseline value. Negative values indicate improvement.",
+    unit: "points"
+}
+
+/*
+ * Concept 8: Analysis Concept
+ *
+ * A statistical analysis parameter or result.
+ */
+concept LeastSquaresMean "Least Squares Mean" {
+    type: AnalysisConcept,
+    category: StatisticalParameter,
+    definition: "Adjusted mean estimate from linear model accounting for covariates and design factors. Also known as estimated marginal mean or adjusted mean."
+}
+
+/*
+ * Concept 9: Body Mass Index
+ *
+ * A calculated vital sign parameter.
+ */
+concept BMI "Body Mass Index" {
+    type: DerivationConcept,
+    category: VitalSign,
+    definition: "Body mass index, calculated as weight (kg) divided by height squared (m²). Used to classify weight status.",
+    unit: "kg/m²",
+    codeLists: [
+        CDISC.CT.VSTESTCD: "BMI",
+        LOINC: "39156-5",
+        SNOMED: "60621009"
+    ]
+}
+
+/*
+ * Concept 10: Responder Status
+ *
+ * A binary classification based on clinical response criteria.
+ */
+concept ClinicalResponder "Clinical Responder (≥4 point improvement)" {
+    type: DerivationConcept,
+    category: ResponseClassification,
+    definition: "Subject classified as clinical responder if ADAS-Cog total score decreased by 4 or more points from baseline, indicating clinically meaningful improvement in cognitive function"
+}
+
+/*
+ * Concept 11: Laboratory Normal Range
+ *
+ * Reference range for laboratory parameters.
+ */
+concept NormalRange "Laboratory Normal Range" {
+    type: BiomedicalConcept,
+    category: ReferenceRange,
+    definition: "Expected range of values for healthy individuals, used to identify abnormal laboratory results"
+}
+
+/*
+ * Concept 12: Visit Concept
+ *
+ * A study visit or timepoint.
+ */
+concept Week24Visit "Week 24 Visit" {
+    type: BiomedicalConcept,
+    category: StudyEvent,
+    definition: "Scheduled study visit occurring 24 weeks (168 days) after randomization. Primary efficacy endpoint assessment timepoint.",
+    codeLists: [
+        CDISC.CT.VISIT: "WEEK 24",
+        CDISC.SDTM.VISITNUM: "12"
+    ]
+}
+
+/*
+ * Concept 13: Population Concept
+ *
+ * Analysis population definition.
+ */
+concept IntentToTreat "Intent-to-Treat Population" {
+    type: AnalysisConcept,
+    category: AnalysisPopulation,
+    definition: "All randomized subjects who received at least one dose of study treatment, analyzed according to treatment assignment at randomization regardless of treatment actually received"
+}
+
+/*
+ * Concept 14: Efficacy Endpoint
+ *
+ * Primary efficacy outcome measure.
+ */
+concept PrimaryEfficacyEndpoint {
+    type: AnalysisConcept,
+    category: EfficacyEndpoint,
+    definition: "Change from baseline to Week 24 in ADAS-Cog 11-item total score, analyzed using ANCOVA with treatment as factor and baseline score as covariate"
+}
+
+/*
+ * Concept 15: Safety Parameter
+ *
+ * Treatment-emergent adverse event classification.
+ */
+concept TreatmentEmergentAE "Treatment-Emergent Adverse Event" {
+    type: DerivationConcept,
+    category: SafetyParameter,
+    definition: "Adverse event with onset date on or after first dose of study treatment and no later than 30 days after last dose",
+    codeLists: [
+        CDISC.CT.AETERM: "TREATMENT EMERGENT"
+    ]
+}
+
+/*
+ * Concept 16: Dose Level
+ *
+ * Study drug dose level.
+ */
+concept LowDose "Low Dose (10 mg)" {
+    type: BiomedicalConcept,
+    category: DoseLevel,
+    definition: "Low dose level of study drug XYZ-123, administered as 10 mg once daily",
+    unit: "mg",
+    codeLists: [
+        CDISC.CT.TRT01A: "XYZ-123 10 mg"
+    ]
+}
+
+/*
+ * Concept 17: Protocol Deviation
+ *
+ * Important protocol deviation category.
+ */
+concept MajorProtocolDeviation {
+    type: BiomedicalConcept,
+    category: ProtocolDeviation,
+    definition: "Protocol deviation that may significantly impact subject safety, data integrity, or ability to draw conclusions from the study"
+}
+
+/*
+ * Concept 18: Concomitant Medication Class
+ *
+ * Medication class for background therapy.
+ */
+concept AcetylcholinesteraseInhibitor "Acetylcholinesterase Inhibitor" {
+    type: BiomedicalConcept,
+    category: MedicationClass,
+    definition: "Class of medications that inhibit acetylcholinesterase enzyme, used as standard background therapy for Alzheimer's disease",
+    codeLists: [
+        WHO.ATC: "N06DA",
+        MedDRA.HLT: "10000450"
+    ]
+}
+
+/*
+ * Concept 19: Biomarker
+ *
+ * Biological marker measured in study.
+ */
+concept PlasmaAmyloidBeta42 "Plasma Amyloid-Beta 1-42" {
+    type: BiomedicalConcept,
+    category: Biomarker,
+    definition: "Concentration of amyloid-beta peptide (42 amino acids) in plasma, a biomarker associated with Alzheimer's disease pathology",
+    unit: "pg/mL",
+    codeLists: [
+        LOINC: "55395-6",
+        SNOMED: "426155006"
+    ]
+}
+
+/*
+ * Concept 20: Study Phase
+ *
+ * Clinical trial phase designation.
+ */
+concept DoubleBlindTreatment "Double-Blind Treatment Phase" {
+    type: BiomedicalConcept,
+    category: StudyPhase,
+    definition: "Study period during which subjects and investigators are blinded to treatment assignment, lasting 24 weeks from randomization"
+}

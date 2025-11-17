@@ -1,0 +1,314 @@
+// Example: Statistical Model Definitions
+// This example demonstrates different types of statistical models using
+// Wilkinson formula notation for specifying model structure
+
+// Define the analysis dataset
+cube ADADAS "ADAS-Cog Analysis Dataset" {
+    namespace: "http://example.org/study/cognitive#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            AVISITN: Integer,
+            AVISIT: Text,
+            TRT01A: CodedValue,
+            SITEGR1: CodedValue
+        ],
+
+        measures: [
+            AVAL: Numeric unit: "points",
+            BASE: Numeric unit: "points",
+            CHG: Numeric unit: "points"
+        ],
+
+        attributes: [
+            EFFFL: Flag,
+            ITTFL: Flag
+        ]
+    }
+}
+
+// Create a slice for Week 24 analysis
+slice Week24_ITT from ADADAS {
+    fix: {
+        AVISIT: "Week 24",
+        ITTFL: "Y"
+    },
+    vary: [USUBJID, TRT01A, SITEGR1],
+    measures: [CHG, BASE]
+}
+
+/*
+ * Model 1: Simple ANCOVA
+ *
+ * Analysis of Covariance with change from baseline as the response,
+ * treatment as the primary factor, and baseline as a covariate.
+ *
+ * Formula: CHG ~ TRT01A + BASE
+ * Family: Gaussian (normal distribution)
+ * Link: Identity link function
+ */
+model ANCOVA_Week24 {
+    input: Week24_ITT,
+    formula: CHG ~ TRT01A + BASE,
+    family: Gaussian,
+    link: Identity
+}
+
+/*
+ * Model 2: ANCOVA with Site Effect
+ *
+ * Same as Model 1 but includes site group as an additional factor
+ * to account for site-to-site variability.
+ *
+ * Formula: CHG ~ TRT01A + BASE + SITEGR1
+ */
+model ANCOVA_WithSite {
+    input: Week24_ITT,
+    formula: CHG ~ TRT01A + BASE + SITEGR1,
+    family: Gaussian,
+    link: Identity
+}
+
+// Create a slice for longitudinal analysis (all post-baseline visits)
+slice PostBaseline_ITT from ADADAS {
+    fix: {
+        ITTFL: "Y"
+    },
+    vary: [USUBJID, AVISIT, TRT01A, SITEGR1],
+    measures: [CHG, BASE],
+    where: AVISITN > 0
+}
+
+/*
+ * Model 3: Mixed Model Repeated Measures (MMRM)
+ *
+ * Longitudinal model analyzing change from baseline across all visits.
+ * Includes treatment-by-visit interaction to test treatment effect at each visit.
+ *
+ * Formula: CHG ~ TRT01A * AVISIT + BASE
+ * Random Effects:
+ *   - Subject-specific intercepts
+ *   - Unstructured covariance for repeated measures within subject
+ */
+model MMRM_Longitudinal {
+    input: PostBaseline_ITT,
+    formula: CHG ~ TRT01A * AVISIT + BASE,
+    family: Gaussian,
+    link: Identity,
+    random: {
+        subject: USUBJID,
+        structure: Unstructured(AVISIT)
+    }
+}
+
+// Define adverse event data
+cube ADAE "Adverse Events Analysis Dataset" {
+    namespace: "http://example.org/study/safety#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            AEDECOD: Text,
+            TRT01A: CodedValue
+        ],
+
+        measures: [
+            AEOCCUR: Integer
+        ],
+
+        attributes: [
+            SAFFL: Flag
+        ]
+    }
+}
+
+// Aggregate AE data by subject and treatment
+slice AE_BySubject from ADAE {
+    vary: [USUBJID, TRT01A],
+    measures: [AEOCCUR]
+}
+
+/*
+ * Model 4: Logistic Regression
+ *
+ * Binary outcome model for presence/absence of adverse events.
+ * Uses binomial family with logit link (logistic regression).
+ *
+ * Formula: AEOCCUR ~ TRT01A
+ * Family: Binomial (for binary outcomes)
+ * Link: Logit (log odds)
+ */
+model LogisticAE {
+    input: AE_BySubject,
+    formula: AEOCCUR ~ TRT01A,
+    family: Binomial,
+    link: Logit
+}
+
+// Define count data
+cube ADAE_Counts "Adverse Event Counts" {
+    namespace: "http://example.org/study/safety#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            TRT01A: CodedValue
+        ],
+
+        measures: [
+            AECOUNT: Integer
+        ],
+
+        attributes: [
+            SAFFL: Flag
+        ]
+    }
+}
+
+slice AE_Counts_Safety from ADAE_Counts {
+    fix: {
+        SAFFL: "Y"
+    },
+    vary: [USUBJID, TRT01A],
+    measures: [AECOUNT]
+}
+
+/*
+ * Model 5: Poisson Regression
+ *
+ * Count data model for number of adverse events per subject.
+ * Uses Poisson family with log link.
+ *
+ * Formula: AECOUNT ~ TRT01A
+ * Family: Poisson (for count data)
+ * Link: Log
+ */
+model PoissonAECount {
+    input: AE_Counts_Safety,
+    formula: AECOUNT ~ TRT01A,
+    family: Poisson,
+    link: Log
+}
+
+// Dose-response analysis dataset
+cube ADDOSE "Dose Response Analysis" {
+    namespace: "http://example.org/study/dose#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            AVISIT: Text
+        ],
+
+        measures: [
+            CHG: Numeric,
+            BASE: Numeric,
+            TRTDOSE: Numeric unit: "mg"
+        ],
+
+        attributes: [
+            EFFFL: Flag
+        ]
+    }
+}
+
+slice DoseResponse_Week24 from ADDOSE {
+    fix: {
+        AVISIT: "Week 24",
+        EFFFL: "Y"
+    },
+    vary: [USUBJID, TRTDOSE],
+    measures: [CHG, BASE]
+}
+
+/*
+ * Model 6: Dose-Response with Polynomial Term
+ *
+ * Tests for linear and quadratic dose effects.
+ * Uses polynomial expansion of the dose variable.
+ *
+ * Formula: CHG ~ poly(TRTDOSE, 2) + BASE
+ * This expands to: CHG ~ TRTDOSE + TRTDOSE^2 + BASE
+ */
+model DoseResponseQuadratic {
+    input: DoseResponse_Week24,
+    formula: CHG ~ poly(TRTDOSE, 2) + BASE,
+    family: Gaussian,
+    link: Identity
+}
+
+// Treatment interaction analysis
+slice Treatment_Interaction from ADADAS {
+    fix: {
+        ITTFL: "Y"
+    },
+    vary: [USUBJID, AVISIT, TRT01A, SITEGR1],
+    measures: [CHG, BASE]
+}
+
+/*
+ * Model 7: Treatment by Site Interaction
+ *
+ * Tests whether treatment effect varies by site group.
+ * The interaction term TRT01A * SITEGR1 tests this hypothesis.
+ *
+ * Formula: CHG ~ TRT01A * SITEGR1 + BASE
+ * This expands to: CHG ~ TRT01A + SITEGR1 + TRT01A:SITEGR1 + BASE
+ */
+model TreatmentBySite {
+    input: Treatment_Interaction,
+    formula: CHG ~ TRT01A * SITEGR1 + BASE,
+    family: Gaussian,
+    link: Identity
+}
+
+/*
+ * Model 8: No Intercept Model
+ *
+ * Model without an intercept term (passes through origin).
+ * Useful when the response must be zero when all predictors are zero.
+ *
+ * Formula: CHG ~ 0 + TRT01A
+ * The 0 term suppresses the intercept.
+ */
+model NoIntercept {
+    input: Week24_ITT,
+    formula: CHG ~ 0 + TRT01A,
+    family: Gaussian,
+    link: Identity
+}
+
+/*
+ * Model 9: Nested Effects
+ *
+ * Model with site nested within treatment group.
+ * The nesting operator (/) indicates SITEGR1 is nested in TRT01A.
+ *
+ * Formula: CHG ~ TRT01A / SITEGR1 + BASE
+ * This expands to: CHG ~ TRT01A + SITEGR1:TRT01A + BASE
+ */
+model NestedSite {
+    input: Treatment_Interaction,
+    formula: CHG ~ TRT01A / SITEGR1 + BASE,
+    family: Gaussian,
+    link: Identity
+}
+
+/*
+ * Model 10: All Two-Way Interactions
+ *
+ * Model with all two-way interactions up to power 2.
+ * The ^2 operator creates all main effects and two-way interactions.
+ *
+ * Formula: CHG ~ (TRT01A + SITEGR1 + BASE)^2
+ * This expands to:
+ *   CHG ~ TRT01A + SITEGR1 + BASE +
+ *         TRT01A:SITEGR1 + TRT01A:BASE + SITEGR1:BASE
+ */
+model AllTwoWayInteractions {
+    input: Treatment_Interaction,
+    formula: CHG ~ (TRT01A + SITEGR1 + BASE)^2,
+    family: Gaussian,
+    link: Identity
+}

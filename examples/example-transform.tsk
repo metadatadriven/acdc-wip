@@ -1,0 +1,266 @@
+// Example: Transform Definitions
+// This example demonstrates how to define transformations that create new
+// cubes from existing ones by applying calculations and derivations
+
+// Define input cube
+cube ADVS "Vital Signs Analysis Dataset" {
+    namespace: "http://example.org/study/vitals#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            AVISITN: Integer,
+            AVISIT: Text,
+            PARAMCD: CodedValue
+        ],
+
+        measures: [
+            AVAL: Numeric unit: "mmHg",
+            BASE: Numeric unit: "mmHg"
+        ],
+
+        attributes: [
+            PARAM: Text,
+            ITTFL: Flag
+        ]
+    }
+}
+
+// Define output cube structure
+cube ADVS_Derived "Vital Signs with Derived Parameters" {
+    namespace: "http://example.org/study/vitals#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            AVISITN: Integer,
+            AVISIT: Text,
+            PARAMCD: CodedValue
+        ],
+
+        measures: [
+            AVAL: Numeric unit: "mmHg",
+            BASE: Numeric unit: "mmHg",
+            CHG: Numeric unit: "mmHg",
+            PCHG: Numeric unit: "percent"
+        ],
+
+        attributes: [
+            PARAM: Text,
+            ITTFL: Flag
+        ]
+    }
+}
+
+/*
+ * Transform 1: Change from Baseline
+ *
+ * This is the most common transformation in clinical trials -
+ * calculating absolute and percent change from baseline.
+ */
+transform CalculateChangeFromBaseline {
+    input: ADVS,
+    output: ADVS_Derived,
+    transformations: [
+        CHG = AVAL - BASE,
+        PCHG = (AVAL - BASE) / BASE * 100
+    ]
+}
+
+// Define a simple analysis cube
+cube ADADAS_Raw "ADAS-Cog Raw Scores" {
+    namespace: "http://example.org/study/cognitive#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            AVISIT: Text,
+            TRT01A: CodedValue
+        ],
+
+        measures: [
+            ACTOT11: Numeric,
+            BASE11: Numeric
+        ],
+
+        attributes: [
+            EFFFL: Flag
+        ]
+    }
+}
+
+cube ADADAS_Analysis "ADAS-Cog Analysis Ready" {
+    namespace: "http://example.org/study/cognitive#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            AVISIT: Text,
+            TRT01A: CodedValue
+        ],
+
+        measures: [
+            AVAL: Numeric,
+            BASE: Numeric,
+            CHG: Numeric,
+            LOGAVAL: Numeric
+        ],
+
+        attributes: [
+            EFFFL: Flag,
+            IMPROVER: Flag
+        ]
+    }
+}
+
+/*
+ * Transform 2: Multiple Derivations with Conditional Logic
+ *
+ * This demonstrates more complex transformations including:
+ * - Renaming variables
+ * - Applying mathematical functions
+ * - Creating derived flags based on conditions
+ */
+transform PrepareForAnalysis {
+    input: ADADAS_Raw,
+    output: ADADAS_Analysis,
+    transformations: [
+        AVAL = ACTOT11,
+        BASE = BASE11,
+        CHG = AVAL - BASE,
+        LOGAVAL = log(AVAL),
+        IMPROVER = CHG > 0
+    ]
+}
+
+// Define cubes for normalization example
+cube Lab_Raw "Laboratory Data Raw Values" {
+    namespace: "http://example.org/study/labs#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            PARAMCD: CodedValue,
+            AVISIT: Text
+        ],
+
+        measures: [
+            AVAL: Numeric,
+            A1LO: Numeric,
+            A1HI: Numeric
+        ],
+
+        attributes: [
+            PARAM: Text
+        ]
+    }
+}
+
+cube Lab_Normalized "Laboratory Data with Normalized Values" {
+    namespace: "http://example.org/study/labs#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            PARAMCD: CodedValue,
+            AVISIT: Text
+        ],
+
+        measures: [
+            AVAL: Numeric,
+            A1LO: Numeric,
+            A1HI: Numeric,
+            ANRLO: Numeric,
+            ANRHI: Numeric,
+            R2A1LO: Numeric,
+            R2A1HI: Numeric
+        ],
+
+        attributes: [
+            PARAM: Text,
+            ABNORMAL: Flag
+        ]
+    }
+}
+
+/*
+ * Transform 3: Normalization and Range Calculations
+ *
+ * This demonstrates transformations for laboratory data:
+ * - Calculating ratios to normal range limits
+ * - Creating abnormal flags
+ * - Multiple dependent calculations
+ */
+transform NormalizeLabs {
+    input: Lab_Raw,
+    output: Lab_Normalized,
+    transformations: [
+        ANRLO = 0.8,
+        ANRHI = 1.2,
+        R2A1LO = AVAL / A1LO,
+        R2A1HI = AVAL / A1HI,
+        ABNORMAL = (R2A1LO < ANRLO) or (R2A1HI > ANRHI)
+    ]
+}
+
+// Simple example for aggregation preparation
+cube Events "Adverse Event Records" {
+    namespace: "http://example.org/study/safety#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            AEDECOD: Text,
+            AESTDTC: DateTime
+        ],
+
+        measures: [
+            AESTDY: Integer,
+            AEENDY: Integer
+        ],
+
+        attributes: [
+            AESER: Flag,
+            AEREL: CodedValue
+        ]
+    }
+}
+
+cube Events_WithDuration "Adverse Events with Duration" {
+    namespace: "http://example.org/study/safety#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            AEDECOD: Text,
+            AESTDTC: DateTime
+        ],
+
+        measures: [
+            AESTDY: Integer,
+            AEENDY: Integer,
+            AEDUR: Integer
+        ],
+
+        attributes: [
+            AESER: Flag,
+            AEREL: CodedValue,
+            RELATED: Flag
+        ]
+    }
+}
+
+/*
+ * Transform 4: Event Duration Calculation
+ *
+ * Calculate derived measures for adverse events including
+ * duration and simplified relatedness flag.
+ */
+transform CalculateEventDuration {
+    input: Events,
+    output: Events_WithDuration,
+    transformations: [
+        AEDUR = AEENDY - AESTDY,
+        RELATED = AEREL == "RELATED" or AEREL == "POSSIBLY RELATED"
+    ]
+}

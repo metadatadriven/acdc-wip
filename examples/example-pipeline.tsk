@@ -1,0 +1,331 @@
+// Example: Pipeline Definitions
+// This example demonstrates how to define analysis pipelines that
+// connect multiple analysis steps in a directed acyclic graph (DAG)
+
+/*
+ * Pipeline 1: Simple Linear Pipeline
+ *
+ * A basic pipeline demonstrating sequential analysis steps:
+ * Load Data -> Transform -> Analyze -> Display
+ */
+pipeline BasicEfficacyAnalysis {
+    stages: [
+        LoadRawData: LoadADASData,
+        CalculateChanges: DeriveChangeFromBaseline depends on [LoadRawData],
+        CreateSlice: SliceWeek24 depends on [CalculateChanges],
+        RunANCOVA: FitANCOVAModel depends on [CreateSlice],
+        GenerateTable: CreateSummaryTable depends on [RunANCOVA]
+    ]
+}
+
+/*
+ * Pipeline 2: Parallel Processing Branches
+ *
+ * This pipeline demonstrates parallel analysis paths that can
+ * execute concurrently before merging for final display.
+ *
+ * Structure:
+ *          LoadData
+ *         /         \
+ *   EfficacyPath   SafetyPath
+ *         \         /
+ *       CombinedReport
+ */
+pipeline ParallelEfficacySafety {
+    stages: [
+        // Initial data loading
+        LoadEfficacy: LoadADASData,
+        LoadSafety: LoadAEData,
+
+        // Parallel efficacy analysis
+        PrepareEfficacy: TransformEfficacyData depends on [LoadEfficacy],
+        AnalyzeEfficacy: RunEfficacyModel depends on [PrepareEfficacy],
+
+        // Parallel safety analysis
+        PrepareSafety: TransformSafetyData depends on [LoadSafety],
+        AnalyzeSafety: RunSafetyModel depends on [PrepareSafety],
+
+        // Merge results
+        CombineResults: MergeEfficacySafety depends on [AnalyzeEfficacy, AnalyzeSafety],
+        GenerateReport: CreateIntegratedReport depends on [CombineResults]
+    ]
+}
+
+/*
+ * Pipeline 3: Multi-Stage Analysis with Multiple Endpoints
+ *
+ * Complex pipeline analyzing multiple endpoints with shared preprocessing
+ * and separate analysis paths.
+ *
+ * Structure:
+ *                LoadData
+ *                   |
+ *             Preprocess
+ *          /      |      \
+ *    Primary  Secondary  Exploratory
+ *          \      |      /
+ *           IntegratedSummary
+ */
+pipeline MultiEndpointAnalysis {
+    stages: [
+        // Data loading and common preprocessing
+        LoadRawData: LoadAllADAMData,
+        Preprocess: ApplyCommonDerivations depends on [LoadRawData],
+
+        // Primary endpoint analysis
+        PrimarySlice: CreatePrimarySlice depends on [Preprocess],
+        PrimaryModel: FitPrimaryANCOVA depends on [PrimarySlice],
+        PrimarySummary: SummarizePrimary depends on [PrimaryModel],
+
+        // Secondary endpoint analysis
+        SecondarySlice: CreateSecondarySlice depends on [Preprocess],
+        SecondaryModel: FitSecondaryMMRM depends on [SecondarySlice],
+        SecondarySummary: SummarizeSecondary depends on [SecondaryModel],
+
+        // Exploratory endpoint analysis
+        ExploratorySlice: CreateExploratorySlice depends on [Preprocess],
+        ExploratoryModel: FitExploratoryModels depends on [ExploratorySlice],
+        ExploratorySummary: SummarizeExploratory depends on [ExploratoryModel],
+
+        // Integrated summary
+        IntegrateResults: CombineAllEndpoints depends on [PrimarySummary, SecondarySummary, ExploratorySummary],
+        GenerateTables: CreateAllTables depends on [IntegrateResults],
+        GenerateFigures: CreateAllFigures depends on [IntegrateResults]
+    ]
+}
+
+/*
+ * Pipeline 4: Iterative Analysis with Feedback
+ *
+ * Pipeline for sensitivity analyses where results from one analysis
+ * inform the next set of analyses.
+ */
+pipeline SensitivityAnalysis {
+    stages: [
+        // Primary analysis
+        LoadData: LoadADASData,
+        PrimaryAnalysis: RunPrimaryANCOVA depends on [LoadData],
+
+        // Sensitivity analysis 1: Different covariate model
+        Sensitivity1: RunModelWithAge depends on [LoadData],
+
+        // Sensitivity analysis 2: Different population
+        Sensitivity2Slice: CreatePerProtocolSlice depends on [LoadData],
+        Sensitivity2Model: RunPerProtocolANCOVA depends on [Sensitivity2Slice],
+
+        // Sensitivity analysis 3: Different method
+        Sensitivity3: RunRobustRegression depends on [LoadData],
+
+        // Compare all results
+        CompareResults: CompareSensitivityResults depends on [PrimaryAnalysis, Sensitivity1, Sensitivity2Model, Sensitivity3],
+        SummarizeFindings: CreateSensitivityTable depends on [CompareResults]
+    ]
+}
+
+/*
+ * Pipeline 5: Longitudinal Analysis with Time-Dependent Steps
+ *
+ * Pipeline for analyzing longitudinal data with visit-specific processing.
+ */
+pipeline LongitudinalAnalysis {
+    stages: [
+        // Load and prepare data
+        LoadData: LoadLongitudinalData,
+
+        // Process each visit
+        ProcessBaseline: ProcessBaselineVisit depends on [LoadData],
+        ProcessWeek4: ProcessWeek4Visit depends on [LoadData],
+        ProcessWeek12: ProcessWeek12Visit depends on [LoadData],
+        ProcessWeek24: ProcessWeek24Visit depends on [LoadData],
+
+        // Combine visits
+        CombineVisits: MergeAllVisits depends on [ProcessBaseline, ProcessWeek4, ProcessWeek12, ProcessWeek24],
+
+        // Longitudinal modeling
+        FitMMRM: RunMMRMModel depends on [CombineVisits],
+
+        // Visit-specific summaries
+        SummarizeByVisit: CreateVisitSummaries depends on [FitMMRM],
+
+        // Visualizations
+        CreateLinePlot: GenerateLongitudinalPlot depends on [SummarizeByVisit],
+        CreateForestPlot: GenerateTreatmentEffectPlot depends on [SummarizeByVisit]
+    ]
+}
+
+/*
+ * Pipeline 6: Subgroup Analysis Pipeline
+ *
+ * Comprehensive subgroup analysis with multiple stratification factors.
+ */
+pipeline SubgroupAnalysis {
+    stages: [
+        // Load and prepare
+        LoadData: LoadADASData,
+        PrepareForSubgroup: AddSubgroupVariables depends on [LoadData],
+
+        // Overall analysis
+        OverallAnalysis: RunOverallModel depends on [PrepareForSubgroup],
+
+        // Subgroup analyses (can run in parallel)
+        AgeSubgroup: RunAgeSubgroupAnalysis depends on [PrepareForSubgroup],
+        SexSubgroup: RunSexSubgroupAnalysis depends on [PrepareForSubgroup],
+        BaselineSeveritySubgroup: RunSeveritySubgroupAnalysis depends on [PrepareForSubgroup],
+        RegionSubgroup: RunRegionSubgroupAnalysis depends on [PrepareForSubgroup],
+
+        // Aggregate subgroup results
+        AggregateSubgroups: CombineSubgroupResults depends on [AgeSubgroup, SexSubgroup, BaselineSeveritySubgroup, RegionSubgroup],
+
+        // Create displays
+        CreateForestPlot: GenerateSubgroupForestPlot depends on [AggregateSubgroups, OverallAnalysis],
+        CreateInteractionTable: GenerateInteractionTable depends on [AggregateSubgroups]
+    ]
+}
+
+/*
+ * Pipeline 7: Safety Analysis Pipeline
+ *
+ * Complete safety analysis workflow from raw adverse events
+ * to summary tables and figures.
+ */
+pipeline SafetyAnalysis {
+    stages: [
+        // Load data
+        LoadAE: LoadAdverseEvents,
+        LoadExposure: LoadExposureData,
+
+        // Prepare AE data
+        ClassifyAEs: ClassifyBySeverity depends on [LoadAE],
+        LinkExposure: AddExposureInfo depends on [ClassifyAEs, LoadExposure],
+
+        // Summary by treatment
+        OverallAESummary: SummarizeAllAEs depends on [LinkExposure],
+        SeriousAESummary: SummarizeSeriousAEs depends on [LinkExposure],
+
+        // Specific analyses
+        MostFrequentAEs: IdentifyFrequentAEs depends on [LinkExposure],
+        AEsBySOC: SummarizeBySOC depends on [LinkExposure],
+
+        // Statistical comparisons
+        CompareRates: CompareAERates depends on [OverallAESummary],
+        TimeToFirstAE: RunSurvivalAnalysis depends on [LinkExposure],
+
+        // Create displays
+        AETable: CreateAESummaryTable depends on [AEsBySOC],
+        SeriousAETable: CreateSeriousAETable depends on [SeriousAESummary],
+        TimeToEventPlot: CreateKaplanMeierPlot depends on [TimeToFirstAE]
+    ]
+}
+
+/*
+ * Pipeline 8: Complete CSR Analysis Pipeline
+ *
+ * End-to-end pipeline for a complete Clinical Study Report,
+ * integrating all analysis domains.
+ */
+pipeline CompleteCSRAnalysis {
+    stages: [
+        // Section 1: Disposition and Demographics
+        LoadDisposition: LoadDispositionData,
+        LoadDemographics: LoadDemographicsData,
+        SummarizeDisposition: CreateDispositionTable depends on [LoadDisposition],
+        SummarizeDemographics: CreateDemographicsTable depends on [LoadDemographics],
+
+        // Section 2: Efficacy
+        LoadEfficacy: LoadEfficacyData,
+        PrepareEfficacy: PrepareEfficacyAnalysis depends on [LoadEfficacy],
+        PrimaryEfficacy: RunPrimaryEfficacyAnalysis depends on [PrepareEfficacy],
+        SecondaryEfficacy: RunSecondaryEfficacyAnalysis depends on [PrepareEfficacy],
+        EfficacyTables: GenerateEfficacyTables depends on [PrimaryEfficacy, SecondaryEfficacy],
+        EfficacyFigures: GenerateEfficacyFigures depends on [PrimaryEfficacy, SecondaryEfficacy],
+
+        // Section 3: Safety
+        LoadSafety: LoadSafetyData,
+        PrepareSafety: PrepareSafetyAnalysis depends on [LoadSafety],
+        AdverseEvents: AnalyzeAdverseEvents depends on [PrepareSafety],
+        LabsVitals: AnalyzeLabsAndVitals depends on [PrepareSafety],
+        SafetyTables: GenerateSafetyTables depends on [AdverseEvents, LabsVitals],
+
+        // Section 4: Pharmacokinetics
+        LoadPK: LoadPKData,
+        PKAnalysis: AnalyzePKParameters depends on [LoadPK],
+        PKTables: GeneratePKTables depends on [PKAnalysis],
+
+        // Integration
+        IntegrateCSR: CompileCSRSections depends on [
+            SummarizeDisposition,
+            SummarizeDemographics,
+            EfficacyTables,
+            EfficacyFigures,
+            SafetyTables,
+            PKTables
+        ],
+
+        // Final outputs
+        GenerateExecutiveSummary: CreateExecutiveSummary depends on [IntegrateCSR],
+        ExportToRTF: ExportTablesAndFigures depends on [IntegrateCSR]
+    ]
+}
+
+/*
+ * Pipeline 9: Interim Analysis Pipeline
+ *
+ * Pipeline designed for interim analyses with data cutoff handling
+ * and blinded review capabilities.
+ */
+pipeline InterimAnalysis {
+    stages: [
+        // Data cutoff
+        ApplyCutoff: ApplyDataCutoffDate,
+
+        // Blinded review
+        BlindedEnrollment: ReviewBlindedEnrollment depends on [ApplyCutoff],
+        BlindedSafety: ReviewBlindedSafety depends on [ApplyCutoff],
+
+        // DMC unblinded analysis (conditional)
+        UnblindedEfficacy: RunUnblindedEfficacyAnalysis depends on [ApplyCutoff],
+        UnblindedSafety: RunUnblindedSafetyAnalysis depends on [ApplyCutoff],
+
+        // Generate DMC report
+        DMCReport: GenerateDMCReport depends on [BlindedEnrollment, BlindedSafety, UnblindedEfficacy, UnblindedSafety],
+
+        // Futility analysis
+        FutilityAnalysis: RunFutilityAnalysis depends on [UnblindedEfficacy],
+
+        // Recommendation
+        DMCRecommendation: GenerateRecommendation depends on [DMCReport, FutilityAnalysis]
+    ]
+}
+
+/*
+ * Pipeline 10: Adaptive Design Pipeline
+ *
+ * Pipeline for adaptive trials with sample size re-estimation
+ * and dose selection.
+ */
+pipeline AdaptiveDesign {
+    stages: [
+        // Stage 1: Initial cohort
+        Stage1Load: LoadStage1Data,
+        Stage1Analysis: AnalyzeStage1Data depends on [Stage1Load],
+
+        // Adaptation decision
+        EstimateVariance: EstimateVarianceComponents depends on [Stage1Analysis],
+        RecalculateSampleSize: UpdateSampleSize depends on [EstimateVariance],
+
+        // Dose selection
+        DoseResponseStage1: FitDoseResponseModel depends on [Stage1Analysis],
+        SelectDoses: SelectDosesForStage2 depends on [DoseResponseStage1],
+
+        // Stage 2: Extended cohort
+        Stage2Load: LoadStage2Data depends on [RecalculateSampleSize, SelectDoses],
+        Stage2Analysis: AnalyzeStage2Data depends on [Stage2Load],
+
+        // Combined analysis
+        CombineStages: CombineStage1And2 depends on [Stage1Analysis, Stage2Analysis],
+        FinalAnalysis: RunFinalAnalysis depends on [CombineStages],
+
+        // Reporting
+        AdaptiveReport: GenerateAdaptiveDesignReport depends on [FinalAnalysis]
+    ]
+}

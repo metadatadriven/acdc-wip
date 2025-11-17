@@ -1,0 +1,451 @@
+// Example: Display Definitions
+// This example demonstrates how to define tables and figures for
+// presenting analysis results in clinical study reports
+
+// Define the efficacy results cube
+cube EfficacyResults "Primary Efficacy Analysis Results" {
+    namespace: "http://example.org/study/results#",
+
+    structure: {
+        dimensions: [
+            Treatment: CodedValue,
+            Visit: Text,
+            Parameter: Text
+        ],
+
+        measures: [
+            N: Integer,
+            Mean: Numeric,
+            StdDev: Numeric,
+            Median: Numeric,
+            Min: Numeric,
+            Max: Numeric,
+            LSmean: Numeric,
+            StdError: Numeric,
+            PValue: Numeric
+        ],
+
+        attributes: [
+            Population: Text,
+            AnalysisMethod: Text
+        ]
+    }
+}
+
+/*
+ * Display 1: Simple Summary Table
+ *
+ * Table 14.2.1 - Change from Baseline in ADAS-Cog Total Score
+ * Summary statistics by treatment group at Week 24
+ */
+display table "Table 14.2.1" "Summary of Change from Baseline at Week 24" {
+    source: EfficacyResults,
+    rows: [Treatment],
+    columns: [N, Mean, StdDev, Median, Min, Max],
+    footnotes: [
+        "Population: Intent-to-Treat",
+        "ADAS-Cog: Alzheimer's Disease Assessment Scale - Cognitive Subscale",
+        "Negative values indicate improvement"
+    ]
+}
+
+// Define model results cube
+cube ModelResults "ANCOVA Model Results" {
+    namespace: "http://example.org/study/results#",
+
+    structure: {
+        dimensions: [
+            Treatment: CodedValue,
+            Comparison: Text
+        ],
+
+        measures: [
+            LSmean: Numeric,
+            StdError: Numeric,
+            LowerCI: Numeric,
+            UpperCI: Numeric,
+            PValue: Numeric
+        ],
+
+        attributes: [
+            Population: Text,
+            Model: Text
+        ]
+    }
+}
+
+/*
+ * Display 2: Model Results Table with Formatting
+ *
+ * Table 14.2.2 - ANCOVA Results for Change from Baseline
+ * Shows LS means, treatment differences, and p-values
+ */
+display table "Table 14.2.2" "ANCOVA Results - Change from Baseline" {
+    source: ModelResults,
+    rows: [Treatment, Comparison],
+    columns: [LSmean, StdError, LowerCI, UpperCI, PValue],
+    format: {
+        LSmean: {
+            decimals: 2,
+            alignment: "right"
+        },
+        StdError: {
+            decimals: 3,
+            alignment: "right"
+        },
+        PValue: {
+            decimals: 4,
+            pattern: "0.####"
+        }
+    },
+    footnotes: [
+        "LS Mean: Least Squares Mean from ANCOVA model",
+        "CI: 95% Confidence Interval",
+        "Model: Change from Baseline ~ Treatment + Baseline + Site"
+    ]
+}
+
+// Define longitudinal data for plotting
+cube LongitudinalData "Change from Baseline Over Time" {
+    namespace: "http://example.org/study/longitudinal#",
+
+    structure: {
+        dimensions: [
+            Treatment: CodedValue,
+            Visit: Text,
+            VisitNum: Integer
+        ],
+
+        measures: [
+            Mean: Numeric,
+            StdError: Numeric,
+            LowerCI: Numeric,
+            UpperCI: Numeric
+        ],
+
+        attributes: [
+            Population: Text
+        ]
+    }
+}
+
+/*
+ * Display 3: Line Plot of Change Over Time
+ *
+ * Figure 14.2.1 - Mean Change from Baseline Over Time
+ * Shows treatment groups as separate lines with error bars
+ */
+display figure "Figure 14.2.1" {
+    source: LongitudinalData,
+    xAxis: VisitNum,
+    yAxis: Mean,
+    groupBy: Treatment,
+    aesthetics: {
+        lineType: "solid",
+        errorBars: "StdError",
+        markerShape: "circle"
+    }
+}
+
+// Define adverse event summary data
+cube AESummary "Adverse Event Summary by Treatment" {
+    namespace: "http://example.org/study/safety#",
+
+    structure: {
+        dimensions: [
+            Treatment: CodedValue,
+            PreferredTerm: Text,
+            SystemOrganClass: Text
+        ],
+
+        measures: [
+            N_Subjects: Integer,
+            N_Events: Integer,
+            Percentage: Numeric
+        ],
+
+        attributes: [
+            Population: Text,
+            Severity: Text
+        ]
+    }
+}
+
+/*
+ * Display 4: Safety Table with Hierarchical Structure
+ *
+ * Table 14.3.1 - Treatment-Emergent Adverse Events
+ * Hierarchical table showing SOC and preferred terms
+ */
+display table "Table 14.3.1" "Treatment-Emergent Adverse Events" {
+    source: AESummary,
+    rows: [SystemOrganClass, PreferredTerm],
+    columns: [Treatment],
+    footnotes: [
+        "Population: Safety",
+        "Subjects are counted once per preferred term",
+        "SOC: System Organ Class (MedDRA)",
+        "Includes events with onset after first dose"
+    ]
+}
+
+// Define dose-response data
+cube DoseResponse "Efficacy by Dose Level" {
+    namespace: "http://example.org/study/dose#",
+
+    structure: {
+        dimensions: [
+            DoseLevel: Numeric,
+            Parameter: Text
+        ],
+
+        measures: [
+            Mean: Numeric,
+            LowerCI: Numeric,
+            UpperCI: Numeric
+        ],
+
+        attributes: [
+            DoseUnit: Text,
+            Model: Text
+        ]
+    }
+}
+
+/*
+ * Display 5: Dose-Response Curve
+ *
+ * Figure 14.2.2 - Dose-Response Relationship
+ * Scatter plot with fitted curve showing dose-response
+ */
+display figure "Figure 14.2.2" {
+    source: DoseResponse,
+    xAxis: DoseLevel,
+    yAxis: Mean,
+    aesthetics: {
+        curveType: "smooth",
+        showPoints: "true",
+        confidenceBand: "true"
+    }
+}
+
+// Define subgroup analysis results
+cube SubgroupAnalysis "Treatment Effect by Subgroup" {
+    namespace: "http://example.org/study/subgroups#",
+
+    structure: {
+        dimensions: [
+            Subgroup: Text,
+            Category: Text
+        ],
+
+        measures: [
+            N: Integer,
+            TreatmentDiff: Numeric,
+            LowerCI: Numeric,
+            UpperCI: Numeric,
+            PValue: Numeric,
+            InteractionP: Numeric
+        ],
+
+        attributes: [
+            Population: Text
+        ]
+    }
+}
+
+/*
+ * Display 6: Forest Plot
+ *
+ * Figure 14.2.3 - Subgroup Analysis Forest Plot
+ * Shows treatment effect estimates with confidence intervals
+ * for different subgroups
+ */
+display figure "Figure 14.2.3" {
+    source: SubgroupAnalysis,
+    xAxis: TreatmentDiff,
+    yAxis: Category,
+    groupBy: Subgroup,
+    aesthetics: {
+        plotType: "forest",
+        referenceValue: "0",
+        errorBars: "CI"
+    }
+}
+
+// Define patient disposition data
+cube Disposition "Patient Disposition" {
+    namespace: "http://example.org/study/disposition#",
+
+    structure: {
+        dimensions: [
+            Treatment: CodedValue,
+            Category: Text,
+            Subcategory: Text
+        ],
+
+        measures: [
+            N: Integer,
+            Percentage: Numeric
+        ],
+
+        attributes: [
+            DisplayOrder: Integer
+        ]
+    }
+}
+
+/*
+ * Display 7: Disposition Table
+ *
+ * Table 14.1.1 - Patient Disposition
+ * Summary of screening, randomization, completion, and discontinuation
+ */
+display table "Table 14.1.1" "Patient Disposition" {
+    source: Disposition,
+    rows: [Category, Subcategory],
+    columns: [Treatment],
+    format: {
+        N: {
+            alignment: "right"
+        },
+        Percentage: {
+            decimals: 1,
+            suffix: "%"
+        }
+    },
+    footnotes: [
+        "Percentages based on number of subjects in each treatment group"
+    ]
+}
+
+// Define baseline demographics
+cube Demographics "Baseline Demographics and Characteristics" {
+    namespace: "http://example.org/study/baseline#",
+
+    structure: {
+        dimensions: [
+            Treatment: CodedValue,
+            Characteristic: Text,
+            Category: Text
+        ],
+
+        measures: [
+            N: Integer,
+            Mean: Numeric,
+            StdDev: Numeric,
+            Median: Numeric,
+            Percentage: Numeric
+        ],
+
+        attributes: [
+            Population: Text,
+            CharType: Text
+        ]
+    }
+}
+
+/*
+ * Display 8: Demographics Table
+ *
+ * Table 14.1.2 - Demographic and Baseline Characteristics
+ * Mixed categorical and continuous variables
+ */
+display table "Table 14.1.2" "Demographics and Baseline Characteristics" {
+    source: Demographics,
+    rows: [Characteristic, Category],
+    columns: [Treatment],
+    footnotes: [
+        "Population: Intent-to-Treat",
+        "Continuous variables: Mean (SD) and Median",
+        "Categorical variables: N (%)"
+    ]
+}
+
+// Define Kaplan-Meier survival data
+cube SurvivalData "Time to Event Analysis" {
+    namespace: "http://example.org/study/survival#",
+
+    structure: {
+        dimensions: [
+            Treatment: CodedValue,
+            TimePoint: Numeric
+        ],
+
+        measures: [
+            Survival: Numeric,
+            LowerCI: Numeric,
+            UpperCI: Numeric,
+            AtRisk: Integer,
+            Events: Integer
+        ],
+
+        attributes: [
+            Event: Text,
+            Censor: Text
+        ]
+    }
+}
+
+/*
+ * Display 9: Kaplan-Meier Curve
+ *
+ * Figure 14.3.1 - Time to First Adverse Event
+ * Survival curves by treatment group with at-risk table
+ */
+display figure "Figure 14.3.1" {
+    source: SurvivalData,
+    xAxis: TimePoint,
+    yAxis: Survival,
+    groupBy: Treatment,
+    aesthetics: {
+        plotType: "step",
+        confidenceBand: "true",
+        atRiskTable: "true"
+    }
+}
+
+// Define responder analysis results
+cube ResponderAnalysis "Responder Analysis Results" {
+    namespace: "http://example.org/study/responders#",
+
+    structure: {
+        dimensions: [
+            Treatment: CodedValue,
+            Threshold: Text
+        ],
+
+        measures: [
+            N: Integer,
+            Responders: Integer,
+            Percentage: Numeric,
+            OddsRatio: Numeric,
+            LowerCI: Numeric,
+            UpperCI: Numeric,
+            PValue: Numeric
+        ],
+
+        attributes: [
+            Population: Text
+        ]
+    }
+}
+
+/*
+ * Display 10: Bar Chart of Responder Rates
+ *
+ * Figure 14.2.4 - Responder Analysis
+ * Grouped bar chart showing responder rates by treatment
+ * for different response thresholds
+ */
+display figure "Figure 14.2.4" {
+    source: ResponderAnalysis,
+    xAxis: Treatment,
+    yAxis: Percentage,
+    groupBy: Threshold,
+    aesthetics: {
+        plotType: "bar",
+        barPosition: "dodge",
+        errorBars: "CI"
+    }
+}
