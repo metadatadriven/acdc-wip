@@ -5,6 +5,9 @@
   "type": "module",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
+  "bin": {
+    "thunderstruck-language-server": "./lib/main.js"
+  },
   "files": [
     "lib",
     "src"
@@ -15,7 +18,8 @@
     "langium:generate": "langium generate",
     "langium:watch": "langium generate --watch",
     "clean": "rm -rf lib",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "start:server": "node ./lib/main.js"
   },
   "keywords": [
     "langium",
