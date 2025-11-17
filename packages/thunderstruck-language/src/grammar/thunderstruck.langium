@@ -18,15 +18,15 @@ ImportPath:
 // Cube definition
 CubeDefinition:
     'cube' name=ID (description=STRING)? '{'
-        ('namespace' ':' namespace=STRING (',' | ';'))?
+        ('namespace' ':' namespace=STRING (',' | ';')?)?
         'structure' ':' structure=CubeStructure
     '}';
 
 CubeStructure:
     '{'
-        ('dimensions' ':' dimensions=ComponentList (',' | ';'))?
-        ('measures' ':' measures=ComponentList (',' | ';'))?
-        ('attributes' ':' attributes=ComponentList (',' | ';'))?
+        ('dimensions' ':' dimensions=ComponentList (',' | ';')?)?
+        ('measures' ':' measures=ComponentList (',' | ';')?)?
+        ('attributes' ':' attributes=ComponentList (',' | ';')?)?
     '}';
 
 ComponentList:
@@ -139,17 +139,17 @@ FormulaConditioning infers FormulaTerm:
 FormulaPrimary infers FormulaTerm:
     '(' FormulaTerm ')' |
     FormulaFunction |
-    FormulaVariable |
-    FormulaIntercept;
+    FormulaNumber |
+    FormulaVariable;
 
 FormulaFunction:
     function=ID '(' (arguments+=FormulaTerm (',' arguments+=FormulaTerm)*)? ')';
 
+FormulaNumber:
+    value=NUMBER;
+
 FormulaVariable:
     variable=ID;
-
-FormulaIntercept:
-    value=('0' | '1');
 
 // ============================================================================
 // Concept Definitions
@@ -157,11 +157,11 @@ FormulaIntercept:
 
 ConceptDefinition:
     'concept' name=ID (description=STRING)? '{'
-        ('type' ':' conceptType=ConceptType (',' | ';'))?
-        ('category' ':' category=ID (',' | ';'))?
-        ('definition' ':' definition=STRING (',' | ';'))?
-        ('unit' ':' unit=STRING (',' | ';'))?
-        ('codeLists' ':' codeLists=CodeListMappings (',' | ';'))?
+        ('type' ':' conceptType=ConceptType (',' | ';')?)?
+        ('category' ':' category=ID (',' | ';')?)?
+        ('definition' ':' definition=STRING (',' | ';')?)?
+        ('unit' ':' unit=STRING (',' | ';')?)?
+        ('codeLists' ':' codeLists=CodeListMappings (',' | ';')?)?
     '}';
 
 ConceptType returns string:
@@ -182,10 +182,10 @@ CodeListNamespace:
 
 SliceDefinition:
     'slice' name=ID 'from' cubeRef=ID (description=STRING)? '{'
-        ('fix' ':' fixedDimensions=DimensionConstraints (',' | ';'))?
-        ('vary' ':' varyingDimensions=DimensionList (',' | ';'))?
-        ('measures' ':' measures=MeasureList (',' | ';'))?
-        ('where' ':' whereClause=Expression (',' | ';'))?
+        ('fix' ':' fixedDimensions=DimensionConstraints (',' | ';')?)?
+        ('vary' ':' varyingDimensions=DimensionList (',' | ';')?)?
+        ('measures' ':' measures=MeasureList (',' | ';')?)?
+        ('where' ':' whereClause=Expression (',' | ';')?)?
     '}';
 
 DimensionConstraints:
@@ -207,8 +207,8 @@ MeasureList:
 TransformDefinition:
     'transform' name=ID (description=STRING)? '{'
         'input' ':' inputRef=ID (',' | ';')
-        'output' ':' output=OutputCubeSpec (',' | ';')
-        ('transformations' ':' transformations=TransformationList (',' | ';'))?
+        'output' ':' output=OutputCubeSpec (',' | ';')?
+        ('transformations' ':' transformations=TransformationList (',' | ';')?)?
     '}';
 
 OutputCubeSpec:
@@ -227,11 +227,11 @@ Transformation:
 ModelDefinition:
     'model' name=ID (description=STRING)? '{'
         'input' ':' inputRef=ID (',' | ';')
-        'formula' ':' formula=Formula (',' | ';')
-        ('family' ':' family=ModelFamily (',' | ';'))?
-        ('link' ':' link=LinkFunction (',' | ';'))?
-        ('random' ':' randomEffects=RandomEffects (',' | ';'))?
-        ('output' ':' output=OutputCubeSpec (',' | ';'))?
+        'formula' ':' formula=Formula (',' | ';')?
+        ('family' ':' family=ModelFamily (',' | ';')?)?
+        ('link' ':' link=LinkFunction (',' | ';')?)?
+        ('random' ':' randomEffects=RandomEffects (',' | ';')?)?
+        ('output' ':' output=OutputCubeSpec (',' | ';')?)?
     '}';
 
 ModelFamily returns string:
@@ -242,8 +242,8 @@ LinkFunction returns string:
 
 RandomEffects:
     '{'
-        ('subject' ':' subject=ID (',' | ';'))?
-        ('structure' ':' structure=CovarianceStructure (',' | ';'))?
+        ('subject' ':' subject=ID (',' | ';')?)?
+        ('structure' ':' structure=CovarianceStructure (',' | ';')?)?
     '}';
 
 CovarianceStructure:
@@ -257,8 +257,8 @@ AggregateDefinition:
     'aggregate' name=ID (description=STRING)? '{'
         'input' ':' inputRef=ID (',' | ';')
         'groupBy' ':' groupBy=DimensionList (',' | ';')
-        'statistics' ':' statistics=StatisticList (',' | ';')
-        ('output' ':' output=OutputCubeSpec (',' | ';'))?
+        'statistics' ':' statistics=StatisticList (',' | ';')?
+        ('output' ':' output=OutputCubeSpec (',' | ';')?)?
     '}';
 
 StatisticList:
@@ -279,7 +279,7 @@ DisplayDefinition:
     'display' displayType=DisplayType (title=STRING)? (description=STRING)? '{'
         'source' ':' sourceRef=ID (',' | ';')
         (tableSpec=TableSpec | figureSpec=FigureSpec)
-        ('footnotes' ':' footnotes=FootnoteList (',' | ';'))?
+        ('footnotes' ':' footnotes=FootnoteList (',' | ';')?)?
     '}';
 
 DisplayType returns string:
@@ -287,16 +287,16 @@ DisplayType returns string:
 
 TableSpec:
     {infer TableSpec}
-    ('rows' ':' rows=DimensionList (',' | ';'))?
-    ('columns' ':' columns=DimensionList (',' | ';'))?
-    ('format' ':' format=FormatSpec (',' | ';'))?;
+    ('rows' ':' rows=DimensionList (',' | ';')?)?
+    ('columns' ':' columns=DimensionList (',' | ';')?)?
+    ('format' ':' format=FormatSpec (',' | ';')?)?;
 
 FigureSpec:
     {infer FigureSpec}
-    ('xAxis' ':' xAxis=ID (',' | ';'))?
-    ('yAxis' ':' yAxis=ID (',' | ';'))?
-    ('groupBy' ':' groupBy=ID (',' | ';'))?
-    ('aesthetics' ':' aesthetics=AestheticSpec (',' | ';'))?;
+    ('xAxis' ':' xAxis=ID (',' | ';')?)?
+    ('yAxis' ':' yAxis=ID (',' | ';')?)?
+    ('groupBy' ':' groupBy=ID (',' | ';')?)?
+    ('aesthetics' ':' aesthetics=AestheticSpec (',' | ';')?)?;
 
 FormatSpec:
     '{' (formats+=ColumnFormat (',' formats+=ColumnFormat)*)? '}';

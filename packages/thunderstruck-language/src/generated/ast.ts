@@ -27,8 +27,6 @@ export type ThunderstruckKeywordNames =
     | "-"
     | "."
     | "/"
-    | "0"
-    | "1"
     | ":"
     | ";"
     | "<"
@@ -158,7 +156,7 @@ export function isExpression(item: unknown): item is Expression {
     return reflection.isInstance(item, Expression);
 }
 
-export type FormulaTerm = FormulaAddition | FormulaConditioning | FormulaCrossing | FormulaFunction | FormulaInteraction | FormulaIntercept | FormulaNesting | FormulaPower | FormulaVariable;
+export type FormulaTerm = FormulaAddition | FormulaConditioning | FormulaCrossing | FormulaFunction | FormulaInteraction | FormulaNesting | FormulaNumber | FormulaPower | FormulaVariable;
 
 export const FormulaTerm = 'FormulaTerm';
 
@@ -639,18 +637,6 @@ export function isFormulaInteraction(item: unknown): item is FormulaInteraction 
     return reflection.isInstance(item, FormulaInteraction);
 }
 
-export interface FormulaIntercept extends langium.AstNode {
-    readonly $container: Formula | FormulaAddition | FormulaConditioning | FormulaCrossing | FormulaFunction | FormulaInteraction | FormulaNesting | FormulaPower;
-    readonly $type: 'FormulaIntercept';
-    value: '0' | '1';
-}
-
-export const FormulaIntercept = 'FormulaIntercept';
-
-export function isFormulaIntercept(item: unknown): item is FormulaIntercept {
-    return reflection.isInstance(item, FormulaIntercept);
-}
-
 export interface FormulaNesting extends langium.AstNode {
     readonly $container: Formula | FormulaAddition | FormulaConditioning | FormulaCrossing | FormulaFunction | FormulaInteraction | FormulaNesting | FormulaPower;
     readonly $type: 'FormulaNesting';
@@ -663,6 +649,18 @@ export const FormulaNesting = 'FormulaNesting';
 
 export function isFormulaNesting(item: unknown): item is FormulaNesting {
     return reflection.isInstance(item, FormulaNesting);
+}
+
+export interface FormulaNumber extends langium.AstNode {
+    readonly $container: Formula | FormulaAddition | FormulaConditioning | FormulaCrossing | FormulaFunction | FormulaInteraction | FormulaNesting | FormulaPower;
+    readonly $type: 'FormulaNumber';
+    value: number;
+}
+
+export const FormulaNumber = 'FormulaNumber';
+
+export function isFormulaNumber(item: unknown): item is FormulaNumber {
+    return reflection.isInstance(item, FormulaNumber);
 }
 
 export interface FormulaPower extends langium.AstNode {
@@ -1067,8 +1065,8 @@ export type ThunderstruckAstType = {
     FormulaCrossing: FormulaCrossing
     FormulaFunction: FormulaFunction
     FormulaInteraction: FormulaInteraction
-    FormulaIntercept: FormulaIntercept
     FormulaNesting: FormulaNesting
+    FormulaNumber: FormulaNumber
     FormulaPower: FormulaPower
     FormulaTerm: FormulaTerm
     FormulaVariable: FormulaVariable
@@ -1107,7 +1105,7 @@ export type ThunderstruckAstType = {
 export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
 
     getAllTypes(): string[] {
-        return [AestheticOption, AestheticSpec, AggregateDefinition, BinaryExpression, BooleanLiteral, CodeListMapping, CodeListMappings, CodeListNamespace, CodeListRef, CodedValueType, ColumnFormat, Component, ComponentList, ConceptDefinition, CovarianceStructure, CubeDefinition, CubeStructure, DependencyList, DimensionConstraint, DimensionConstraints, DimensionList, DisplayDefinition, Expression, FigureSpec, FootnoteList, FormatOption, FormatSpec, Formula, FormulaAddition, FormulaConditioning, FormulaCrossing, FormulaFunction, FormulaInteraction, FormulaIntercept, FormulaNesting, FormulaPower, FormulaTerm, FormulaVariable, FunctionCallExpression, IdentifierType, ImportPath, ImportStatement, Literal, MeasureList, MemberAccessExpression, ModelDefinition, NumberLiteral, OutputCubeRef, OutputCubeSpec, PipelineDefinition, PipelineStage, PrimitiveType, Program, ProgramElement, RandomEffects, SliceDefinition, StageList, Statistic, StatisticList, StringLiteral, TableSpec, TransformDefinition, Transformation, TransformationList, TypeReference, UnaryExpression, UnitSpec, VariableReference];
+        return [AestheticOption, AestheticSpec, AggregateDefinition, BinaryExpression, BooleanLiteral, CodeListMapping, CodeListMappings, CodeListNamespace, CodeListRef, CodedValueType, ColumnFormat, Component, ComponentList, ConceptDefinition, CovarianceStructure, CubeDefinition, CubeStructure, DependencyList, DimensionConstraint, DimensionConstraints, DimensionList, DisplayDefinition, Expression, FigureSpec, FootnoteList, FormatOption, FormatSpec, Formula, FormulaAddition, FormulaConditioning, FormulaCrossing, FormulaFunction, FormulaInteraction, FormulaNesting, FormulaNumber, FormulaPower, FormulaTerm, FormulaVariable, FunctionCallExpression, IdentifierType, ImportPath, ImportStatement, Literal, MeasureList, MemberAccessExpression, ModelDefinition, NumberLiteral, OutputCubeRef, OutputCubeSpec, PipelineDefinition, PipelineStage, PrimitiveType, Program, ProgramElement, RandomEffects, SliceDefinition, StageList, Statistic, StatisticList, StringLiteral, TableSpec, TransformDefinition, Transformation, TransformationList, TypeReference, UnaryExpression, UnitSpec, VariableReference];
     }
 
     protected override computeIsSubtype(subtype: string, supertype: string): boolean {
@@ -1148,8 +1146,8 @@ export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
             case FormulaCrossing:
             case FormulaFunction:
             case FormulaInteraction:
-            case FormulaIntercept:
             case FormulaNesting:
+            case FormulaNumber:
             case FormulaPower:
             case FormulaVariable: {
                 return this.isSubtype(FormulaTerm, supertype);
@@ -1475,14 +1473,6 @@ export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
                     ]
                 };
             }
-            case FormulaIntercept: {
-                return {
-                    name: FormulaIntercept,
-                    properties: [
-                        { name: 'value' }
-                    ]
-                };
-            }
             case FormulaNesting: {
                 return {
                     name: FormulaNesting,
@@ -1490,6 +1480,14 @@ export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
                         { name: 'left' },
                         { name: 'operator' },
                         { name: 'right' }
+                    ]
+                };
+            }
+            case FormulaNumber: {
+                return {
+                    name: FormulaNumber,
+                    properties: [
+                        { name: 'value' }
                     ]
                 };
             }

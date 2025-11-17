@@ -15,7 +15,7 @@
     "langium:generate": "langium generate",
     "langium:watch": "langium generate --watch",
     "clean": "rm -rf lib",
-    "test": "jest"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "keywords": [
     "langium",
@@ -26,10 +26,15 @@
   "author": "Statistical Computing & Data Science Team",
   "license": "MIT",
   "dependencies": {
-    "langium": "^3.3.0",
+    "langium": "^3.5.0",
     "vscode-languageserver": "^9.0.1"
   },
   "devDependencies": {
-    "langium-cli": "^3.3.0"
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.10.1",
+    "jest": "^30.2.0",
+    "langium-cli": "^3.3.0",
+    "ts-jest": "^29.4.5",
+    "typescript": "^5.9.3"
   }
 }
