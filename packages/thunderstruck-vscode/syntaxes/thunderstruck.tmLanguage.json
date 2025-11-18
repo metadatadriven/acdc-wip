@@ -4,7 +4,11 @@
   "patterns": [
     { "include": "#comments" },
     { "include": "#keywords" },
+    { "include": "#model-keywords" },
+    { "include": "#concept-types" },
+    { "include": "#functions" },
     { "include": "#types" },
+    { "include": "#constants" },
     { "include": "#strings" },
     { "include": "#numbers" },
     { "include": "#operators" }
@@ -27,7 +31,67 @@
       "patterns": [
         {
           "name": "keyword.control.thunderstruck",
-          "match": "\\b(cube|slice|model|transform|aggregate|display|pipeline|concept|import|as|from|namespace|structure|dimensions|measures|attributes|input|output|formula|family|link|vary|fix|unit)\\b"
+          "match": "\\b(import|as|from|where|depends|on)\\b"
+        },
+        {
+          "name": "keyword.other.thunderstruck",
+          "match": "\\b(cube|concept|slice|transform|model|aggregate|display|pipeline)\\b"
+        },
+        {
+          "name": "keyword.other.structure.thunderstruck",
+          "match": "\\b(namespace|structure|dimensions|measures|attributes|unit|codeLists)\\b"
+        },
+        {
+          "name": "keyword.other.definition.thunderstruck",
+          "match": "\\b(input|output|formula|family|link|random|subject|transformations)\\b"
+        },
+        {
+          "name": "keyword.other.slice.thunderstruck",
+          "match": "\\b(fix|vary)\\b"
+        },
+        {
+          "name": "keyword.other.aggregate.thunderstruck",
+          "match": "\\b(groupBy|statistics)\\b"
+        },
+        {
+          "name": "keyword.other.display.thunderstruck",
+          "match": "\\b(source|rows|columns|format|xAxis|yAxis|aesthetics|footnotes|table|figure)\\b"
+        },
+        {
+          "name": "keyword.other.pipeline.thunderstruck",
+          "match": "\\b(stages)\\b"
+        },
+        {
+          "name": "keyword.other.concept.thunderstruck",
+          "match": "\\b(type|category|definition)\\b"
+        }
+      ]
+    },
+    "model-keywords": {
+      "patterns": [
+        {
+          "name": "support.class.model-family.thunderstruck",
+          "match": "\\b(Gaussian|Binomial|Poisson|Gamma|InverseGaussian)\\b"
+        },
+        {
+          "name": "support.class.link-function.thunderstruck",
+          "match": "\\b(Identity|Log|Logit|Probit|Inverse|Sqrt)\\b"
+        }
+      ]
+    },
+    "concept-types": {
+      "patterns": [
+        {
+          "name": "support.class.concept-type.thunderstruck",
+          "match": "\\b(BiomedicalConcept|DerivationConcept|AnalysisConcept)\\b"
+        }
+      ]
+    },
+    "functions": {
+      "patterns": [
+        {
+          "name": "entity.name.function.aggregate.thunderstruck",
+          "match": "\\b(mean|median|stddev|variance|min|max|count|sum|quantile|ci_lower|ci_upper)\\b"
         }
       ]
     },
@@ -39,24 +103,99 @@
         }
       ]
     },
-    "strings": {
-      "name": "string.quoted.double.thunderstruck",
-      "begin": "\"",
-      "end": "\"",
+    "constants": {
       "patterns": [
         {
-          "name": "constant.character.escape.thunderstruck",
-          "match": "\\\\."
+          "name": "constant.language.boolean.thunderstruck",
+          "match": "\\b(true|false)\\b"
+        },
+        {
+          "name": "constant.language.null.thunderstruck",
+          "match": "\\b(null|undefined)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.thunderstruck",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.thunderstruck",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.thunderstruck",
+          "begin": "'",
+          "end": "'",
+          "patterns": [
+            {
+              "name": "constant.character.escape.thunderstruck",
+              "match": "\\\\."
+            }
+          ]
         }
       ]
     },
     "numbers": {
-      "name": "constant.numeric.thunderstruck",
-      "match": "\\b\\d+(\\.\\d+)?\\b"
+      "patterns": [
+        {
+          "name": "constant.numeric.scientific.thunderstruck",
+          "match": "\\b\\d+(\\.\\d+)?[eE][+-]?\\d+\\b"
+        },
+        {
+          "name": "constant.numeric.decimal.thunderstruck",
+          "match": "\\b\\d+\\.\\d+\\b"
+        },
+        {
+          "name": "constant.numeric.integer.thunderstruck",
+          "match": "\\b\\d+\\b"
+        }
+      ]
     },
     "operators": {
-      "name": "keyword.operator.thunderstruck",
-      "match": "[:=\\[\\]{}(),;]"
+      "patterns": [
+        {
+          "name": "keyword.operator.logical.thunderstruck",
+          "match": "\\b(and|or|not)\\b"
+        },
+        {
+          "name": "keyword.operator.comparison.thunderstruck",
+          "match": "(==|!=|<=|>=|<|>)"
+        },
+        {
+          "name": "keyword.operator.arithmetic.thunderstruck",
+          "match": "(\\+|\\-|\\*|\\/|\\^)"
+        },
+        {
+          "name": "keyword.operator.formula.thunderstruck",
+          "match": "(~|:)"
+        },
+        {
+          "name": "keyword.operator.assignment.thunderstruck",
+          "match": "="
+        },
+        {
+          "name": "punctuation.separator.thunderstruck",
+          "match": "[,;]"
+        },
+        {
+          "name": "punctuation.bracket.thunderstruck",
+          "match": "[\\[\\]{}()]"
+        },
+        {
+          "name": "punctuation.accessor.thunderstruck",
+          "match": "\\."
+        },
+        {
+          "name": "keyword.operator.pipe.thunderstruck",
+          "match": "\\|"
+        }
+      ]
     }
   },
   "scopeName": "source.thunderstruck"
