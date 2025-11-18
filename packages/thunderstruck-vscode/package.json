@@ -37,8 +37,14 @@
     "languages": [
       {
         "id": "thunderstruck",
-        "aliases": ["Thunderstruck", "thunderstruck"],
-        "extensions": [".tsk", ".thunderstruck"],
+        "aliases": [
+          "Thunderstruck",
+          "thunderstruck"
+        ],
+        "extensions": [
+          ".tsk",
+          ".thunderstruck"
+        ],
         "configuration": "./language-configuration.json",
         "icon": {
           "light": "./icons/thunderstruck-icon.png",
@@ -55,11 +61,12 @@
     ]
   },
   "scripts": {
-    "build": "tsc -b tsconfig.json",
-    "watch": "tsc -b tsconfig.json --watch",
+    "build": "node esbuild.js --production",
+    "watch": "node esbuild.js --watch",
+    "compile": "tsc -b tsconfig.json",
     "clean": "rm -rf out",
     "vscode:prepublish": "npm run build",
-    "package": "vsce package --no-dependencies"
+    "package": "vsce package --skip-license --no-dependencies"
   },
   "dependencies": {
     "vscode-languageclient": "^9.0.1"
