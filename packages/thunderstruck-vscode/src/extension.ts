@@ -52,9 +52,9 @@ export function deactivate(): Thenable<void> | undefined {
  * Start the Language Server Protocol client
  */
 function startLanguageClient(context: vscode.ExtensionContext): LanguageClient {
-  // The server is implemented in the thunderstruck-language package
+  // The server is bundled within the extension
   const serverModule = context.asAbsolutePath(
-    path.join('..', 'thunderstruck-language', 'lib', 'main.js')
+    path.join('out', 'server', 'main.js')
   );
 
   // If the extension is launched in debug mode then the debug server options are used
@@ -62,11 +62,11 @@ function startLanguageClient(context: vscode.ExtensionContext): LanguageClient {
   const serverOptions: ServerOptions = {
     run: {
       module: serverModule,
-      transport: TransportKind.ipc,
+      transport: TransportKind.stdio,
     },
     debug: {
       module: serverModule,
-      transport: TransportKind.ipc,
+      transport: TransportKind.stdio,
       options: {
         execArgv: ['--nolazy', '--inspect=6009'],
       },

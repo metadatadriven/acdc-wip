@@ -5,7 +5,8 @@ const production = process.argv.includes('--production');
 const watch = process.argv.includes('--watch');
 
 async function main() {
-  const ctx = await esbuild.context({
+  // Build the extension client
+  const clientCtx = await esbuild.context({
     entryPoints: ['src/extension.ts'],
     bundle: true,
     format: 'cjs',
@@ -23,12 +24,32 @@ async function main() {
     ],
   });
 
+  // Build the LSP server
+  const serverCtx = await esbuild.context({
+    entryPoints: [path.join(__dirname, '../thunderstruck-language/src/main.ts')],
+    bundle: true,
+    format: 'cjs',
+    minify: production,
+    sourcemap: !production,
+    sourcesContent: false,
+    platform: 'node',
+    outfile: 'out/server/main.js',
+    external: [],
+    logLevel: 'info',
+    plugins: [],
+    nodePaths: [
+      path.join(__dirname, '../thunderstruck-language/node_modules'),
+      path.join(__dirname, 'node_modules'),
+      path.join(__dirname, '../../node_modules'),
+    ],
+  });
+
   if (watch) {
-    await ctx.watch();
+    await Promise.all([clientCtx.watch(), serverCtx.watch()]);
     console.log('Watching for changes...');
   } else {
-    await ctx.rebuild();
-    await ctx.dispose();
+    await Promise.all([clientCtx.rebuild(), serverCtx.rebuild()]);
+    await Promise.all([clientCtx.dispose(), serverCtx.dispose()]);
   }
 }
 
