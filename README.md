@@ -64,18 +64,23 @@ Thunderstruck is an implementation of the **cube-centric intermediate representa
 
 ### Project Status
 
-**Current Phase:** Increment 1 - Basic Language Foundation + VS Code Authoring (Complete ✅)
+**Current Phase:** Increment 2 - Enhanced Grammar + LSP Foundation (Complete ✅)
 
-**Key Deliverables:**
+**Completed Deliverables:**
 - ✅ Langium-based grammar for all core constructs (cube, concept, slice, transform, model, aggregate, display, pipeline)
 - ✅ VS Code extension with comprehensive syntax highlighting
-- ✅ LSP integration with real-time diagnostics
-- ✅ Status bar indicator showing language server state
-- ✅ Type system and validation infrastructure
-- ✅ 44 passing parser tests
+- ✅ LSP integration with real-time diagnostics and error squiggles
+- ✅ IPC transport for reliable language server communication
+- ✅ Expression language with full operator support
+- ✅ Wilkinson formula notation for statistical models
+- ✅ 44 passing tests (parser, LSP, examples)
 - ✅ 10 comprehensive example `.tsk` files demonstrating all features
+- ✅ All example files parse without errors
+- ✅ Comprehensive review assessment completed
 
-**Next Phase:** Increment 2 - Enhanced Grammar + LSP Foundation (Ready to start)
+**Next Phase:** Increment 3 - Type System + Semantic Validation (Ready to start)
+
+See [docs/INCREMENT_2_REVIEW.md](docs/INCREMENT_2_REVIEW.md) for detailed assessment.
 
 ### Quick Links
 
