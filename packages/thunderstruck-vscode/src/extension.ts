@@ -62,11 +62,11 @@ function startLanguageClient(context: vscode.ExtensionContext): LanguageClient {
   const serverOptions: ServerOptions = {
     run: {
       module: serverModule,
-      transport: TransportKind.stdio,
+      transport: TransportKind.ipc,
     },
     debug: {
       module: serverModule,
-      transport: TransportKind.stdio,
+      transport: TransportKind.ipc,
       options: {
         execArgv: ['--nolazy', '--inspect=6009'],
       },

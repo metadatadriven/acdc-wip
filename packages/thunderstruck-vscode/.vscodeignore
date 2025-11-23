@@ -3,6 +3,7 @@
 
 # Include only what we need
 !out/extension.js
+!out/server/**
 !syntaxes/**
 !language-configuration.json
 !README.md
