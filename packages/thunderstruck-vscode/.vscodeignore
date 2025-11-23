@@ -1,14 +1,12 @@
-.vscode/**
-.vscode-test/**
-src/**
-node_modules/**
-*.ts
-*.map
-*.tsbuildinfo
-tsconfig.json
-.gitignore
-.eslintrc.json
-**/*.ts
-**/*.map
-**/*.tsbuildinfo
-.vscodeignore
+# Exclude everything by default
+**
+
+# Include only what we need
+!out/extension.js
+!out/server/**
+!syntaxes/**
+!language-configuration.json
+!README.md
+!CHANGELOG.md
+!EXTENSION_INFO.md
+!package.json

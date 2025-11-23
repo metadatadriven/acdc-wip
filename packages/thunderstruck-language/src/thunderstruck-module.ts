@@ -12,6 +12,7 @@ import {
   ThunderstruckGeneratedModule,
   ThunderstruckGeneratedSharedModule,
 } from './generated/module.js';
+import { registerValidationChecks } from './thunderstruck-validator.js';
 
 /**
  * Declaration of custom services for Thunderstruck
@@ -54,5 +55,9 @@ export function createThunderstruckServices(context: DefaultSharedModuleContext)
     ThunderstruckModule
   );
   shared.ServiceRegistry.register(thunderstruck);
+
+  // Register validation checks
+  registerValidationChecks(thunderstruck);
+
   return { shared, thunderstruck };
 }

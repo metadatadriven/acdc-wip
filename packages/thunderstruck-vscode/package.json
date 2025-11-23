@@ -1,7 +1,7 @@
 {
   "name": "thunderstruck-vscode",
-  "displayName": "Thunderstruck",
-  "description": "VS Code extension for Thunderstruck DSL - Statistical Analysis Plans for Clinical Trials",
+  "displayName": "Thunderstruck - Statistical Analysis Plans DSL",
+  "description": "Language support for Thunderstruck DSL - A domain-specific language for authoring Statistical Analysis Plans (SAPs) in clinical trials using W3C Data Cube standards. Provides syntax highlighting, real-time diagnostics, and LSP integration for formal, machine-readable analysis specifications.",
   "version": "0.1.0",
   "publisher": "thunderstruck",
   "engines": {
@@ -9,21 +9,42 @@
     "node": ">=18.0.0"
   },
   "categories": [
-    "Programming Languages"
+    "Programming Languages",
+    "Linters",
+    "Data Science"
   ],
   "keywords": [
     "clinical-trials",
     "statistical-analysis",
     "CDISC",
-    "DSL"
+    "SDTM",
+    "ADaM",
+    "DSL",
+    "biostatistics",
+    "pharmaceutical",
+    "W3C",
+    "data-cube",
+    "SAP",
+    "langium",
+    "language-server"
   ],
+  "galleryBanner": {
+    "color": "#1e1e1e",
+    "theme": "dark"
+  },
   "main": "./out/extension.js",
   "contributes": {
     "languages": [
       {
         "id": "thunderstruck",
-        "aliases": ["Thunderstruck", "thunderstruck"],
-        "extensions": [".tsk", ".thunderstruck"],
+        "aliases": [
+          "Thunderstruck",
+          "thunderstruck"
+        ],
+        "extensions": [
+          ".tsk",
+          ".thunderstruck"
+        ],
         "configuration": "./language-configuration.json",
         "icon": {
           "light": "./icons/thunderstruck-icon.png",
@@ -40,18 +61,22 @@
     ]
   },
   "scripts": {
-    "build": "tsc -b tsconfig.json",
-    "watch": "tsc -b tsconfig.json --watch",
+    "build": "node esbuild.js --production",
+    "watch": "node esbuild.js --watch",
+    "compile": "tsc -b tsconfig.json",
     "clean": "rm -rf out",
     "vscode:prepublish": "npm run build",
-    "package": "vsce package --no-dependencies"
+    "package": "vsce package --skip-license --no-dependencies"
   },
   "dependencies": {
+    "vscode-languageclient": "^9.0.1"
   },
   "devDependencies": {
+    "@types/node": "^18.0.0",
     "@types/vscode": "^1.80.0",
     "@vscode/vsce": "^3.2.1",
-    "esbuild": "^0.24.2"
+    "esbuild": "^0.24.2",
+    "typescript": "^5.3.3"
   },
   "author": "Statistical Computing & Data Science Team",
   "license": "MIT",
@@ -59,5 +84,17 @@
     "type": "git",
     "url": "https://github.com/metadatadriven/acdc-wip.git",
     "directory": "packages/thunderstruck-vscode"
-  }
+  },
+  "homepage": "https://github.com/metadatadriven/acdc-wip/blob/main/README.thunderstruck.md",
+  "bugs": {
+    "url": "https://github.com/metadatadriven/acdc-wip/issues"
+  },
+  "qna": "https://github.com/metadatadriven/acdc-wip/discussions",
+  "badges": [
+    {
+      "url": "https://img.shields.io/badge/status-alpha-orange",
+      "href": "https://github.com/metadatadriven/acdc-wip",
+      "description": "Project Status: Alpha"
+    }
+  ]
 }

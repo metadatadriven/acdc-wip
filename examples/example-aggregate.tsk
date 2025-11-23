@@ -1,0 +1,438 @@
+// Example: Aggregate Definitions
+// This example demonstrates how to define aggregations that compute
+// summary statistics grouped by dimensions
+
+// Define the base efficacy dataset
+cube ADADAS "ADAS-Cog Analysis Dataset" {
+    namespace: "http://example.org/study/cognitive#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            AVISITN: Integer,
+            AVISIT: Text,
+            TRT01A: CodedValue,
+            SITEGR1: CodedValue
+        ],
+
+        measures: [
+            AVAL: Numeric unit: "points",
+            BASE: Numeric unit: "points",
+            CHG: Numeric unit: "points"
+        ],
+
+        attributes: [
+            EFFFL: Flag,
+            ITTFL: Flag
+        ]
+    }
+}
+
+// Create slice for Week 24 analysis
+slice Week24_ITT from ADADAS {
+    fix: {
+        AVISIT: "Week 24",
+        ITTFL: "Y"
+    },
+    vary: [USUBJID, TRT01A, SITEGR1],
+    measures: [CHG, BASE]
+}
+
+/*
+ * Aggregate 1: Simple Summary Statistics by Treatment
+ *
+ * Basic descriptive statistics for change from baseline
+ * grouped by treatment group.
+ */
+aggregate SummaryByTreatment {
+    input: Week24_ITT,
+    groupBy: [TRT01A],
+    statistics: [
+        N = count(CHG),
+        MEAN = mean(CHG),
+        SD = stddev(CHG),
+        MEDIAN = median(CHG),
+        MIN = min(CHG),
+        MAX = max(CHG)
+    ]
+}
+
+/*
+ * Aggregate 2: Summary Statistics by Treatment and Visit
+ *
+ * Descriptive statistics for longitudinal data analysis,
+ * grouped by both treatment and visit.
+ */
+slice PostBaseline_ITT from ADADAS {
+    fix: {
+        ITTFL: "Y"
+    },
+    vary: [USUBJID, AVISIT, TRT01A],
+    measures: [CHG],
+    where: AVISITN > 0
+}
+
+aggregate LongitudinalSummary {
+    input: PostBaseline_ITT,
+    groupBy: [TRT01A, AVISIT],
+    statistics: [
+        N = count(CHG),
+        MEAN = mean(CHG),
+        SD = stddev(CHG),
+        SE = stddev(CHG),
+        CI_LOWER = ci_lower(CHG),
+        CI_UPPER = ci_upper(CHG)
+    ]
+}
+
+// Define adverse event data
+cube ADAE "Adverse Events Analysis Dataset" {
+    namespace: "http://example.org/study/safety#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            AEDECOD: Text,
+            AESOC: Text,
+            TRT01A: CodedValue
+        ],
+
+        measures: [
+            AESTDY: Integer,
+            AEENDY: Integer
+        ],
+
+        attributes: [
+            AESER: Flag,
+            AEREL: CodedValue,
+            SAFFL: Flag
+        ]
+    }
+}
+
+slice SafetyPopulation from ADAE {
+    fix: {
+        SAFFL: "Y"
+    },
+    vary: [USUBJID, AEDECOD, AESOC, TRT01A],
+    measures: [AESTDY]
+}
+
+/*
+ * Aggregate 3: Adverse Event Counts by SOC and Treatment
+ *
+ * Count of subjects with at least one AE in each
+ * System Organ Class by treatment group.
+ */
+aggregate AE_BySocAndTreatment {
+    input: SafetyPopulation,
+    groupBy: [AESOC, TRT01A],
+    statistics: [
+        N_SUBJECTS = count(USUBJID),
+        N_EVENTS = sum(USUBJID)
+    ]
+}
+
+/*
+ * Aggregate 4: Most Frequent Adverse Events
+ *
+ * Count and percentage of subjects experiencing each
+ * preferred term, summarized by treatment.
+ */
+aggregate FrequentAEs {
+    input: SafetyPopulation,
+    groupBy: [AEDECOD, TRT01A],
+    statistics: [
+        N = count(USUBJID),
+        PERCENT = mean(USUBJID)
+    ]
+}
+
+// Define vital signs data
+cube ADVS "Vital Signs Analysis Dataset" {
+    namespace: "http://example.org/study/vitals#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            PARAMCD: CodedValue,
+            PARAM: Text,
+            AVISIT: Text,
+            TRT01A: CodedValue
+        ],
+
+        measures: [
+            AVAL: Numeric unit: "mmHg",
+            CHG: Numeric unit: "mmHg"
+        ],
+
+        attributes: [
+            SAFFL: Flag
+        ]
+    }
+}
+
+slice VitalsPostBaseline from ADVS {
+    fix: {
+        SAFFL: "Y"
+    },
+    vary: [USUBJID, PARAMCD, AVISIT, TRT01A],
+    measures: [AVAL, CHG]
+}
+
+/*
+ * Aggregate 5: Vital Signs Summary by Parameter and Visit
+ *
+ * Summary statistics for multiple vital signs parameters
+ * over time by treatment group.
+ */
+aggregate VitalsSummary {
+    input: VitalsPostBaseline,
+    groupBy: [PARAMCD, AVISIT, TRT01A],
+    statistics: [
+        N = count(AVAL),
+        MEAN_VALUE = mean(AVAL),
+        SD_VALUE = stddev(AVAL),
+        MEAN_CHANGE = mean(CHG),
+        SD_CHANGE = stddev(CHG)
+    ]
+}
+
+// Define laboratory data
+cube ADLB "Laboratory Test Results" {
+    namespace: "http://example.org/study/labs#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            PARAMCD: CodedValue,
+            PARAM: Text,
+            AVISIT: Text,
+            TRT01A: CodedValue
+        ],
+
+        measures: [
+            AVAL: Numeric,
+            CHG: Numeric,
+            PCHG: Numeric
+        ],
+
+        attributes: [
+            ANRIND: CodedValue,
+            SAFFL: Flag
+        ]
+    }
+}
+
+slice LabsPostBaseline from ADLB {
+    fix: {
+        SAFFL: "Y"
+    },
+    vary: [USUBJID, PARAMCD, AVISIT, TRT01A, ANRIND],
+    measures: [AVAL, CHG]
+}
+
+/*
+ * Aggregate 6: Laboratory Shift Table
+ *
+ * Count of subjects with normal/abnormal lab values at baseline
+ * and post-baseline, creating a shift table.
+ */
+aggregate LabShiftCounts {
+    input: LabsPostBaseline,
+    groupBy: [PARAMCD, TRT01A, ANRIND],
+    statistics: [
+        N = count(USUBJID)
+    ]
+}
+
+// Define responder analysis data
+cube ResponderData "Clinical Responder Analysis" {
+    namespace: "http://example.org/study/responders#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            AVISIT: Text,
+            TRT01A: CodedValue
+        ],
+
+        measures: [
+            CHG: Numeric,
+            RESPONDER_4PT: Flag,
+            RESPONDER_7PT: Flag
+        ],
+
+        attributes: [
+            EFFFL: Flag
+        ]
+    }
+}
+
+slice RespondersWeek24 from ResponderData {
+    fix: {
+        AVISIT: "Week 24",
+        EFFFL: "Y"
+    },
+    vary: [USUBJID, TRT01A],
+    measures: [RESPONDER_4PT, RESPONDER_7PT]
+}
+
+/*
+ * Aggregate 7: Responder Rate Analysis
+ *
+ * Count and percentage of subjects meeting responder criteria
+ * for different thresholds.
+ */
+aggregate ResponderRates {
+    input: RespondersWeek24,
+    groupBy: [TRT01A],
+    statistics: [
+        N_TOTAL = count(USUBJID),
+        N_RESP_4PT = sum(RESPONDER_4PT),
+        N_RESP_7PT = sum(RESPONDER_7PT)
+    ]
+}
+
+// Define subgroup data
+cube SubgroupData "Subgroup Analysis Dataset" {
+    namespace: "http://example.org/study/subgroups#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            TRT01A: CodedValue,
+            AGEGR1: CodedValue,
+            SEX: CodedValue,
+            BSEVERITY: CodedValue
+        ],
+
+        measures: [
+            CHG: Numeric,
+            BASE: Numeric
+        ],
+
+        attributes: [
+            EFFFL: Flag
+        ]
+    }
+}
+
+slice SubgroupWeek24 from SubgroupData {
+    fix: {
+        EFFFL: "Y"
+    },
+    vary: [USUBJID, TRT01A, AGEGR1, SEX, BSEVERITY],
+    measures: [CHG, BASE]
+}
+
+/*
+ * Aggregate 8: Subgroup Summary Statistics
+ *
+ * Summary statistics within each subgroup for
+ * heterogeneity of treatment effect analysis.
+ */
+aggregate SubgroupSummaries {
+    input: SubgroupWeek24,
+    groupBy: [AGEGR1, SEX, BSEVERITY, TRT01A],
+    statistics: [
+        N = count(CHG),
+        MEAN = mean(CHG),
+        SD = stddev(CHG)
+    ]
+}
+
+// Define exposure data
+cube ExposureData "Treatment Exposure" {
+    namespace: "http://example.org/study/exposure#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            TRT01A: CodedValue
+        ],
+
+        measures: [
+            EXDUR: Numeric unit: "days",
+            CUMDOSE: Numeric unit: "mg"
+        ],
+
+        attributes: [
+            SAFFL: Flag
+        ]
+    }
+}
+
+slice SafetyExposure from ExposureData {
+    fix: {
+        SAFFL: "Y"
+    },
+    vary: [USUBJID, TRT01A],
+    measures: [EXDUR, CUMDOSE]
+}
+
+/*
+ * Aggregate 9: Treatment Exposure Summary
+ *
+ * Summary of treatment duration and cumulative dose
+ * by treatment group.
+ */
+aggregate ExposureSummary {
+    input: SafetyExposure,
+    groupBy: [TRT01A],
+    statistics: [
+        N = count(USUBJID),
+        MEAN_DURATION = mean(EXDUR),
+        SD_DURATION = stddev(EXDUR),
+        MEDIAN_DURATION = median(EXDUR),
+        MEAN_CUMDOSE = mean(CUMDOSE),
+        SD_CUMDOSE = stddev(CUMDOSE)
+    ]
+}
+
+// Define time-to-event data
+cube TimeToEvent "Time to First Adverse Event" {
+    namespace: "http://example.org/study/tte#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            TRT01A: CodedValue
+        ],
+
+        measures: [
+            AVAL: Numeric unit: "days",
+            CNSR: Flag
+        ],
+
+        attributes: [
+            SAFFL: Flag
+        ]
+    }
+}
+
+slice TTEAnalysis from TimeToEvent {
+    fix: {
+        SAFFL: "Y"
+    },
+    vary: [USUBJID, TRT01A],
+    measures: [AVAL, CNSR]
+}
+
+/*
+ * Aggregate 10: Time-to-Event Summary
+ *
+ * Summary statistics for time-to-event endpoints including
+ * median survival time and event counts.
+ */
+aggregate TTESummary {
+    input: TTEAnalysis,
+    groupBy: [TRT01A],
+    statistics: [
+        N_TOTAL = count(USUBJID),
+        N_EVENTS = sum(CNSR),
+        MEDIAN_TIME = median(AVAL),
+        Q1_TIME = quantile(AVAL),
+        Q3_TIME = quantile(AVAL)
+    ]
+}

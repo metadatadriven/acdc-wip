@@ -1,0 +1,100 @@
+// Example: Slice Definitions
+// This example demonstrates how to create slices of cubes by fixing dimensions,
+// varying others, and applying filtering conditions
+
+// First, define the base cube
+cube ADADAS "Analysis Dataset for ADAS-Cog Total Score" {
+    namespace: "http://example.org/study/xyz#",
+
+    structure: {
+        dimensions: [
+            USUBJID: Identifier,
+            AVISITN: Integer,
+            AVISIT: Text,
+            TRT01A: CodedValue,
+            SITEGR1: CodedValue
+        ],
+
+        measures: [
+            AVAL: Numeric unit: "points",
+            BASE: Numeric unit: "points",
+            CHG: Numeric unit: "points"
+        ],
+
+        attributes: [
+            PARAMCD: CodedValue,
+            PARAM: Text,
+            EFFFL: Flag,
+            ITTFL: Flag
+        ]
+    }
+}
+
+/*
+ * Slice 1: Fixed Visit, Varying Subjects and Treatment
+ *
+ * This slice fixes the analysis to Week 24 and keeps only subjects
+ * in the ITT population who have efficacy data.
+ */
+slice Week24_Efficacy from ADADAS {
+    fix: {
+        AVISIT: "Week 24",
+        EFFFL: "Y",
+        ITTFL: "Y"
+    },
+    vary: [USUBJID, TRT01A],
+    measures: [CHG]
+}
+
+/*
+ * Slice 2: Using Where Clause
+ *
+ * This slice uses a where clause to filter observations
+ * instead of fixing dimensions.
+ */
+slice PostBaseline_Improvers from ADADAS {
+    vary: [USUBJID, AVISIT, TRT01A],
+    where: CHG > 0 and EFFFL == "Y"
+}
+
+/*
+ * Slice 3: Multiple Fixed Dimensions
+ *
+ * This slice is for a specific subgroup analysis:
+ * Week 24, Site Group 1, in the ITT population.
+ */
+slice Week24_SiteGroup1_ITT from ADADAS {
+    fix: {
+        AVISIT: "Week 24",
+        SITEGR1: "Site Group 1",
+        ITTFL: "Y"
+    },
+    vary: [USUBJID, TRT01A],
+    measures: [CHG, BASE, AVAL]
+}
+
+/*
+ * Slice 4: Complex Where Clause
+ *
+ * This demonstrates more complex filtering logic with
+ * multiple conditions and logical operators.
+ */
+slice Baseline_Completers from ADADAS {
+    vary: [USUBJID, TRT01A, AVISIT],
+    where: (BASE > 0) and (EFFFL == "Y") and (CHG > -10 and CHG < 10)
+}
+
+/*
+ * Slice 5: Simple Slice for Primary Analysis
+ *
+ * Week 24 primary efficacy analysis population.
+ * This is typically used as input to statistical models.
+ */
+slice Primary_Analysis_Week24 from ADADAS {
+    fix: {
+        AVISIT: "Week 24",
+        ITTFL: "Y"
+    },
+    vary: [USUBJID, TRT01A, SITEGR1],
+    measures: [CHG, BASE]
+}
