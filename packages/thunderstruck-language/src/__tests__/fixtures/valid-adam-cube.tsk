@@ -1,0 +1,65 @@
+/**
+ * Valid ADaM ADSL (Subject-Level Analysis Dataset)
+ *
+ * This fixture demonstrates a correctly structured ADaM ADSL dataset
+ * that conforms to ADaM 1.2 specifications.
+ */
+
+standards {
+    SDTM: "3.4",
+    ADaM: "1.2"
+}
+
+cube ADSL_Cube {
+    namespace: "http://cdisc.org/adam/adsl",
+    structure: {
+        dimensions: [
+            STUDYID: Identifier,
+            USUBJID: Identifier,
+            SUBJID: Text,
+            SITEID: Text
+        ],
+        measures: [
+            AGE: Numeric,
+            AGEU: CodedValue<AGEU>,
+            SEX: CodedValue<SEX>,
+            RACE: CodedValue<RACE>,
+            ARM: Text,
+            ARMCD: CodedValue<ARMCD>,
+            ACTARM: Text,
+            ACTARMCD: CodedValue<ACTARMCD>,
+            TRT01P: Text,
+            TRT01A: Text,
+            COUNTRY: CodedValue<COUNTRY>,
+            DMDTC: DateTime,
+            ITTFL: Text,
+            SAFFL: Text,
+            RANDDT: Date
+        ]
+    }
+}
+
+// Valid BDS (Basic Data Structure) dataset
+cube ADEFF_BDS {
+    namespace: "http://cdisc.org/adam/bds",
+    structure: {
+        dimensions: [
+            STUDYID: Identifier,
+            USUBJID: Identifier,
+            PARAMCD: CodedValue<PARAMCD>,
+            AVISIT: Text
+        ],
+        measures: [
+            PARAM: Text,
+            AVAL: Numeric,
+            AVALU: Text,
+            BASE: Numeric,
+            CHG: Numeric,
+            PCHG: Numeric,
+            DTYPE: Text,
+            ADT: Date,
+            ADTM: DateTime,
+            AVISITN: Numeric
+        ]
+    }
+}

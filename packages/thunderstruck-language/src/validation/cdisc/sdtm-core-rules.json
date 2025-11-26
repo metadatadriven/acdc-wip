@@ -1,0 +1,187 @@
+{
+  "version": "3.4",
+  "rules": [
+    {
+      "id": "CG0001",
+      "description": "STUDYID, DOMAIN, and USUBJID are required for all SDTM domains",
+      "severity": "error",
+      "category": "Structure",
+      "checkerType": "no-duplicate-key",
+      "config": {
+        "keyVariables": ["STUDYID", "DOMAIN", "USUBJID"]
+      }
+    },
+    {
+      "id": "CG0002",
+      "description": "Date/time variables must use ISO 8601 format",
+      "severity": "warning",
+      "category": "Formatting",
+      "checkerType": "iso8601-date",
+      "appliesTo": ["DM"],
+      "variables": ["RFSTDTC", "RFENDTC", "DTHDTC"],
+      "config": {}
+    },
+    {
+      "id": "CG0003",
+      "description": "Start date must come before end date",
+      "severity": "warning",
+      "category": "Content",
+      "checkerType": "datetime-order",
+      "appliesTo": ["DM"],
+      "config": {
+        "startVariable": "RFSTDTC",
+        "endVariable": "RFENDTC"
+      }
+    },
+    {
+      "id": "CG0010",
+      "description": "SEX must use controlled terminology",
+      "severity": "warning",
+      "category": "Content",
+      "checkerType": "value-in-codelist",
+      "appliesTo": ["DM"],
+      "config": {
+        "variable": "SEX",
+        "codeList": "SEX"
+      }
+    },
+    {
+      "id": "CG0011",
+      "description": "AGEU must use controlled terminology when AGE is present",
+      "severity": "warning",
+      "category": "Content",
+      "checkerType": "required-if",
+      "appliesTo": ["DM"],
+      "config": {
+        "conditionVariable": "AGE",
+        "requiredVariable": "AGEU"
+      }
+    },
+    {
+      "id": "CG0012",
+      "description": "AGEU must use controlled terminology",
+      "severity": "warning",
+      "category": "Content",
+      "checkerType": "value-in-codelist",
+      "appliesTo": ["DM"],
+      "config": {
+        "variable": "AGEU",
+        "codeList": "AGEU"
+      }
+    },
+    {
+      "id": "CG0020",
+      "description": "AE domain requires STUDYID, USUBJID, DOMAIN, and AESEQ as keys",
+      "severity": "error",
+      "category": "Structure",
+      "checkerType": "no-duplicate-key",
+      "appliesTo": ["AE"],
+      "config": {
+        "keyVariables": ["STUDYID", "USUBJID", "DOMAIN", "AESEQ"]
+      }
+    },
+    {
+      "id": "CG0021",
+      "description": "Adverse event date/time variables must use ISO 8601 format",
+      "severity": "warning",
+      "category": "Formatting",
+      "checkerType": "iso8601-date",
+      "appliesTo": ["AE"],
+      "variables": ["AESTDTC", "AEENDTC"],
+      "config": {}
+    },
+    {
+      "id": "CG0022",
+      "description": "AE start date must come before end date",
+      "severity": "warning",
+      "category": "Content",
+      "checkerType": "datetime-order",
+      "appliesTo": ["AE"],
+      "config": {
+        "startVariable": "AESTDTC",
+        "endVariable": "AEENDTC"
+      }
+    },
+    {
+      "id": "CG0023",
+      "description": "AESEV must use controlled terminology",
+      "severity": "warning",
+      "category": "Content",
+      "checkerType": "value-in-codelist",
+      "appliesTo": ["AE"],
+      "config": {
+        "variable": "AESEV",
+        "codeList": "AESEV"
+      }
+    },
+    {
+      "id": "CG0024",
+      "description": "AESER must use controlled terminology",
+      "severity": "warning",
+      "category": "Content",
+      "checkerType": "value-in-codelist",
+      "appliesTo": ["AE"],
+      "config": {
+        "variable": "AESER",
+        "codeList": "NY"
+      }
+    },
+    {
+      "id": "CG0025",
+      "description": "AEREL must use controlled terminology",
+      "severity": "warning",
+      "category": "Content",
+      "checkerType": "value-in-codelist",
+      "appliesTo": ["AE"],
+      "config": {
+        "variable": "AEREL",
+        "codeList": "AEREL"
+      }
+    },
+    {
+      "id": "CG0030",
+      "description": "LB domain requires STUDYID, USUBJID, DOMAIN, and LBSEQ as keys",
+      "severity": "error",
+      "category": "Structure",
+      "checkerType": "no-duplicate-key",
+      "appliesTo": ["LB"],
+      "config": {
+        "keyVariables": ["STUDYID", "USUBJID", "DOMAIN", "LBSEQ"]
+      }
+    },
+    {
+      "id": "CG0031",
+      "description": "Lab test date/time must use ISO 8601 format",
+      "severity": "warning",
+      "category": "Formatting",
+      "checkerType": "iso8601-date",
+      "appliesTo": ["LB"],
+      "variables": ["LBDTC"],
+      "config": {}
+    },
+    {
+      "id": "CG0032",
+      "description": "LBORRESU required when LBORRES is present",
+      "severity": "warning",
+      "category": "Content",
+      "checkerType": "required-if",
+      "appliesTo": ["LB"],
+      "config": {
+        "conditionVariable": "LBORRES",
+        "requiredVariable": "LBORRESU"
+      }
+    },
+    {
+      "id": "CG0033",
+      "description": "LBSTRESU required when LBSTRESN is present",
+      "severity": "warning",
+      "category": "Content",
+      "checkerType": "required-if",
+      "appliesTo": ["LB"],
+      "config": {
+        "conditionVariable": "LBSTRESN",
+        "requiredVariable": "LBSTRESU"
+      }
+    }
+  ]
+}

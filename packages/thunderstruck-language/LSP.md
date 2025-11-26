@@ -113,7 +113,7 @@ npm test
 - Syntax validation for all Thunderstruck constructs:
   - Cube definitions
   - Slice definitions
-  - Transform definitions
+  - Derive definitions
   - Model definitions (with Wilkinson formulas)
   - Aggregate definitions
   - Display definitions

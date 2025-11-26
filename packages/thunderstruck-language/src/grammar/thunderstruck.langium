@@ -4,7 +4,7 @@ entry Program:
     (elements+=ProgramElement)*;
 
 ProgramElement:
-    ImportStatement | CubeDefinition | ConceptDefinition | SliceDefinition |
+    ImportStatement | StandardsDeclaration | CubeDefinition | ConceptDefinition | SliceDefinition |
     DeriveDefinition | ModelDefinition | AggregateDefinition |
     DisplayDefinition | PipelineDefinition;
 
@@ -14,6 +14,13 @@ ImportStatement:
 
 ImportPath:
     segments+=ID ('.' segments+=ID)*;
+
+// Standards version declarations
+StandardsDeclaration:
+    'standards' '{' standards+=StandardVersion (',' standards+=StandardVersion)* '}';
+
+StandardVersion:
+    standard=ID ':' version=STRING;
 
 // Cube definition
 CubeDefinition:

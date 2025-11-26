@@ -1,0 +1,179 @@
+{
+  "version": "1.2",
+  "rules": [
+    {
+      "id": "AG0001",
+      "description": "STUDYID and USUBJID are required for all ADaM datasets",
+      "severity": "error",
+      "category": "Structure",
+      "checkerType": "no-duplicate-key",
+      "config": {
+        "keyVariables": ["STUDYID", "USUBJID"]
+      }
+    },
+    {
+      "id": "AG0002",
+      "description": "SUBJID is required in ADSL",
+      "severity": "error",
+      "category": "Structure",
+      "checkerType": "no-duplicate-key",
+      "appliesTo": ["ADSL"],
+      "config": {
+        "keyVariables": ["STUDYID", "USUBJID", "SUBJID"]
+      }
+    },
+    {
+      "id": "AG0003",
+      "description": "SEX must use controlled terminology",
+      "severity": "warning",
+      "category": "Content",
+      "checkerType": "value-in-codelist",
+      "appliesTo": ["ADSL"],
+      "config": {
+        "variable": "SEX",
+        "codeList": "SEX"
+      }
+    },
+    {
+      "id": "AG0004",
+      "description": "AGEU must use controlled terminology when AGE is present",
+      "severity": "warning",
+      "category": "Content",
+      "checkerType": "required-if",
+      "appliesTo": ["ADSL"],
+      "config": {
+        "conditionVariable": "AGE",
+        "requiredVariable": "AGEU"
+      }
+    },
+    {
+      "id": "AG0005",
+      "description": "AGEU must use controlled terminology",
+      "severity": "warning",
+      "category": "Content",
+      "checkerType": "value-in-codelist",
+      "appliesTo": ["ADSL"],
+      "config": {
+        "variable": "AGEU",
+        "codeList": "AGEU"
+      }
+    },
+    {
+      "id": "AG0006",
+      "description": "Treatment start date must come before end date",
+      "severity": "warning",
+      "category": "Content",
+      "checkerType": "datetime-order",
+      "appliesTo": ["ADSL"],
+      "config": {
+        "startVariable": "TRTSDT",
+        "endVariable": "TRTEDT"
+      }
+    },
+    {
+      "id": "AG0007",
+      "description": "SAFFL must use controlled terminology",
+      "severity": "warning",
+      "category": "Content",
+      "checkerType": "value-in-codelist",
+      "appliesTo": ["ADSL"],
+      "config": {
+        "variable": "SAFFL",
+        "codeList": "NY"
+      }
+    },
+    {
+      "id": "AG0008",
+      "description": "ITTFL must use controlled terminology",
+      "severity": "warning",
+      "category": "Content",
+      "checkerType": "value-in-codelist",
+      "appliesTo": ["ADSL"],
+      "config": {
+        "variable": "ITTFL",
+        "codeList": "NY"
+      }
+    },
+    {
+      "id": "AG0009",
+      "description": "EFFFL must use controlled terminology",
+      "severity": "warning",
+      "category": "Content",
+      "checkerType": "value-in-codelist",
+      "appliesTo": ["ADSL"],
+      "config": {
+        "variable": "EFFFL",
+        "codeList": "NY"
+      }
+    },
+    {
+      "id": "AG0010",
+      "description": "BDS datasets require STUDYID, USUBJID, PARAMCD, and AVISIT as keys",
+      "severity": "error",
+      "category": "Structure",
+      "checkerType": "no-duplicate-key",
+      "appliesTo": ["BDS"],
+      "config": {
+        "keyVariables": ["STUDYID", "USUBJID", "PARAMCD", "AVISIT"]
+      }
+    },
+    {
+      "id": "AG0011",
+      "description": "PARAM is required when PARAMCD is present",
+      "severity": "error",
+      "category": "Content",
+      "checkerType": "required-if",
+      "appliesTo": ["BDS"],
+      "config": {
+        "conditionVariable": "PARAMCD",
+        "requiredVariable": "PARAM"
+      }
+    },
+    {
+      "id": "AG0012",
+      "description": "AVISITN is recommended when AVISIT is present",
+      "severity": "warning",
+      "category": "Content",
+      "checkerType": "required-if",
+      "appliesTo": ["BDS"],
+      "config": {
+        "conditionVariable": "AVISIT",
+        "requiredVariable": "AVISITN"
+      }
+    },
+    {
+      "id": "AG0013",
+      "description": "Analysis date must use Date type",
+      "severity": "warning",
+      "category": "Formatting",
+      "checkerType": "iso8601-date",
+      "appliesTo": ["BDS"],
+      "variables": ["ADT"],
+      "config": {}
+    },
+    {
+      "id": "AG0014",
+      "description": "ABLFL must use controlled terminology",
+      "severity": "warning",
+      "category": "Content",
+      "checkerType": "value-in-codelist",
+      "appliesTo": ["BDS"],
+      "config": {
+        "variable": "ABLFL",
+        "codeList": "NY"
+      }
+    },
+    {
+      "id": "AG0015",
+      "description": "ANL01FL must use controlled terminology",
+      "severity": "warning",
+      "category": "Content",
+      "checkerType": "value-in-codelist",
+      "appliesTo": ["BDS"],
+      "config": {
+        "variable": "ANL01FL",
+        "codeList": "NY"
+      }
+    }
+  ]
+}
