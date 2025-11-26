@@ -6,7 +6,7 @@
  * Pipeline 1: Simple Linear Pipeline
  *
  * A basic pipeline demonstrating sequential analysis steps:
- * Load Data -> Transform -> Analyze -> Display
+ * Load Data -> Derive -> Analyze -> Display
  */
 pipeline BasicEfficacyAnalysis {
     stages: [
@@ -38,11 +38,11 @@ pipeline ParallelEfficacySafety {
         LoadSafety: LoadAEData,
 
         // Parallel efficacy analysis
-        PrepareEfficacy: TransformEfficacyData depends on [LoadEfficacy],
+        PrepareEfficacy: DeriveEfficacyData depends on [LoadEfficacy],
         AnalyzeEfficacy: RunEfficacyModel depends on [PrepareEfficacy],
 
         // Parallel safety analysis
-        PrepareSafety: TransformSafetyData depends on [LoadSafety],
+        PrepareSafety: DeriveSafetyData depends on [LoadSafety],
         AnalyzeSafety: RunSafetyModel depends on [PrepareSafety],
 
         // Merge results

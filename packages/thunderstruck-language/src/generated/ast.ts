@@ -75,6 +75,8 @@ export type ThunderstruckKeywordNames =
     | "cube"
     | "definition"
     | "depends"
+    | "derivations"
+    | "derive"
     | "dimensions"
     | "display"
     | "false"
@@ -113,8 +115,6 @@ export type ThunderstruckKeywordNames =
     | "subject"
     | "sum"
     | "table"
-    | "transform"
-    | "transformations"
     | "true"
     | "type"
     | "unit"
@@ -192,7 +192,7 @@ export function isOutputCubeSpec(item: unknown): item is OutputCubeSpec {
     return reflection.isInstance(item, OutputCubeSpec);
 }
 
-export type ProgramElement = AggregateDefinition | ConceptDefinition | CubeDefinition | DisplayDefinition | ImportStatement | ModelDefinition | PipelineDefinition | SliceDefinition | TransformDefinition;
+export type ProgramElement = AggregateDefinition | ConceptDefinition | CubeDefinition | DeriveDefinition | DisplayDefinition | ImportStatement | ModelDefinition | PipelineDefinition | SliceDefinition;
 
 export const ProgramElement = 'ProgramElement';
 
@@ -251,7 +251,7 @@ export function isAggregateDefinition(item: unknown): item is AggregateDefinitio
 }
 
 export interface BinaryExpression extends langium.AstNode {
-    readonly $container: BinaryExpression | DimensionConstraint | FunctionCallExpression | MemberAccessExpression | SliceDefinition | Transformation | UnaryExpression;
+    readonly $container: BinaryExpression | Derivation | DimensionConstraint | FunctionCallExpression | MemberAccessExpression | SliceDefinition | UnaryExpression;
     readonly $type: 'BinaryExpression';
     left: Expression;
     operator: '!=' | '*' | '+' | '-' | '/' | '<' | '<=' | '==' | '>' | '>=' | 'and' | 'or';
@@ -265,7 +265,7 @@ export function isBinaryExpression(item: unknown): item is BinaryExpression {
 }
 
 export interface BooleanLiteral extends langium.AstNode {
-    readonly $container: BinaryExpression | DimensionConstraint | FunctionCallExpression | MemberAccessExpression | SliceDefinition | Transformation | UnaryExpression;
+    readonly $container: BinaryExpression | Derivation | DimensionConstraint | FunctionCallExpression | MemberAccessExpression | SliceDefinition | UnaryExpression;
     readonly $type: 'BooleanLiteral';
     value: 'false' | 'true';
 }
@@ -408,7 +408,7 @@ export function isCovarianceStructure(item: unknown): item is CovarianceStructur
 }
 
 export interface CubeDefinition extends langium.AstNode {
-    readonly $container: AggregateDefinition | ModelDefinition | Program | TransformDefinition;
+    readonly $container: AggregateDefinition | DeriveDefinition | ModelDefinition | Program;
     readonly $type: 'CubeDefinition';
     description?: string;
     name: string;
@@ -446,6 +446,47 @@ export const DependencyList = 'DependencyList';
 
 export function isDependencyList(item: unknown): item is DependencyList {
     return reflection.isInstance(item, DependencyList);
+}
+
+export interface Derivation extends langium.AstNode {
+    readonly $container: DerivationList;
+    readonly $type: 'Derivation';
+    expression: Expression;
+    target: string;
+}
+
+export const Derivation = 'Derivation';
+
+export function isDerivation(item: unknown): item is Derivation {
+    return reflection.isInstance(item, Derivation);
+}
+
+export interface DerivationList extends langium.AstNode {
+    readonly $container: DeriveDefinition;
+    readonly $type: 'DerivationList';
+    derivations: Array<Derivation>;
+}
+
+export const DerivationList = 'DerivationList';
+
+export function isDerivationList(item: unknown): item is DerivationList {
+    return reflection.isInstance(item, DerivationList);
+}
+
+export interface DeriveDefinition extends langium.AstNode {
+    readonly $container: Program;
+    readonly $type: 'DeriveDefinition';
+    derivations?: DerivationList;
+    description?: string;
+    inputRef: string;
+    name: string;
+    output: OutputCubeSpec;
+}
+
+export const DeriveDefinition = 'DeriveDefinition';
+
+export function isDeriveDefinition(item: unknown): item is DeriveDefinition {
+    return reflection.isInstance(item, DeriveDefinition);
 }
 
 export interface DimensionConstraint extends langium.AstNode {
@@ -690,7 +731,7 @@ export function isFormulaVariable(item: unknown): item is FormulaVariable {
 }
 
 export interface FunctionCallExpression extends langium.AstNode {
-    readonly $container: BinaryExpression | DimensionConstraint | FunctionCallExpression | MemberAccessExpression | SliceDefinition | Transformation | UnaryExpression;
+    readonly $container: BinaryExpression | Derivation | DimensionConstraint | FunctionCallExpression | MemberAccessExpression | SliceDefinition | UnaryExpression;
     readonly $type: 'FunctionCallExpression';
     arguments: Array<Expression>;
     function: string;
@@ -752,7 +793,7 @@ export function isMeasureList(item: unknown): item is MeasureList {
 }
 
 export interface MemberAccessExpression extends langium.AstNode {
-    readonly $container: BinaryExpression | DimensionConstraint | FunctionCallExpression | MemberAccessExpression | SliceDefinition | Transformation | UnaryExpression;
+    readonly $container: BinaryExpression | Derivation | DimensionConstraint | FunctionCallExpression | MemberAccessExpression | SliceDefinition | UnaryExpression;
     readonly $type: 'MemberAccessExpression';
     member: string;
     receiver: Expression;
@@ -784,7 +825,7 @@ export function isModelDefinition(item: unknown): item is ModelDefinition {
 }
 
 export interface NumberLiteral extends langium.AstNode {
-    readonly $container: BinaryExpression | DimensionConstraint | FunctionCallExpression | MemberAccessExpression | SliceDefinition | Transformation | UnaryExpression;
+    readonly $container: BinaryExpression | Derivation | DimensionConstraint | FunctionCallExpression | MemberAccessExpression | SliceDefinition | UnaryExpression;
     readonly $type: 'NumberLiteral';
     value: number;
 }
@@ -796,7 +837,7 @@ export function isNumberLiteral(item: unknown): item is NumberLiteral {
 }
 
 export interface OutputCubeRef extends langium.AstNode {
-    readonly $container: AggregateDefinition | ModelDefinition | TransformDefinition;
+    readonly $container: AggregateDefinition | DeriveDefinition | ModelDefinition;
     readonly $type: 'OutputCubeRef';
     cubeRef: string;
 }
@@ -928,7 +969,7 @@ export function isStatisticList(item: unknown): item is StatisticList {
 }
 
 export interface StringLiteral extends langium.AstNode {
-    readonly $container: BinaryExpression | DimensionConstraint | FunctionCallExpression | MemberAccessExpression | SliceDefinition | Transformation | UnaryExpression;
+    readonly $container: BinaryExpression | Derivation | DimensionConstraint | FunctionCallExpression | MemberAccessExpression | SliceDefinition | UnaryExpression;
     readonly $type: 'StringLiteral';
     value: string;
 }
@@ -953,49 +994,8 @@ export function isTableSpec(item: unknown): item is TableSpec {
     return reflection.isInstance(item, TableSpec);
 }
 
-export interface Transformation extends langium.AstNode {
-    readonly $container: TransformationList;
-    readonly $type: 'Transformation';
-    expression: Expression;
-    target: string;
-}
-
-export const Transformation = 'Transformation';
-
-export function isTransformation(item: unknown): item is Transformation {
-    return reflection.isInstance(item, Transformation);
-}
-
-export interface TransformationList extends langium.AstNode {
-    readonly $container: TransformDefinition;
-    readonly $type: 'TransformationList';
-    transformations: Array<Transformation>;
-}
-
-export const TransformationList = 'TransformationList';
-
-export function isTransformationList(item: unknown): item is TransformationList {
-    return reflection.isInstance(item, TransformationList);
-}
-
-export interface TransformDefinition extends langium.AstNode {
-    readonly $container: Program;
-    readonly $type: 'TransformDefinition';
-    description?: string;
-    inputRef: string;
-    name: string;
-    output: OutputCubeSpec;
-    transformations?: TransformationList;
-}
-
-export const TransformDefinition = 'TransformDefinition';
-
-export function isTransformDefinition(item: unknown): item is TransformDefinition {
-    return reflection.isInstance(item, TransformDefinition);
-}
-
 export interface UnaryExpression extends langium.AstNode {
-    readonly $container: BinaryExpression | DimensionConstraint | FunctionCallExpression | MemberAccessExpression | SliceDefinition | Transformation | UnaryExpression;
+    readonly $container: BinaryExpression | Derivation | DimensionConstraint | FunctionCallExpression | MemberAccessExpression | SliceDefinition | UnaryExpression;
     readonly $type: 'UnaryExpression';
     operand: Expression;
     operator: '-' | 'not';
@@ -1020,7 +1020,7 @@ export function isUnitSpec(item: unknown): item is UnitSpec {
 }
 
 export interface VariableReference extends langium.AstNode {
-    readonly $container: BinaryExpression | DimensionConstraint | FunctionCallExpression | MemberAccessExpression | SliceDefinition | Transformation | UnaryExpression;
+    readonly $container: BinaryExpression | Derivation | DimensionConstraint | FunctionCallExpression | MemberAccessExpression | SliceDefinition | UnaryExpression;
     readonly $type: 'VariableReference';
     variable: string;
 }
@@ -1050,6 +1050,9 @@ export type ThunderstruckAstType = {
     CubeDefinition: CubeDefinition
     CubeStructure: CubeStructure
     DependencyList: DependencyList
+    Derivation: Derivation
+    DerivationList: DerivationList
+    DeriveDefinition: DeriveDefinition
     DimensionConstraint: DimensionConstraint
     DimensionConstraints: DimensionConstraints
     DimensionList: DimensionList
@@ -1093,9 +1096,6 @@ export type ThunderstruckAstType = {
     StatisticList: StatisticList
     StringLiteral: StringLiteral
     TableSpec: TableSpec
-    TransformDefinition: TransformDefinition
-    Transformation: Transformation
-    TransformationList: TransformationList
     TypeReference: TypeReference
     UnaryExpression: UnaryExpression
     UnitSpec: UnitSpec
@@ -1105,19 +1105,19 @@ export type ThunderstruckAstType = {
 export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
 
     getAllTypes(): string[] {
-        return [AestheticOption, AestheticSpec, AggregateDefinition, BinaryExpression, BooleanLiteral, CodeListMapping, CodeListMappings, CodeListNamespace, CodeListRef, CodedValueType, ColumnFormat, Component, ComponentList, ConceptDefinition, CovarianceStructure, CubeDefinition, CubeStructure, DependencyList, DimensionConstraint, DimensionConstraints, DimensionList, DisplayDefinition, Expression, FigureSpec, FootnoteList, FormatOption, FormatSpec, Formula, FormulaAddition, FormulaConditioning, FormulaCrossing, FormulaFunction, FormulaInteraction, FormulaNesting, FormulaNumber, FormulaPower, FormulaTerm, FormulaVariable, FunctionCallExpression, IdentifierType, ImportPath, ImportStatement, Literal, MeasureList, MemberAccessExpression, ModelDefinition, NumberLiteral, OutputCubeRef, OutputCubeSpec, PipelineDefinition, PipelineStage, PrimitiveType, Program, ProgramElement, RandomEffects, SliceDefinition, StageList, Statistic, StatisticList, StringLiteral, TableSpec, TransformDefinition, Transformation, TransformationList, TypeReference, UnaryExpression, UnitSpec, VariableReference];
+        return [AestheticOption, AestheticSpec, AggregateDefinition, BinaryExpression, BooleanLiteral, CodeListMapping, CodeListMappings, CodeListNamespace, CodeListRef, CodedValueType, ColumnFormat, Component, ComponentList, ConceptDefinition, CovarianceStructure, CubeDefinition, CubeStructure, DependencyList, Derivation, DerivationList, DeriveDefinition, DimensionConstraint, DimensionConstraints, DimensionList, DisplayDefinition, Expression, FigureSpec, FootnoteList, FormatOption, FormatSpec, Formula, FormulaAddition, FormulaConditioning, FormulaCrossing, FormulaFunction, FormulaInteraction, FormulaNesting, FormulaNumber, FormulaPower, FormulaTerm, FormulaVariable, FunctionCallExpression, IdentifierType, ImportPath, ImportStatement, Literal, MeasureList, MemberAccessExpression, ModelDefinition, NumberLiteral, OutputCubeRef, OutputCubeSpec, PipelineDefinition, PipelineStage, PrimitiveType, Program, ProgramElement, RandomEffects, SliceDefinition, StageList, Statistic, StatisticList, StringLiteral, TableSpec, TypeReference, UnaryExpression, UnitSpec, VariableReference];
     }
 
     protected override computeIsSubtype(subtype: string, supertype: string): boolean {
         switch (subtype) {
             case AggregateDefinition:
             case ConceptDefinition:
+            case DeriveDefinition:
             case DisplayDefinition:
             case ImportStatement:
             case ModelDefinition:
             case PipelineDefinition:
-            case SliceDefinition:
-            case TransformDefinition: {
+            case SliceDefinition: {
                 return this.isSubtype(ProgramElement, supertype);
             }
             case BinaryExpression:
@@ -1337,6 +1337,35 @@ export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
                     name: DependencyList,
                     properties: [
                         { name: 'dependencies', defaultValue: [] }
+                    ]
+                };
+            }
+            case Derivation: {
+                return {
+                    name: Derivation,
+                    properties: [
+                        { name: 'expression' },
+                        { name: 'target' }
+                    ]
+                };
+            }
+            case DerivationList: {
+                return {
+                    name: DerivationList,
+                    properties: [
+                        { name: 'derivations', defaultValue: [] }
+                    ]
+                };
+            }
+            case DeriveDefinition: {
+                return {
+                    name: DeriveDefinition,
+                    properties: [
+                        { name: 'derivations' },
+                        { name: 'description' },
+                        { name: 'inputRef' },
+                        { name: 'name' },
+                        { name: 'output' }
                     ]
                 };
             }
@@ -1691,35 +1720,6 @@ export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
                         { name: 'columns' },
                         { name: 'format' },
                         { name: 'rows' }
-                    ]
-                };
-            }
-            case Transformation: {
-                return {
-                    name: Transformation,
-                    properties: [
-                        { name: 'expression' },
-                        { name: 'target' }
-                    ]
-                };
-            }
-            case TransformationList: {
-                return {
-                    name: TransformationList,
-                    properties: [
-                        { name: 'transformations', defaultValue: [] }
-                    ]
-                };
-            }
-            case TransformDefinition: {
-                return {
-                    name: TransformDefinition,
-                    properties: [
-                        { name: 'description' },
-                        { name: 'inputRef' },
-                        { name: 'name' },
-                        { name: 'output' },
-                        { name: 'transformations' }
                     ]
                 };
             }
