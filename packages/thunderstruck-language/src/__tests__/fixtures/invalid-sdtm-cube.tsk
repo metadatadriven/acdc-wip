@@ -1,0 +1,41 @@
+/**
+ * Invalid SDTM DM (Demographics) Cube
+ *
+ * This fixture demonstrates various SDTM validation errors:
+ * - Missing required variables (USUBJID)
+ * - Wrong variable types (AGE should be Numeric, not Text)
+ * - Missing controlled terminology (SEX should be CodedValue)
+ * - Key variables not as dimensions (USUBJID as measure)
+ * - Duplicate component names (STUDYID appears twice)
+ */
+
+standards {
+    SDTM: "3.4"
+}
+
+cube DM_Cube {
+    namespace: "http://cdisc.org/sdtm/dm",
+    structure: {
+        dimensions: [
+            STUDYID: Identifier,
+            DOMAIN: Identifier,
+            STUDYID: Identifier  // IC-2: Duplicate component name
+            // Missing: USUBJID (required key variable)
+        ],
+        measures: [
+            USUBJID: Text,       // Should be dimension (key variable)
+            AGE: Text,           // Wrong type - should be Numeric
+            SEX: Text,           // Should be CodedValue<SEX>
+            RACE: Text           // Should be CodedValue<RACE>
+        ]
+    }
+}
+
+// Invalid slice - missing dimensions
+slice DM_Partial from DM_Cube {
+    fix: {
+        STUDYID = "STUDY001"
+        // IC-11: Missing DOMAIN, USUBJID dimensions
+    },
+    vary: []  // IC-12: No varying dimensions
+}

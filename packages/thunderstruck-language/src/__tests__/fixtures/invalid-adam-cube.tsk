@@ -1,0 +1,57 @@
+/**
+ * Invalid ADaM ADSL (Subject-Level Analysis Dataset)
+ *
+ * This fixture demonstrates various ADaM validation errors:
+ * - Missing required variables
+ * - Naming convention violations
+ * - Derived variable dependencies
+ */
+
+standards {
+    ADaM: "1.2"
+}
+
+// Naming violation - should start with 'AD'
+cube SubjectLevel {
+    namespace: "http://cdisc.org/adam/adsl",
+    structure: {
+        dimensions: [
+            STUDYID: Identifier,
+            USUBJID: Identifier
+            // Missing required: SUBJID, SITEID
+        ],
+        measures: [
+            AGE: Numeric,
+            SEX: CodedValue<SEX>
+            // Missing required: AGEU, RACE, ARM, ARMCD, ACTARM, ACTARMCD, TRT01P, TRT01A
+        ]
+    }
+}
+
+// BDS with missing dependencies
+cube ADEFF_Invalid {
+    namespace: "http://cdisc.org/adam/bds",
+    structure: {
+        dimensions: [
+            STUDYID: Identifier,
+            USUBJID: Identifier,
+            PARAMCD: CodedValue<PARAMCD>,
+            PARAMCD: CodedValue<PARAM2>  // IC-2: Duplicate component name
+        ],
+        measures: [
+            PARAM: Text,
+            AVAL: Numeric,
+            AVALU: Text,
+            CHG: Numeric,      // Requires BASE
+            PCHG: Numeric,     // Requires BASE
+            DTYPE: Text
+            // Missing: BASE (required for CHG and PCHG)
+        ]
+    }
+}
+
+// Cube with slice missing dimensions (IC-11 violation)
+slice Invalid_Slice from ADEFF_Invalid {
+    fix: { STUDYID = "STUDY001" },
+    vary: []  // IC-11: Missing USUBJID, PARAMCD dimensions
+}

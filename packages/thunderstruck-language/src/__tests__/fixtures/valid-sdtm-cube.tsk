@@ -1,0 +1,43 @@
+/**
+ * Valid SDTM DM (Demographics) Cube
+ *
+ * This fixture demonstrates a correctly structured SDTM Demographics domain
+ * that conforms to SDTM 3.4 specifications.
+ */
+
+standards {
+    SDTM: "3.4",
+    W3C_Cube: "2014-01-16"
+}
+
+cube DM_Cube {
+    namespace: "http://cdisc.org/sdtm/dm",
+    structure: {
+        dimensions: [
+            STUDYID: Identifier,
+            DOMAIN: Identifier,
+            USUBJID: Identifier,
+            SUBJID: Text
+        ],
+        measures: [
+            AGE: Numeric,
+            AGEU: CodedValue<AGEU>,
+            SEX: CodedValue<SEX>,
+            RACE: CodedValue<RACE>,
+            ARMCD: CodedValue<ARMCD>,
+            ARM: Text,
+            COUNTRY: CodedValue<COUNTRY>,
+            RFSTDTC: DateTime,
+            RFENDTC: DateTime
+        ]
+    }
+}
+
+// Valid slice with all dimensions specified
+slice DM_ByCountry from DM_Cube {
+    fix: {
+        STUDYID = "STUDY001",
+        DOMAIN = "DM"
+    },
+    vary: [USUBJID, SUBJID]
+}

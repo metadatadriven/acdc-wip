@@ -27,7 +27,7 @@
       "patterns": [
         {
           "name": "keyword.control.thunderstruck",
-          "match": "\\b(cube|slice|model|transform|aggregate|display|pipeline|concept|import|as|from|namespace|structure|dimensions|measures|attributes|input|output|formula|family|link|vary|fix|unit)\\b"
+          "match": "\\b(cube|slice|model|derive|aggregate|display|pipeline|concept|import|as|from|namespace|structure|dimensions|measures|attributes|input|output|formula|family|link|vary|fix|unit)\\b"
         }
       ]
     },
