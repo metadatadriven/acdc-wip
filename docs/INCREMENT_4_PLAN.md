@@ -2,7 +2,7 @@
 
 **Version:** 1.0
 **Date:** 2025-11-26
-**Status:** In Progress - Phases 1 & 2 Complete
+**Status:** In Progress - Phases 1, 2 & 3 Complete
 **Last Updated:** 2025-11-26
 **Dependencies:** Increment 3 (Type System + Semantic Validation) complete
 **GitHub Issue:** #7
@@ -12,7 +12,7 @@
 
 - ✅ **Phase 1:** W3C Data Cube Integrity Constraints (Complete)
 - ✅ **Phase 2:** CDISC Validation Framework (Complete)
-- ⏳ **Phase 3:** CDISC CORE Rules Engine (Pending)
+- ✅ **Phase 3:** CDISC CORE Rules Engine (Complete)
 - ⏳ **Phase 4:** Version Management (Pending)
 - ⏳ **Phase 5:** Validation Reporting (Pending)
 - ⏳ **Phase 6:** Testing Strategy (Pending)
@@ -1276,9 +1276,38 @@ export class ADaMValidator {
 
 ---
 
-## Phase 3: CDISC CORE Rules Engine
+## Phase 3: CDISC CORE Rules Engine ✅ COMPLETE
 
-### 3.1 CORE Rules Structure
+**Status:** Implemented and tested
+**Commit:** bf43c4e
+**Files Added:** 5 (rules engine + 5 checkers + SDTM/ADaM rules + tests)
+
+### 3.1 CORE Rules Engine Framework
+
+**Implementation:** Created extensible framework for CORE rules validation with pluggable checker architecture.
+
+**Files:**
+- `src/validation/cdisc/core-rules-engine.ts` - Main engine with checker registration
+- `src/validation/cdisc/core-checkers.ts` - Five concrete checker implementations
+- `src/validation/cdisc/sdtm-core-rules.json` - 16 SDTM CORE rules (v3.4)
+- `src/validation/cdisc/adam-core-rules.json` - 15 ADaM CORE rules (v1.2)
+- `src/validation/cdisc/cdisc-validator.ts` - Updated with CORE integration
+- `src/__tests__/core-rules.test.ts` - Comprehensive test suite (16 tests)
+
+**Key Features:**
+- Extensible checker registration system
+- JSON-driven rule definitions
+- Domain-specific rule filtering
+- Five checker types implemented:
+  - `NoDuplicateKeyChecker` - Validates key variables presence
+  - `ISO8601DateChecker` - Validates DateTime/Date type usage
+  - `DateTimeOrderChecker` - Validates date ordering (start before end)
+  - `RequiredIfChecker` - Validates conditional requirements
+  - `ValueInCodeListChecker` - Validates CodedValue code lists
+
+**Test Results:** All 322 tests pass (16 new CORE rules tests added)
+
+### 3.2 CORE Rules Structure
 
 **Data Format:**
 
