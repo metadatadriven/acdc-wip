@@ -1,0 +1,475 @@
+{
+  "version": "3.4",
+  "domains": [
+    {
+      "domain": "DM",
+      "name": "Demographics",
+      "class": "Special Purpose",
+      "version": "3.4",
+      "keyVariables": ["STUDYID", "USUBJID"],
+      "variables": [
+        {
+          "name": "STUDYID",
+          "label": "Study Identifier",
+          "type": "Text",
+          "required": true,
+          "role": "Identifier",
+          "core": "Required",
+          "length": 200
+        },
+        {
+          "name": "DOMAIN",
+          "label": "Domain Abbreviation",
+          "type": "Text",
+          "required": true,
+          "role": "Identifier",
+          "core": "Required",
+          "length": 2,
+          "allowedValues": ["DM"]
+        },
+        {
+          "name": "USUBJID",
+          "label": "Unique Subject Identifier",
+          "type": "Text",
+          "required": true,
+          "role": "Identifier",
+          "core": "Required",
+          "length": 200
+        },
+        {
+          "name": "SUBJID",
+          "label": "Subject Identifier for the Study",
+          "type": "Text",
+          "required": true,
+          "role": "Topic",
+          "core": "Required",
+          "length": 200
+        },
+        {
+          "name": "RFSTDTC",
+          "label": "Subject Reference Start Date/Time",
+          "type": "DateTime",
+          "required": false,
+          "role": "Record Qualifier",
+          "core": "Expected",
+          "length": 20
+        },
+        {
+          "name": "RFENDTC",
+          "label": "Subject Reference End Date/Time",
+          "type": "DateTime",
+          "required": false,
+          "role": "Record Qualifier",
+          "core": "Expected",
+          "length": 20
+        },
+        {
+          "name": "AGE",
+          "label": "Age",
+          "type": "Integer",
+          "required": false,
+          "role": "Record Qualifier",
+          "core": "Expected"
+        },
+        {
+          "name": "AGEU",
+          "label": "Age Units",
+          "type": "CodedValue",
+          "codeList": "AGEU",
+          "required": false,
+          "role": "Qualifier",
+          "core": "Expected",
+          "length": 10
+        },
+        {
+          "name": "SEX",
+          "label": "Sex",
+          "type": "CodedValue",
+          "codeList": "SEX",
+          "required": false,
+          "role": "Record Qualifier",
+          "core": "Required",
+          "length": 1
+        },
+        {
+          "name": "RACE",
+          "label": "Race",
+          "type": "CodedValue",
+          "codeList": "RACE",
+          "required": false,
+          "role": "Record Qualifier",
+          "core": "Expected",
+          "length": 200
+        },
+        {
+          "name": "ARMCD",
+          "label": "Planned Arm Code",
+          "type": "Text",
+          "required": false,
+          "role": "Record Qualifier",
+          "core": "Expected",
+          "length": 20
+        },
+        {
+          "name": "ARM",
+          "label": "Description of Planned Arm",
+          "type": "Text",
+          "required": false,
+          "role": "Qualifier",
+          "core": "Expected",
+          "length": 200
+        },
+        {
+          "name": "ACTARMCD",
+          "label": "Actual Arm Code",
+          "type": "Text",
+          "required": false,
+          "role": "Record Qualifier",
+          "core": "Expected",
+          "length": 20
+        },
+        {
+          "name": "ACTARM",
+          "label": "Description of Actual Arm",
+          "type": "Text",
+          "required": false,
+          "role": "Qualifier",
+          "core": "Expected",
+          "length": 200
+        },
+        {
+          "name": "COUNTRY",
+          "label": "Country",
+          "type": "CodedValue",
+          "codeList": "COUNTRY",
+          "required": false,
+          "role": "Record Qualifier",
+          "core": "Expected",
+          "length": 3
+        }
+      ]
+    },
+    {
+      "domain": "AE",
+      "name": "Adverse Events",
+      "class": "Events",
+      "version": "3.4",
+      "keyVariables": ["STUDYID", "USUBJID", "AESEQ"],
+      "variables": [
+        {
+          "name": "STUDYID",
+          "label": "Study Identifier",
+          "type": "Text",
+          "required": true,
+          "role": "Identifier",
+          "core": "Required",
+          "length": 200
+        },
+        {
+          "name": "DOMAIN",
+          "label": "Domain Abbreviation",
+          "type": "Text",
+          "required": true,
+          "role": "Identifier",
+          "core": "Required",
+          "length": 2,
+          "allowedValues": ["AE"]
+        },
+        {
+          "name": "USUBJID",
+          "label": "Unique Subject Identifier",
+          "type": "Text",
+          "required": true,
+          "role": "Identifier",
+          "core": "Required",
+          "length": 200
+        },
+        {
+          "name": "AESEQ",
+          "label": "Sequence Number",
+          "type": "Integer",
+          "required": true,
+          "role": "Identifier",
+          "core": "Required"
+        },
+        {
+          "name": "AETERM",
+          "label": "Reported Term for the Adverse Event",
+          "type": "Text",
+          "required": true,
+          "role": "Topic",
+          "core": "Required",
+          "length": 200
+        },
+        {
+          "name": "AEDECOD",
+          "label": "Dictionary-Derived Term",
+          "type": "Text",
+          "required": false,
+          "role": "Qualifier",
+          "core": "Expected",
+          "length": 200
+        },
+        {
+          "name": "AESTDTC",
+          "label": "Start Date/Time of Adverse Event",
+          "type": "DateTime",
+          "required": false,
+          "role": "Timing",
+          "core": "Expected",
+          "length": 20
+        },
+        {
+          "name": "AEENDTC",
+          "label": "End Date/Time of Adverse Event",
+          "type": "DateTime",
+          "required": false,
+          "role": "Timing",
+          "core": "Expected",
+          "length": 20
+        },
+        {
+          "name": "AESEV",
+          "label": "Severity/Intensity",
+          "type": "CodedValue",
+          "codeList": "AESEV",
+          "required": false,
+          "role": "Qualifier",
+          "core": "Expected",
+          "length": 50
+        },
+        {
+          "name": "AESER",
+          "label": "Serious Event",
+          "type": "CodedValue",
+          "codeList": "NY",
+          "required": false,
+          "role": "Qualifier",
+          "core": "Expected",
+          "length": 1
+        },
+        {
+          "name": "AEREL",
+          "label": "Causality",
+          "type": "CodedValue",
+          "codeList": "AEREL",
+          "required": false,
+          "role": "Qualifier",
+          "core": "Expected",
+          "length": 50
+        },
+        {
+          "name": "AEOUT",
+          "label": "Outcome of Adverse Event",
+          "type": "CodedValue",
+          "codeList": "AEOUT",
+          "required": false,
+          "role": "Qualifier",
+          "core": "Expected",
+          "length": 200
+        }
+      ]
+    },
+    {
+      "domain": "LB",
+      "name": "Laboratory Test Results",
+      "class": "Findings",
+      "version": "3.4",
+      "keyVariables": ["STUDYID", "USUBJID", "LBSEQ"],
+      "variables": [
+        {
+          "name": "STUDYID",
+          "label": "Study Identifier",
+          "type": "Text",
+          "required": true,
+          "role": "Identifier",
+          "core": "Required",
+          "length": 200
+        },
+        {
+          "name": "DOMAIN",
+          "label": "Domain Abbreviation",
+          "type": "Text",
+          "required": true,
+          "role": "Identifier",
+          "core": "Required",
+          "length": 2,
+          "allowedValues": ["LB"]
+        },
+        {
+          "name": "USUBJID",
+          "label": "Unique Subject Identifier",
+          "type": "Text",
+          "required": true,
+          "role": "Identifier",
+          "core": "Required",
+          "length": 200
+        },
+        {
+          "name": "LBSEQ",
+          "label": "Sequence Number",
+          "type": "Integer",
+          "required": true,
+          "role": "Identifier",
+          "core": "Required"
+        },
+        {
+          "name": "LBTESTCD",
+          "label": "Lab Test or Examination Short Name",
+          "type": "Text",
+          "required": true,
+          "role": "Topic",
+          "core": "Required",
+          "length": 8
+        },
+        {
+          "name": "LBTEST",
+          "label": "Lab Test or Examination Name",
+          "type": "Text",
+          "required": true,
+          "role": "Qualifier",
+          "core": "Required",
+          "length": 40
+        },
+        {
+          "name": "LBORRES",
+          "label": "Result or Finding in Original Units",
+          "type": "Text",
+          "required": false,
+          "role": "Qualifier",
+          "core": "Expected",
+          "length": 200
+        },
+        {
+          "name": "LBORRESU",
+          "label": "Original Units",
+          "type": "Text",
+          "required": false,
+          "role": "Qualifier",
+          "core": "Expected",
+          "length": 40
+        },
+        {
+          "name": "LBSTRESC",
+          "label": "Character Result/Finding in Std Format",
+          "type": "Text",
+          "required": false,
+          "role": "Qualifier",
+          "core": "Expected",
+          "length": 200
+        },
+        {
+          "name": "LBSTRESN",
+          "label": "Numeric Result/Finding in Standard Units",
+          "type": "Numeric",
+          "required": false,
+          "role": "Qualifier",
+          "core": "Expected"
+        },
+        {
+          "name": "LBSTRESU",
+          "label": "Standard Units",
+          "type": "Text",
+          "required": false,
+          "role": "Qualifier",
+          "core": "Expected",
+          "length": 40
+        },
+        {
+          "name": "LBDTC",
+          "label": "Date/Time of Specimen Collection",
+          "type": "DateTime",
+          "required": false,
+          "role": "Timing",
+          "core": "Expected",
+          "length": 20
+        },
+        {
+          "name": "VISIT",
+          "label": "Visit Name",
+          "type": "Text",
+          "required": false,
+          "role": "Timing",
+          "core": "Expected",
+          "length": 200
+        },
+        {
+          "name": "VISITNUM",
+          "label": "Visit Number",
+          "type": "Numeric",
+          "required": false,
+          "role": "Timing",
+          "core": "Expected"
+        }
+      ]
+    }
+  ],
+  "codeLists": [
+    {
+      "id": "SEX",
+      "name": "Sex",
+      "extensible": false,
+      "codes": [
+        {"code": "M", "decode": "Male"},
+        {"code": "F", "decode": "Female"},
+        {"code": "U", "decode": "Unknown"},
+        {"code": "UNDIFFERENTIATED", "decode": "Undifferentiated"}
+      ]
+    },
+    {
+      "id": "NY",
+      "name": "No Yes Response",
+      "extensible": false,
+      "codes": [
+        {"code": "N", "decode": "No"},
+        {"code": "Y", "decode": "Yes"}
+      ]
+    },
+    {
+      "id": "AGEU",
+      "name": "Age Unit",
+      "extensible": false,
+      "codes": [
+        {"code": "YEARS", "decode": "Years"},
+        {"code": "MONTHS", "decode": "Months"},
+        {"code": "WEEKS", "decode": "Weeks"},
+        {"code": "DAYS", "decode": "Days"}
+      ]
+    },
+    {
+      "id": "AESEV",
+      "name": "Severity/Intensity Scale for Adverse Events",
+      "extensible": true,
+      "codes": [
+        {"code": "MILD", "decode": "Mild"},
+        {"code": "MODERATE", "decode": "Moderate"},
+        {"code": "SEVERE", "decode": "Severe"}
+      ]
+    },
+    {
+      "id": "AEREL",
+      "name": "Causality",
+      "extensible": true,
+      "codes": [
+        {"code": "NOT RELATED", "decode": "Not Related"},
+        {"code": "UNLIKELY RELATED", "decode": "Unlikely Related"},
+        {"code": "POSSIBLY RELATED", "decode": "Possibly Related"},
+        {"code": "PROBABLY RELATED", "decode": "Probably Related"},
+        {"code": "RELATED", "decode": "Related"}
+      ]
+    },
+    {
+      "id": "AEOUT",
+      "name": "Outcome of Event",
+      "extensible": false,
+      "codes": [
+        {"code": "FATAL", "decode": "Fatal"},
+        {"code": "NOT RECOVERED/NOT RESOLVED", "decode": "Not Recovered/Not Resolved"},
+        {"code": "RECOVERED/RESOLVED", "decode": "Recovered/Resolved"},
+        {"code": "RECOVERED/RESOLVED WITH SEQUELAE", "decode": "Recovered/Resolved with Sequelae"},
+        {"code": "RECOVERING/RESOLVING", "decode": "Recovering/Resolving"},
+        {"code": "UNKNOWN", "decode": "Unknown"}
+      ]
+    }
+  ]
+}

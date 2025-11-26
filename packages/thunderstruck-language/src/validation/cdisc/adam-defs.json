@@ -1,0 +1,261 @@
+{
+  "version": "1.2",
+  "datasets": [
+    {
+      "dataset": "ADSL",
+      "name": "Subject-Level Analysis Dataset",
+      "structure": "One record per subject",
+      "version": "1.2",
+      "keyVariables": ["STUDYID", "USUBJID"],
+      "variables": [
+        {
+          "name": "STUDYID",
+          "label": "Study Identifier",
+          "type": "Text",
+          "required": true,
+          "core": "Required",
+          "length": 200
+        },
+        {
+          "name": "USUBJID",
+          "label": "Unique Subject Identifier",
+          "type": "Text",
+          "required": true,
+          "core": "Required",
+          "length": 200
+        },
+        {
+          "name": "SUBJID",
+          "label": "Subject Identifier for the Study",
+          "type": "Text",
+          "required": true,
+          "core": "Required",
+          "length": 200
+        },
+        {
+          "name": "AGE",
+          "label": "Age",
+          "type": "Integer",
+          "required": false,
+          "core": "Expected"
+        },
+        {
+          "name": "AGEU",
+          "label": "Age Units",
+          "type": "CodedValue",
+          "codeList": "AGEU",
+          "required": false,
+          "core": "Expected",
+          "length": 10
+        },
+        {
+          "name": "SEX",
+          "label": "Sex",
+          "type": "CodedValue",
+          "codeList": "SEX",
+          "required": false,
+          "core": "Expected",
+          "length": 1
+        },
+        {
+          "name": "RACE",
+          "label": "Race",
+          "type": "CodedValue",
+          "codeList": "RACE",
+          "required": false,
+          "core": "Expected",
+          "length": 200
+        },
+        {
+          "name": "TRT01P",
+          "label": "Planned Treatment for Period 01",
+          "type": "Text",
+          "required": false,
+          "core": "Expected",
+          "length": 200
+        },
+        {
+          "name": "TRT01A",
+          "label": "Actual Treatment for Period 01",
+          "type": "Text",
+          "required": false,
+          "core": "Expected",
+          "length": 200
+        },
+        {
+          "name": "TRTSDT",
+          "label": "Date of First Exposure to Treatment",
+          "type": "Date",
+          "required": false,
+          "core": "Expected"
+        },
+        {
+          "name": "TRTEDT",
+          "label": "Date of Last Exposure to Treatment",
+          "type": "Date",
+          "required": false,
+          "core": "Expected"
+        },
+        {
+          "name": "SAFFL",
+          "label": "Safety Population Flag",
+          "type": "CodedValue",
+          "codeList": "NY",
+          "required": false,
+          "core": "Expected",
+          "length": 1
+        },
+        {
+          "name": "ITTFL",
+          "label": "Intent-To-Treat Population Flag",
+          "type": "CodedValue",
+          "codeList": "NY",
+          "required": false,
+          "core": "Expected",
+          "length": 1
+        },
+        {
+          "name": "EFFFL",
+          "label": "Efficacy Population Flag",
+          "type": "CodedValue",
+          "codeList": "NY",
+          "required": false,
+          "core": "Expected",
+          "length": 1
+        }
+      ]
+    },
+    {
+      "dataset": "BDS",
+      "name": "Basic Data Structure",
+      "structure": "One record per subject per parameter per analysis visit",
+      "version": "1.2",
+      "keyVariables": ["STUDYID", "USUBJID", "PARAMCD", "AVISIT"],
+      "variables": [
+        {
+          "name": "STUDYID",
+          "label": "Study Identifier",
+          "type": "Text",
+          "required": true,
+          "core": "Required",
+          "length": 200
+        },
+        {
+          "name": "USUBJID",
+          "label": "Unique Subject Identifier",
+          "type": "Text",
+          "required": true,
+          "core": "Required",
+          "length": 200
+        },
+        {
+          "name": "PARAMCD",
+          "label": "Parameter Code",
+          "type": "Text",
+          "required": true,
+          "core": "Required",
+          "length": 8
+        },
+        {
+          "name": "PARAM",
+          "label": "Parameter",
+          "type": "Text",
+          "required": true,
+          "core": "Required",
+          "length": 200
+        },
+        {
+          "name": "AVAL",
+          "label": "Analysis Value",
+          "type": "Numeric",
+          "required": false,
+          "core": "Expected"
+        },
+        {
+          "name": "AVALC",
+          "label": "Analysis Value (C)",
+          "type": "Text",
+          "required": false,
+          "core": "Expected",
+          "length": 200
+        },
+        {
+          "name": "BASE",
+          "label": "Baseline Value",
+          "type": "Numeric",
+          "required": false,
+          "core": "Expected"
+        },
+        {
+          "name": "CHG",
+          "label": "Change from Baseline",
+          "type": "Numeric",
+          "required": false,
+          "core": "Expected"
+        },
+        {
+          "name": "PCHG",
+          "label": "Percent Change from Baseline",
+          "type": "Numeric",
+          "required": false,
+          "core": "Expected"
+        },
+        {
+          "name": "AVISIT",
+          "label": "Analysis Visit",
+          "type": "Text",
+          "required": false,
+          "core": "Expected",
+          "length": 200
+        },
+        {
+          "name": "AVISITN",
+          "label": "Analysis Visit (N)",
+          "type": "Numeric",
+          "required": false,
+          "core": "Expected"
+        },
+        {
+          "name": "ADT",
+          "label": "Analysis Date",
+          "type": "Date",
+          "required": false,
+          "core": "Expected"
+        },
+        {
+          "name": "ADY",
+          "label": "Analysis Relative Day",
+          "type": "Integer",
+          "required": false,
+          "core": "Expected"
+        },
+        {
+          "name": "DTYPE",
+          "label": "Derivation Type",
+          "type": "Text",
+          "required": false,
+          "core": "Permissible",
+          "length": 200
+        },
+        {
+          "name": "ABLFL",
+          "label": "Baseline Record Flag",
+          "type": "CodedValue",
+          "codeList": "NY",
+          "required": false,
+          "core": "Expected",
+          "length": 1
+        },
+        {
+          "name": "ANL01FL",
+          "label": "Analysis Flag 01",
+          "type": "CodedValue",
+          "codeList": "NY",
+          "required": false,
+          "core": "Permissible",
+          "length": 1
+        }
+      ]
+    }
+  ]
+}
