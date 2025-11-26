@@ -901,6 +901,22 @@ slice S2 from S1 { }  // Error: circular
 
 ## Open Questions
 
+**Status:** ✅ All questions answered (2025-01-26)
+
+**Summary of Decisions:**
+- Q1: Type Inference → **Moderate** (infer expressions, explicit definitions)
+- Q2: Unit Compatibility → **Strict** (exact string match)
+- Q3: Reference Resolution → **Two-pass** (symbol table first)
+- Q4: Error Severity → **Accepted** (errors/warnings/hints as proposed)
+- Q5: Performance → **Accepted** (<50ms/<200ms/<500ms)
+- Q6: Formula Type Inference → **Variables must exist in cube**
+- Q7: Quick Fixes → **Defer to Increment 5**
+- Q8: Scoping → **Accepted** (global/cube/formula/expression scopes)
+- Q9: CodedValue → **Specific to general** (CodedValue<X> → CodedValue)
+- Q10: Missing Types → **Error Type** (propagates, collects multiple errors)
+
+---
+
 ### Q1: Type Inference Aggressiveness
 **Question:** How aggressive should type inference be?
 
@@ -919,7 +935,9 @@ C. **Aggressive:** Infer types everywhere possible, minimize explicit type annot
 - Conservative: More type annotations required, clearer but verbose
 - Aggressive: Less verbose but potentially confusing errors
 
-**Your preference?**
+**✅ DECISION: Option B - Moderate** (2025-01-26)
+- Accepted recommended approach
+- Provides good balance between explicitness and convenience
 
 ---
 
@@ -937,7 +955,10 @@ D. **Validation-only:** Check units are valid UCUM, allow any combination
 - No ambiguity about what's allowed
 - Can relax in future increments
 
-**Your preference?**
+**✅ DECISION: Option A - Strict** (2025-01-26)
+- Accepted recommended approach
+- Units must match exactly (string equality)
+- Future enhancement: Add normalization/conversion in later increments
 
 ---
 
@@ -954,7 +975,9 @@ C. **Two-pass:** Build symbol table first, then resolve references
 - Allows forward references
 - Clear separation of concerns
 
-**Your preference?**
+**✅ DECISION: Option C - Two-pass** (2025-01-26)
+- Accepted recommended approach (Langium best practice)
+- Build symbol table first, then resolve references
 
 ---
 
@@ -980,7 +1003,10 @@ C. **Two-pass:** Build symbol table first, then resolve references
 - Performance optimization suggestions (future)
 - Style recommendations (future)
 
-**Your preference or modifications?**
+**✅ DECISION: Accept proposed severity levels** (2025-01-26)
+- Errors: Type mismatches, undefined references, circular dependencies, invalid formula variables, pipeline cycles
+- Warnings: Dimension in both fix and vary, unused variables, missing optional properties
+- Hints: Performance optimizations, style recommendations
 
 ---
 
@@ -1002,7 +1028,11 @@ C. **Two-pass:** Build symbol table first, then resolve references
 - Caching of type information
 - Lazy evaluation where possible
 
-**Your expectations?**
+**✅ DECISION: Accept recommended performance targets** (2025-01-26)
+- Small file (~100 lines): <50ms
+- Medium file (~500 lines): <200ms
+- Large file (~2000 lines): <500ms
+- Will implement incremental validation, caching, and lazy evaluation as needed
 
 ---
 
@@ -1019,7 +1049,10 @@ C. **Two-pass:** Build symbol table first, then resolve references
 - Clear error messages
 - No ambiguity
 
-**Your preference?**
+**✅ DECISION: Option A/C - Variables must exist in cube** (2025-01-26)
+- Accepted recommended approach
+- All formula variables must be pre-declared in input cube
+- Use declared types from cube, no formula-specific type inference
 
 ---
 
@@ -1036,7 +1069,10 @@ C. **Two-pass:** Build symbol table first, then resolve references
 - Quick fixes require LSP code actions
 - More complex implementation
 
-**Your preference?**
+**✅ DECISION: Defer to Increment 5** (2025-01-26)
+- Accepted recommended approach
+- Focus on validation and diagnostics in this increment
+- Quick fixes will be implemented in Advanced LSP Features increment
 
 ---
 
@@ -1056,7 +1092,12 @@ C. **Two-pass:** Build symbol table first, then resolve references
 
 **Shadowing:** Not allowed (all names must be unique in their scope)
 
-**Your preference or modifications?**
+**✅ DECISION: Accept proposed scoping rules** (2025-01-26)
+- Global scope for all top-level definitions
+- Cube scope for internal components (dimensions, measures, attributes)
+- Formula scope references input cube components
+- Expression scope references containing construct
+- No shadowing allowed - all names unique within scope
 
 ---
 
@@ -1079,7 +1120,11 @@ CodedValue<CDISC.CT.TRT01A>  // specific code list
 - General coded value cannot be used where specific list required
 - Mirrors nominal typing in TypeScript
 
-**Your preference?**
+**✅ DECISION: Option C - Specific to general allowed** (2025-01-26)
+- Accepted recommended approach
+- CodedValue<X> is compatible with CodedValue (specific → general)
+- General CodedValue cannot be used where specific list required
+- Mirrors TypeScript nominal typing pattern
 
 ---
 
@@ -1101,7 +1146,11 @@ C. **Fail Fast:** Stop validation immediately when type cannot be determined
 - Collects multiple errors in one pass
 - Clearly marks error locations
 
-**Your preference?**
+**✅ DECISION: Option A - Error Type** (2025-01-26)
+- Accepted recommended approach
+- Use special ErrorType that propagates through expressions
+- Allows validation to continue and collect multiple errors
+- Clearly marks error locations without false cascading errors
 
 ---
 
