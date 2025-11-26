@@ -44,7 +44,7 @@ describe('SliceValidator', () => {
                 }
 
                 slice Week24 from ADADAS {
-                    fix: [AVISIT = "Week 24", AVISITN = 24],
+                    fix: { AVISIT: "Week 24", AVISITN: 24 },
                     vary: [USUBJID],
                     measures: [AVAL, CHG],
                     where: AVAL > 0
@@ -149,7 +149,7 @@ describe('SliceValidator', () => {
                 }
 
                 slice BadSlice from ADADAS {
-                    fix: [NonExistent = "value"],
+                    fix: { NonExistent: "value" },
                     vary: [USUBJID]
                 }
             `);
@@ -177,7 +177,7 @@ describe('SliceValidator', () => {
                 }
 
                 slice FilteredSlice from TestCube {
-                    fix: [CATEGORY = "A"],
+                    fix: { CATEGORY: "A" },
                     vary: [ID]
                 }
             `);
@@ -201,7 +201,7 @@ describe('SliceValidator', () => {
                 }
 
                 slice BadSlice from ADADAS {
-                    fix: [AVISTIT = "Week 24"],
+                    fix: { AVISTIT: "Week 24" },
                     vary: [USUBJID]
                 }
             `);
@@ -341,7 +341,7 @@ describe('SliceValidator', () => {
                 }
 
                 slice OverlappingSlice from TestCube {
-                    fix: [CATEGORY = "A"],
+                    fix: { CATEGORY: "A" },
                     vary: [ID, CATEGORY]
                 }
             `);

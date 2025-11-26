@@ -332,6 +332,7 @@ PipelineStage:
     name=ID ':' operationRef=ID ('depends' 'on' dependencies=DependencyList)?;
 
 DependencyList:
+    dependencies+=ID |
     '[' (dependencies+=ID (',' dependencies+=ID)*)? ']';
 
 // Terminals

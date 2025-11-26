@@ -198,6 +198,9 @@ export class PipelineValidator {
     /**
      * Build dependency graph from pipeline definition.
      * Returns a map from stage name to set of dependency names.
+     *
+     * Note: This builds a forward dependency graph (node -> dependencies)
+     * which is used for cycle detection. For topological sort, use buildReverseGraph().
      */
     buildDependencyGraph(pipeline: PipelineDefinition): Map<string, Set<string>> {
         const graph = new Map<string, Set<string>>();
@@ -221,6 +224,33 @@ export class PipelineValidator {
     }
 
     /**
+     * Build reverse dependency graph (node -> dependents).
+     * Used for topological sort where we need to find what depends on each node.
+     */
+    private buildReverseGraph(pipeline: PipelineDefinition): Map<string, Set<string>> {
+        const graph = new Map<string, Set<string>>();
+
+        // Initialize nodes
+        for (const stage of pipeline.stages.stages) {
+            graph.set(stage.name, new Set<string>());
+        }
+
+        // Add reverse edges (dependents)
+        for (const stage of pipeline.stages.stages) {
+            if (stage.dependencies) {
+                for (const depName of stage.dependencies.dependencies) {
+                    const dependents = graph.get(depName);
+                    if (dependents) {
+                        dependents.add(stage.name);
+                    }
+                }
+            }
+        }
+
+        return graph;
+    }
+
+    /**
      * Perform topological sort on the pipeline.
      * Returns array of stage names in execution order, or null if there are cycles.
      */
@@ -230,17 +260,16 @@ export class PipelineValidator {
             return null;
         }
 
-        const graph = this.buildDependencyGraph(pipeline);
+        // Build forward graph (node -> dependencies) for calculating in-degrees
+        const forwardGraph = this.buildDependencyGraph(pipeline);
 
-        // Calculate in-degrees
+        // Build reverse graph (node -> dependents) for processing
+        const reverseGraph = this.buildReverseGraph(pipeline);
+
+        // Calculate in-degrees (number of dependencies each node has)
         const inDegree = new Map<string, number>();
-        for (const node of graph.keys()) {
-            inDegree.set(node, 0);
-        }
-        for (const neighbors of graph.values()) {
-            for (const neighbor of neighbors) {
-                inDegree.set(neighbor, (inDegree.get(neighbor) || 0) + 1);
-            }
+        for (const [node, dependencies] of forwardGraph.entries()) {
+            inDegree.set(node, dependencies.size);
         }
 
         // Queue nodes with in-degree 0
@@ -257,18 +286,19 @@ export class PipelineValidator {
             const node = queue.shift()!;
             result.push(node);
 
-            const neighbors = graph.get(node) || new Set<string>();
-            for (const neighbor of neighbors) {
-                const newDegree = (inDegree.get(neighbor) || 0) - 1;
-                inDegree.set(neighbor, newDegree);
+            // Get dependents (what depends on this node)
+            const dependents = reverseGraph.get(node) || new Set<string>();
+            for (const dependent of dependents) {
+                const newDegree = (inDegree.get(dependent) || 0) - 1;
+                inDegree.set(dependent, newDegree);
                 if (newDegree === 0) {
-                    queue.push(neighbor);
+                    queue.push(dependent);
                 }
             }
         }
 
         // If not all nodes processed, there's a cycle (shouldn't happen due to check above)
-        if (result.length !== graph.size) {
+        if (result.length !== forwardGraph.size) {
             return null;
         }
 

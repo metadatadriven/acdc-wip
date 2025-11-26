@@ -308,7 +308,7 @@ describe('PipelineValidator', () => {
                         A: S1,
                         B: S1 depends on A,
                         C: S1 depends on A,
-                        D: S1 depends on B, C
+                        D: S1 depends on [B, C]
                     ]
                 }
             `);
@@ -402,7 +402,7 @@ describe('PipelineValidator', () => {
                         A: S1,
                         B: S1 depends on A,
                         C: S1 depends on A,
-                        D: S1 depends on B, C
+                        D: S1 depends on [B, C]
                     ]
                 }
             `);
@@ -439,7 +439,7 @@ describe('PipelineValidator', () => {
                     stages: [
                         A: S1,
                         B: S1 depends on A,
-                        C: S1 depends on A, B
+                        C: S1 depends on [A, B]
                     ]
                 }
             `);

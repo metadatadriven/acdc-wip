@@ -160,7 +160,7 @@ describe('Validation Integration Tests', () => {
                 }
 
                 slice Week24 from ADADAS {
-                    fix: [AVISIT = "Week 24"],
+                    fix: { AVISIT: "Week 24" },
                     vary: [USUBJID],
                     measures: [CHG, BASE],
                     where: AVAL > 0
@@ -510,7 +510,7 @@ describe('Validation Integration Tests', () => {
                 }
 
                 slice Filtered from BaseCube {
-                    fix: [AVISIT = "Week 24"],
+                    fix: { AVISIT: "Week 24" },
                     vary: [USUBJID],
                     where: AVAL > 0
                 }
