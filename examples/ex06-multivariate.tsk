@@ -240,7 +240,7 @@ cube Table_2_6_3_1 "MANOVA Summary Table - Week 6" {
 
 // TODO: In Increment 2+, add:
 // - Slice definitions (fixing Week 6 and ITT population)
-// - Transform definitions (change from baseline calculation)
+// - Derive definitions (change from baseline calculation)
 // - Model definition (MMRM with subscales as dependent variables)
 // - Display formatting specifications
 // - Statistical test specifications (Wilks' Lambda)

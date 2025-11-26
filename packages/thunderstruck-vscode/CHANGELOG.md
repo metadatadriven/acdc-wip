@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Core Language Support
 - Comprehensive syntax highlighting for all Thunderstruck DSL constructs
-- Support for core constructs: `cube`, `concept`, `slice`, `transform`, `model`, `aggregate`, `display`, `pipeline`
+- Support for core constructs: `cube`, `concept`, `slice`, `derive`, `model`, `aggregate`, `display`, `pipeline`
 - Syntax highlighting for all keywords, types, operators, and language elements
 - Support for `.tsk` and `.thunderstruck` file extensions
 

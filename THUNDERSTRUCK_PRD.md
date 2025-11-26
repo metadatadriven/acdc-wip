@@ -52,7 +52,7 @@ Thunderstruck provides:
 - **Multi-target code generation** (R, SAS) from single specification
 - **Semantic interoperability** via RDF export enabling integration with multiple standards (CDISC, W3C, OMOP, FHIR)
 - **Rich IDE support** in VS Code with syntax highlighting and validation
-- **Provenance tracking** from raw data through all transformations to results
+- **Provenance tracking** from raw data through all derivations to results
 - **LLM integration** via MCP server for AI-assisted SAP authoring
 
 ### Value Proposition
@@ -693,7 +693,7 @@ display table "Table 14.3.01: Dose Response Analysis" {
 - Can query: "Where did this number come from?"
 - Lineage graph from SDTM → ADaM → Analysis → Results
 - Export provenance as PROV-O RDF (see [W3C PROV-O](https://www.w3.org/TR/prov-o/))
-- Track transformations, agents (who), activities (how), and entities (what)
+- Track derivations, agents (who), activities (how), and entities (what)
 
 ---
 
@@ -705,7 +705,7 @@ display table "Table 14.3.01: Dose Response Analysis" {
 - **MUST** support concept definitions (biomedical, derivation, analysis concepts) as first-class constructs
 - **MUST** support cube definitions with dimensions, measures, attributes
 - **MUST** support slice definitions (fixing and varying dimensions)
-- **MUST** support transform definitions (cube → cube mappings)
+- **MUST** support derive definitions (cube → cube mappings)
 - **MUST** support model definitions (statistical models)
 - **MUST** support aggregate definitions (summary statistics)
 - **MUST** support display definitions (tables and figures)
@@ -839,8 +839,8 @@ display table "Table 14.3.01: Dose Response Analysis" {
 - **MUST** include ADaM BDS template
 - **SHOULD** include common ADaM datasets (ADAE, ADTTE, etc.)
 
-#### FR-5.2: Standard Transformations
-- **MUST** include ChangeFromBaseline transformation
+#### FR-5.2: Standard Derivations
+- **MUST** include ChangeFromBaseline derivation
 - **SHOULD** include LOCF imputation
 - **SHOULD** include BOCF imputation
 - **SHOULD** include baseline definition helpers
@@ -1807,12 +1807,12 @@ model MyModel {
 }
 ```
 
-#### Transformation Functions
+#### Derivation Functions
 
-Common transformations (exact syntax may vary by target language):
+Common derivations (exact syntax may vary by target language):
 
 ```thunderstruck
-formula: log(AVAL) ~ TRTDOSE                 // Log transformation
+formula: log(AVAL) ~ TRTDOSE                 // Log derivation
 formula: sqrt(AVAL) ~ TRT01A                 // Square root
 formula: AVAL ~ poly(TRTDOSE, 2)             // Orthogonal polynomial (degree 2)
 formula: AVAL ~ ns(TRTDOSE, df=3)            // Natural spline

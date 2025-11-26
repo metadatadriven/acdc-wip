@@ -206,10 +206,10 @@ describe('Thunderstruck Parser Tests', () => {
   describe('Expression Language', () => {
     it('should parse arithmetic expressions', async () => {
       const text = `
-        transform Test {
+        derive Test {
           input: ADADAS,
           output: Result,
-          transformations: [
+          derivations: [
             CHG = AVAL - BASE,
             PCHG = (AVAL - BASE) / BASE * 100
           ]
@@ -222,10 +222,10 @@ describe('Thunderstruck Parser Tests', () => {
 
     it('should parse comparison expressions', async () => {
       const text = `
-        transform Test {
+        derive Test {
           input: ADADAS,
           output: Result,
-          transformations: [
+          derivations: [
             FLAG1 = AVAL > BASE,
             FLAG2 = CHG >= 10,
             FLAG3 = PARAM == "ACTOT11"
@@ -239,10 +239,10 @@ describe('Thunderstruck Parser Tests', () => {
 
     it('should parse logical expressions', async () => {
       const text = `
-        transform Test {
+        derive Test {
           input: ADADAS,
           output: Result,
-          transformations: [
+          derivations: [
             FLAG = EFFFL == "Y" and ITTFL == "Y",
             COND = CHG > 0 or BASE < 50
           ]
@@ -255,10 +255,10 @@ describe('Thunderstruck Parser Tests', () => {
 
     it('should parse function calls', async () => {
       const text = `
-        transform Test {
+        derive Test {
           input: ADADAS,
           output: Result,
-          transformations: [
+          derivations: [
             LOGVAL = log(AVAL),
             SQRTVAL = sqrt(BASE)
           ]
@@ -348,8 +348,8 @@ describe('Thunderstruck Parser Tests', () => {
     });
   });
 
-  describe('Transform Definitions', () => {
-    it('should parse transform with transformations', async () => {
+  describe('Derive Definitions', () => {
+    it('should parse derive with derivations', async () => {
       const text = `
         cube Input {
           namespace: "http://example.org#",
@@ -367,10 +367,10 @@ describe('Thunderstruck Parser Tests', () => {
           }
         }
 
-        transform ChangeFromBaseline {
+        derive ChangeFromBaseline {
           input: Input,
           output: Output,
-          transformations: [
+          derivations: [
             CHG = VAL - BASE
           ]
         }

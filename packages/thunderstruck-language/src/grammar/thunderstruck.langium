@@ -5,7 +5,7 @@ entry Program:
 
 ProgramElement:
     ImportStatement | CubeDefinition | ConceptDefinition | SliceDefinition |
-    TransformDefinition | ModelDefinition | AggregateDefinition |
+    DeriveDefinition | ModelDefinition | AggregateDefinition |
     DisplayDefinition | PipelineDefinition;
 
 // Import statements
@@ -201,23 +201,23 @@ MeasureList:
     '[' (measures+=ID (',' measures+=ID)*)? ']';
 
 // ============================================================================
-// Transform Definitions
+// Derive Definitions
 // ============================================================================
 
-TransformDefinition:
-    'transform' name=ID (description=STRING)? '{'
+DeriveDefinition:
+    'derive' name=ID (description=STRING)? '{'
         'input' ':' inputRef=ID (',' | ';')
         'output' ':' output=OutputCubeSpec (',' | ';')?
-        ('transformations' ':' transformations=TransformationList (',' | ';')?)?
+        ('derivations' ':' derivations=DerivationList (',' | ';')?)?
     '}';
 
 OutputCubeSpec:
     CubeDefinition | {infer OutputCubeRef} cubeRef=ID;
 
-TransformationList:
-    '[' (transformations+=Transformation (',' transformations+=Transformation)*)? ']';
+DerivationList:
+    '[' (derivations+=Derivation (',' derivations+=Derivation)*)? ']';
 
-Transformation:
+Derivation:
     target=ID '=' expression=Expression;
 
 // ============================================================================
@@ -332,6 +332,7 @@ PipelineStage:
     name=ID ':' operationRef=ID ('depends' 'on' dependencies=DependencyList)?;
 
 DependencyList:
+    dependencies+=ID |
     '[' (dependencies+=ID (',' dependencies+=ID)*)? ']';
 
 // Terminals
