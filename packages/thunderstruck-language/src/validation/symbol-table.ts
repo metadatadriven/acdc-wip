@@ -409,6 +409,13 @@ export class SymbolTable {
         return this.errors.length > 0;
     }
 
+    /**
+     * Get all global symbol names (for suggestions).
+     */
+    getAllGlobalSymbols(): string[] {
+        return this.globalScope.getAllNames();
+    }
+
     // Type guards
     private isCubeDefinition(node: AstNode): node is CubeDefinition {
         return node.$type === 'CubeDefinition';
