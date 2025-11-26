@@ -5,7 +5,7 @@
  * Loads standards metadata and provides unified validation interface.
  */
 
-import { CubeDefinition } from '../../generated/ast.js';
+import { CubeDefinition, Program } from '../../generated/ast.js';
 import { StandardsMetadataRegistry } from './standards-metadata.js';
 import { SDTMValidator, SDTMValidationResult } from './sdtm-validator.js';
 import { ADaMValidator, ADaMValidationResult } from './adam-validator.js';
@@ -17,25 +17,28 @@ import {
     RequiredIfChecker,
     ValueInCodeListChecker,
 } from './core-checkers.js';
+import { VersionManager, VersionDiagnostic } from './version-manager.js';
 import sdtmDefs from './sdtm-defs.json';
 import adamDefs from './adam-defs.json';
 import sdtmCoreRules from './sdtm-core-rules.json';
 import adamCoreRules from './adam-core-rules.json';
 
 /**
- * Main CDISC validator with CORE rules support.
+ * Main CDISC validator with CORE rules support and version management.
  */
 export class CDISCValidator {
     private registry: StandardsMetadataRegistry;
     private sdtmValidator: SDTMValidator;
     private adamValidator: ADaMValidator;
     private coreEngine: COREulesEngine;
+    private versionManager: VersionManager;
 
     constructor() {
         this.registry = new StandardsMetadataRegistry();
         this.sdtmValidator = new SDTMValidator(this.registry);
         this.adamValidator = new ADaMValidator(this.registry);
         this.coreEngine = new COREulesEngine();
+        this.versionManager = new VersionManager();
 
         // Load standards metadata and rules
         this.loadStandardsMetadata();
@@ -146,5 +149,33 @@ export class CDISCValidator {
      */
     getCOREEngine(): COREulesEngine {
         return this.coreEngine;
+    }
+
+    /**
+     * Get the version manager (for advanced usage).
+     */
+    getVersionManager(): VersionManager {
+        return this.versionManager;
+    }
+
+    /**
+     * Load standards versions from program.
+     */
+    loadVersionsFromProgram(program: Program): void {
+        this.versionManager.loadFromProgram(program);
+    }
+
+    /**
+     * Validate standards version declarations and compatibility.
+     */
+    validateVersions(program?: Program): VersionDiagnostic[] {
+        return this.versionManager.validateVersions(program);
+    }
+
+    /**
+     * Get effective versions being used (declared or defaults).
+     */
+    getEffectiveVersions() {
+        return this.versionManager.getEffectiveVersions();
     }
 }
