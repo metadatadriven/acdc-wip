@@ -10,7 +10,7 @@ Thunderstruck captures SAP intent as **typed, composable abstractions** over dat
 
 - **Concepts ≙ Types** (immutable, reusable, versioned)
 - **Structural elements ≙ Functions** (pure, referentially transparent)
-- **Analyses ≙ Typed programs** that transform cube slices into results
+- **Analyses ≙ Typed programs** that derive cube slices into results
 
 This enables:
 

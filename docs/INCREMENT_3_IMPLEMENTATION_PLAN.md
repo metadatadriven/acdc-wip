@@ -356,7 +356,7 @@ class UnitChecker {
 interface Symbol {
   name: string;
   type: Type;
-  kind: 'cube' | 'concept' | 'slice' | 'model' | 'transform' |
+  kind: 'cube' | 'concept' | 'slice' | 'model' | 'derive' |
         'aggregate' | 'display' | 'pipeline' | 'dimension' |
         'measure' | 'attribute';
   node: AstNode;

@@ -1,5 +1,5 @@
-// Example: Transform Definitions
-// This example demonstrates how to define transformations that create new
+// Example: Derive Definitions
+// This example demonstrates how to define derivations that create new
 // cubes from existing ones by applying calculations and derivations
 
 // Define input cube
@@ -53,15 +53,15 @@ cube ADVS_Derived "Vital Signs with Derived Parameters" {
 }
 
 /*
- * Transform 1: Change from Baseline
+ * Derive Derive: Change from Baseline
  *
- * This is the most common transformation in clinical trials -
+ * This is the most common derivation in clinical trials -
  * calculating absolute and percent change from baseline.
  */
-transform CalculateChangeFromBaseline {
+derive CalculateChangeFromBaseline {
     input: ADVS,
     output: ADVS_Derived,
-    transformations: [
+    derivations: [
         CHG = AVAL - BASE,
         PCHG = (AVAL - BASE) / BASE * 100
     ]
@@ -114,17 +114,17 @@ cube ADADAS_Analysis "ADAS-Cog Analysis Ready" {
 }
 
 /*
- * Transform 2: Multiple Derivations with Conditional Logic
+ * Derive Derive: Multiple Derivations with Conditional Logic
  *
- * This demonstrates more complex transformations including:
+ * This demonstrates more complex derivations including:
  * - Renaming variables
  * - Applying mathematical functions
  * - Creating derived flags based on conditions
  */
-transform PrepareForAnalysis {
+derive PrepareForAnalysis {
     input: ADADAS_Raw,
     output: ADADAS_Analysis,
-    transformations: [
+    derivations: [
         AVAL = ACTOT11,
         BASE = BASE11,
         CHG = AVAL - BASE,
@@ -184,17 +184,17 @@ cube Lab_Normalized "Laboratory Data with Normalized Values" {
 }
 
 /*
- * Transform 3: Normalization and Range Calculations
+ * Derive Derive: Normalization and Range Calculations
  *
- * This demonstrates transformations for laboratory data:
+ * This demonstrates derivations for laboratory data:
  * - Calculating ratios to normal range limits
  * - Creating abnormal flags
  * - Multiple dependent calculations
  */
-transform NormalizeLabs {
+derive NormalizeLabs {
     input: Lab_Raw,
     output: Lab_Normalized,
-    transformations: [
+    derivations: [
         ANRLO = 0.8,
         ANRHI = 1.2,
         R2A1LO = AVAL / A1LO,
@@ -251,15 +251,15 @@ cube Events_WithDuration "Adverse Events with Duration" {
 }
 
 /*
- * Transform 4: Event Duration Calculation
+ * Derive Derive: Event Duration Calculation
  *
  * Calculate derived measures for adverse events including
  * duration and simplified relatedness flag.
  */
-transform CalculateEventDuration {
+derive CalculateEventDuration {
     input: Events,
     output: Events_WithDuration,
-    transformations: [
+    derivations: [
         AEDUR = AEENDY - AESTDY,
         RELATED = AEREL == "RELATED" or AEREL == "POSSIBLY RELATED"
     ]

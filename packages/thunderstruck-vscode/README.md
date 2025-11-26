@@ -57,7 +57,7 @@ model PrimaryEfficacy {
 
 Rich syntax highlighting for Thunderstruck DSL with support for:
 
-- **Core Constructs**: `cube`, `concept`, `slice`, `transform`, `model`, `aggregate`, `display`, `pipeline`
+- **Core Constructs**: `cube`, `concept`, `slice`, `derive`, `model`, `aggregate`, `display`, `pipeline`
 - **Keywords**: `import`, `namespace`, `structure`, `dimensions`, `measures`, `attributes`, `input`, `output`, `formula`, `family`, `link`, etc.
 - **Types**: `Numeric`, `Integer`, `Text`, `DateTime`, `Date`, `Flag`, `Identifier`, `CodedValue`
 - **Model Families**: `Gaussian`, `Binomial`, `Poisson`, `Gamma`, `InverseGaussian`
