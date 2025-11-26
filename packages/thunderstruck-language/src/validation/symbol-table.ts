@@ -174,6 +174,28 @@ export class SymbolTable {
                 this.resolveCubeType(element);
             }
         }
+
+        // Third pass: Resolve types for slices (inherit CubeType from source)
+        // May need multiple iterations for slices-from-slices
+        let resolved = true;
+        let iterations = 0;
+        const maxIterations = 10; // Prevent infinite loops
+
+        do {
+            resolved = true;
+            for (const element of program.elements) {
+                if (this.isSliceDefinition(element)) {
+                    const sliceSymbol = this.globalScope.lookup(element.name);
+                    if (sliceSymbol && !(sliceSymbol.type instanceof CubeType)) {
+                        const wasResolved = this.resolveSliceType(element);
+                        if (!wasResolved) {
+                            resolved = false;
+                        }
+                    }
+                }
+            }
+            iterations++;
+        } while (!resolved && iterations < maxIterations);
     }
 
     /**
@@ -323,6 +345,36 @@ export class SymbolTable {
     }
 
     /**
+     * Third pass: Resolve slice type to inherit from source cube.
+     * Returns true if resolution was successful, false if it needs another iteration.
+     */
+    private resolveSliceType(slice: SliceDefinition): boolean {
+        // Get the source cube/slice
+        const sourceSymbol = this.globalScope.lookup(slice.cubeRef);
+        if (!sourceSymbol) {
+            // Error will be caught by reference validator
+            return true; // Nothing more we can do
+        }
+
+        // If source has a CubeType, use it
+        if (sourceSymbol.type instanceof CubeType) {
+            const sliceSymbol = this.globalScope.lookup(slice.name);
+            if (sliceSymbol) {
+                (sliceSymbol as any).type = sourceSymbol.type;
+            }
+            return true; // Successfully resolved
+        }
+
+        // If source is a slice that hasn't been resolved yet, try again later
+        if (sourceSymbol.kind === 'slice') {
+            return false; // Needs another iteration
+        }
+
+        // Source is something else (not a cube or slice)
+        return true; // Nothing more we can do
+    }
+
+    /**
      * Resolve a type reference from the AST to a Type.
      */
     private resolveTypeReference(typeRef: TypeReference, unit?: string): Type {
@@ -419,6 +471,10 @@ export class SymbolTable {
     // Type guards
     private isCubeDefinition(node: AstNode): node is CubeDefinition {
         return node.$type === 'CubeDefinition';
+    }
+
+    private isSliceDefinition(node: AstNode): node is SliceDefinition {
+        return node.$type === 'SliceDefinition';
     }
 
     private isPrimitiveType(typeRef: TypeReference): typeRef is PrimitiveType {
