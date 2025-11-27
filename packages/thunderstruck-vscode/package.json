@@ -2,7 +2,7 @@
   "name": "thunderstruck-vscode",
   "displayName": "Thunderstruck - Statistical Analysis Plans DSL",
   "description": "Language support for Thunderstruck DSL - A domain-specific language for authoring Statistical Analysis Plans (SAPs) in clinical trials using W3C Data Cube standards. Provides syntax highlighting, real-time diagnostics, and LSP integration for formal, machine-readable analysis specifications.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "thunderstruck",
   "engines": {
     "vscode": "^1.80.0",

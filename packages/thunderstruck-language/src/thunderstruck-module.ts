@@ -13,12 +13,20 @@ import {
   ThunderstruckGeneratedSharedModule,
 } from './generated/module.js';
 import { registerValidationChecks } from './thunderstruck-validator.js';
+import { ThunderstruckHoverProvider } from './lsp/thunderstruck-hover-provider.js';
 
 /**
  * Declaration of custom services for Thunderstruck
  */
 export type ThunderstruckAddedServices = {
   // Add custom services here in future increments
+  // Note: Langium provides default LSP services out of the box:
+  // - Code completion
+  // - Go-to-definition
+  // - Find references
+  // - Document symbols
+  // - Hover information
+  // - Diagnostics (via validation)
 };
 
 /**
@@ -33,7 +41,9 @@ export const ThunderstruckModule: Module<
   ThunderstruckServices,
   PartialLangiumServices & ThunderstruckAddedServices
 > = {
-  // Add custom service implementations here in future increments
+  lsp: {
+    HoverProvider: (services) => new ThunderstruckHoverProvider(),
+  },
 };
 
 /**

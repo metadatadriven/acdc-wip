@@ -188,7 +188,7 @@ CodeListNamespace:
 // ============================================================================
 
 SliceDefinition:
-    'slice' name=ID 'from' cubeRef=ID (description=STRING)? '{'
+    'slice' name=ID 'from' cubeRef=[CubeDefinition:ID] (description=STRING)? '{'
         ('fix' ':' fixedDimensions=DimensionConstraints (',' | ';')?)?
         ('vary' ':' varyingDimensions=DimensionList (',' | ';')?)?
         ('measures' ':' measures=MeasureList (',' | ';')?)?
@@ -213,13 +213,13 @@ MeasureList:
 
 DeriveDefinition:
     'derive' name=ID (description=STRING)? '{'
-        'input' ':' inputRef=ID (',' | ';')
+        'input' ':' inputRef=[ProgramElement:ID] (',' | ';')
         'output' ':' output=OutputCubeSpec (',' | ';')?
         ('derivations' ':' derivations=DerivationList (',' | ';')?)?
     '}';
 
 OutputCubeSpec:
-    CubeDefinition | {infer OutputCubeRef} cubeRef=ID;
+    CubeDefinition | {infer OutputCubeRef} cubeRef=[CubeDefinition:ID];
 
 DerivationList:
     '[' (derivations+=Derivation (',' derivations+=Derivation)*)? ']';
@@ -233,7 +233,7 @@ Derivation:
 
 ModelDefinition:
     'model' name=ID (description=STRING)? '{'
-        'input' ':' inputRef=ID (',' | ';')
+        'input' ':' inputRef=[ProgramElement:ID] (',' | ';')
         'formula' ':' formula=Formula (',' | ';')?
         ('family' ':' family=ModelFamily (',' | ';')?)?
         ('link' ':' link=LinkFunction (',' | ';')?)?
@@ -262,7 +262,7 @@ CovarianceStructure:
 
 AggregateDefinition:
     'aggregate' name=ID (description=STRING)? '{'
-        'input' ':' inputRef=ID (',' | ';')
+        'input' ':' inputRef=[ProgramElement:ID] (',' | ';')
         'groupBy' ':' groupBy=DimensionList (',' | ';')
         'statistics' ':' statistics=StatisticList (',' | ';')?
         ('output' ':' output=OutputCubeSpec (',' | ';')?)?
@@ -284,7 +284,7 @@ AggregateFunction returns string:
 
 DisplayDefinition:
     'display' displayType=DisplayType (title=STRING)? (description=STRING)? '{'
-        'source' ':' sourceRef=ID (',' | ';')
+        'source' ':' sourceRef=[ProgramElement:ID] (',' | ';')
         (tableSpec=TableSpec | figureSpec=FigureSpec)
         ('footnotes' ':' footnotes=FootnoteList (',' | ';')?)?
     '}';

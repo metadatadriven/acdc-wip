@@ -122,7 +122,7 @@ export class IC19_CodesFromCodeList extends IntegrityConstraint {
         }
 
         // Get cube type
-        const cubeSymbol = symbolTable.resolveGlobal(slice.cubeRef);
+        const cubeSymbol = symbolTable.resolveGlobal(slice.cubeRef.$refText);
         if (!cubeSymbol || !(cubeSymbol.type instanceof CubeType)) {
             // Reference error will be caught by reference validator
             return violations;

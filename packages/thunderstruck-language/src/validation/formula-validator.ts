@@ -102,12 +102,12 @@ export class FormulaValidator {
         const diagnostics: TypeDiagnostic[] = [];
 
         // Resolve input cube
-        const inputSymbol = this.symbolTable.resolveGlobal(model.inputRef);
+        const inputSymbol = this.symbolTable.resolveGlobal(model.inputRef.$refText);
 
         if (!inputSymbol) {
             diagnostics.push({
                 severity: DiagnosticSeverity.Error,
-                message: `Model '${model.name}' references undefined input '${model.inputRef}'`,
+                message: `Model '${model.name}' references undefined input '${model.inputRef.$refText}'`,
             });
             return diagnostics;
         }
@@ -116,7 +116,7 @@ export class FormulaValidator {
         if (!(inputSymbol.type instanceof CubeType)) {
             diagnostics.push({
                 severity: DiagnosticSeverity.Error,
-                message: `Model '${model.name}' input '${model.inputRef}' is not a cube`,
+                message: `Model '${model.name}' input '${model.inputRef.$refText}' is not a cube`,
             });
             return diagnostics;
         }

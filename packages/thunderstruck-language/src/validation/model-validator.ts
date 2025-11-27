@@ -99,7 +99,7 @@ export class ModelValidator {
         model: ModelDefinition
     ): { cube: CubeType | null; diagnostics: TypeDiagnostic[] } {
         return this.referenceValidator.validateInputReference(
-            model.inputRef,
+            model.inputRef.$refText,
             `Model '${model.name}'`
         );
     }

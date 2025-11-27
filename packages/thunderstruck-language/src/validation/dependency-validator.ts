@@ -103,31 +103,31 @@ export class DependencyValidator {
         switch (element.$type) {
             case 'SliceDefinition': {
                 const slice = element as SliceDefinition;
-                deps.push(slice.cubeRef);
+                deps.push(slice.cubeRef.$refText);
                 break;
             }
 
             case 'ModelDefinition': {
                 const model = element as ModelDefinition;
-                deps.push(model.inputRef);
+                deps.push(model.inputRef.$refText);
                 break;
             }
 
             case 'DeriveDefinition': {
                 const derive = element as DeriveDefinition;
-                deps.push(derive.inputRef);
+                deps.push(derive.inputRef.$refText);
                 break;
             }
 
             case 'AggregateDefinition': {
                 const aggregate = element as AggregateDefinition;
-                deps.push(aggregate.inputRef);
+                deps.push(aggregate.inputRef.$refText);
                 break;
             }
 
             case 'DisplayDefinition': {
                 const display = element as DisplayDefinition;
-                deps.push(display.sourceRef);
+                deps.push(display.sourceRef.$refText);
                 break;
             }
 

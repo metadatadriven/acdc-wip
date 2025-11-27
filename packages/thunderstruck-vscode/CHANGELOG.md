@@ -5,6 +5,29 @@ All notable changes to the Thunderstruck VS Code extension will be documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2025-11-27
+
+### Fixed
+- **Hover Information**: Added custom hover provider to show detailed type information when hovering over identifiers
+  - Cubes now show dimensions, measures, and attributes with their types
+  - Slices show source cube, fixed dimensions, varying dimensions, and where clauses
+  - Models show input, formula, family, and link function
+  - Aggregates show input, grouping dimensions, and statistics
+  - Derives show input and output cubes
+  - Displays show type, title, and source
+
+### Changed
+- Updated Langium grammar to use proper cross-reference syntax (`[Type:ID]`) instead of plain strings
+  - Enables Langium's built-in LSP features to work correctly
+  - All validators updated to work with `Reference<T>` objects
+- All 403 tests passing
+
+### Technical Details
+- Created `ThunderstruckHoverProvider` class with rich hover content formatting
+- Integrated hover provider into language services module
+- Hover content uses Markdown formatting for better readability
+- Full type information display for all language constructs
+
 ## [0.1.0] - 2024-11-18
 
 ### Added
