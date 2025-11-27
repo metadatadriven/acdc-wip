@@ -273,8 +273,7 @@ describe('Thunderstruck Parser Tests', () => {
   describe('Concept Definitions', () => {
     it('should parse basic concept definition', async () => {
       const text = `
-        concept SystolicBP "Systolic Blood Pressure" {
-          type: BiomedicalConcept,
+        concept SystolicBP "Systolic Blood Pressure" type_of BiomedicalConcept {
           category: VitalSign,
           definition: "Maximum blood pressure during contraction of the ventricles",
           unit: "mmHg"
@@ -287,8 +286,7 @@ describe('Thunderstruck Parser Tests', () => {
 
     it('should parse concept with code list mappings', async () => {
       const text = `
-        concept SystolicBP {
-          type: BiomedicalConcept,
+        concept SystolicBP is_a BiomedicalConcept {
           codeLists: [
             CDISC.CT.VSTESTCD: "SYSBP",
             LOINC: "8480-6",

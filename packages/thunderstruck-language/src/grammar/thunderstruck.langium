@@ -163,16 +163,19 @@ FormulaVariable:
 // ============================================================================
 
 ConceptDefinition:
-    'concept' name=ID (description=STRING)? '{'
-        ('type' ':' conceptType=ConceptType (',' | ';')?)?
+    'concept' name=ID (description=STRING)? (('type_of' | 'is_a') parentType=[ConceptDefinition:ID])? '{'
         ('category' ':' category=ID (',' | ';')?)?
         ('definition' ':' definition=STRING (',' | ';')?)?
+        (('property' | 'properties') ':' properties=ConceptPropertyList (',' | ';')?)?
         ('unit' ':' unit=STRING (',' | ';')?)?
         ('codeLists' ':' codeLists=CodeListMappings (',' | ';')?)?
     '}';
 
-ConceptType returns string:
-    'BiomedicalConcept' | 'DerivationConcept' | 'AnalysisConcept';
+ConceptPropertyList:
+    '[' (properties+=ConceptProperty (',' properties+=ConceptProperty)*)? ']';
+
+ConceptProperty:
+    name=ID ':' type=[ConceptDefinition:ID];
 
 CodeListMappings:
     '[' (mappings+=CodeListMapping (',' mappings+=CodeListMapping)*)? ']';
