@@ -112,7 +112,7 @@ export class SliceValidator {
         slice: SliceDefinition
     ): { cube: CubeType | null; diagnostics: TypeDiagnostic[] } {
         return this.referenceValidator.validateCubeReference(
-            slice.cubeRef,
+            slice.cubeRef.$refText,
             `Slice '${slice.name}'`
         );
     }

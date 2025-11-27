@@ -235,7 +235,7 @@ export interface AggregateDefinition extends langium.AstNode {
     readonly $type: 'AggregateDefinition';
     description?: string;
     groupBy: DimensionList;
-    inputRef: string;
+    inputRef: langium.Reference<ProgramElement>;
     name: string;
     output?: OutputCubeSpec;
     statistics: StatisticList;
@@ -463,7 +463,7 @@ export interface DeriveDefinition extends langium.AstNode {
     readonly $type: 'DeriveDefinition';
     derivations?: DerivationList;
     description?: string;
-    inputRef: string;
+    inputRef: langium.Reference<ProgramElement>;
     name: string;
     output: OutputCubeSpec;
 }
@@ -518,7 +518,7 @@ export interface DisplayDefinition extends langium.AstNode {
     displayType: DisplayType;
     figureSpec?: FigureSpec;
     footnotes?: FootnoteList;
-    sourceRef: string;
+    sourceRef: langium.Reference<ProgramElement>;
     tableSpec?: TableSpec;
     title?: string;
 }
@@ -796,7 +796,7 @@ export interface ModelDefinition extends langium.AstNode {
     description?: string;
     family?: ModelFamily;
     formula: Formula;
-    inputRef: string;
+    inputRef: langium.Reference<ProgramElement>;
     link?: LinkFunction;
     name: string;
     output?: OutputCubeSpec;
@@ -824,7 +824,7 @@ export function isNumberLiteral(item: unknown): item is NumberLiteral {
 export interface OutputCubeRef extends langium.AstNode {
     readonly $container: AggregateDefinition | DeriveDefinition | ModelDefinition;
     readonly $type: 'OutputCubeRef';
-    cubeRef: string;
+    cubeRef: langium.Reference<CubeDefinition>;
 }
 
 export const OutputCubeRef = 'OutputCubeRef';
@@ -872,7 +872,7 @@ export function isRandomEffects(item: unknown): item is RandomEffects {
 export interface SliceDefinition extends langium.AstNode {
     readonly $container: Program;
     readonly $type: 'SliceDefinition';
-    cubeRef: string;
+    cubeRef: langium.Reference<CubeDefinition>;
     description?: string;
     fixedDimensions?: DimensionConstraints;
     measures?: MeasureList;
@@ -1132,6 +1132,16 @@ export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
     getReferenceType(refInfo: langium.ReferenceInfo): string {
         const referenceId = `${refInfo.container.$type}:${refInfo.property}`;
         switch (referenceId) {
+            case 'AggregateDefinition:inputRef':
+            case 'DeriveDefinition:inputRef':
+            case 'DisplayDefinition:sourceRef':
+            case 'ModelDefinition:inputRef': {
+                return ProgramElement;
+            }
+            case 'OutputCubeRef:cubeRef':
+            case 'SliceDefinition:cubeRef': {
+                return CubeDefinition;
+            }
             default: {
                 throw new Error(`${referenceId} is not a valid reference id.`);
             }

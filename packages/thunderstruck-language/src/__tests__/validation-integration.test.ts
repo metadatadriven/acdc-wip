@@ -75,7 +75,7 @@ function validateProgram(program: Program): TypeDiagnostic[] {
             case 'DeriveDefinition': {
                 // Validate input reference
                 const inputResult = referenceValidator.validateInputReference(
-                    element.inputRef,
+                    element.inputRef.$refText,
                     `Derive '${element.name}'`
                 );
                 diagnostics.push(...inputResult.diagnostics);
@@ -98,7 +98,7 @@ function validateProgram(program: Program): TypeDiagnostic[] {
             case 'AggregateDefinition': {
                 // Validate input reference
                 const inputResult = referenceValidator.validateInputReference(
-                    element.inputRef,
+                    element.inputRef.$refText,
                     `Aggregate '${element.name}'`
                 );
                 diagnostics.push(...inputResult.diagnostics);
@@ -108,7 +108,7 @@ function validateProgram(program: Program): TypeDiagnostic[] {
             case 'DisplayDefinition': {
                 // Validate source reference
                 const sourceDiags = referenceValidator.validateReference(
-                    element.sourceRef,
+                    element.sourceRef.$refText,
                     ['cube', 'slice', 'model', 'aggregate', 'derive'],
                     `Display '${element.displayType}'`
                 );

@@ -51,7 +51,7 @@ export class IC11_AllDimensionsRequired extends IntegrityConstraint {
         const violations: IntegrityConstraintViolation[] = [];
 
         // Get source cube type
-        const cubeSymbol = symbolTable.resolveGlobal(slice.cubeRef);
+        const cubeSymbol = symbolTable.resolveGlobal(slice.cubeRef.$refText);
         if (!cubeSymbol || !(cubeSymbol.type instanceof CubeType)) {
             // Reference error will be caught by reference validator
             return violations;
@@ -89,7 +89,7 @@ export class IC11_AllDimensionsRequired extends IntegrityConstraint {
             violations.push({
                 constraintId: this.id,
                 severity: DiagnosticSeverity.Error,
-                message: `Slice '${slice.name}' does not specify all dimensions from cube '${slice.cubeRef}'. Missing dimension${plural ? 's' : ''}: ${dimList} (W3C IC-11).`,
+                message: `Slice '${slice.name}' does not specify all dimensions from cube '${slice.cubeRef.$refText}'. Missing dimension${plural ? 's' : ''}: ${dimList} (W3C IC-11).`,
                 location: slice,
                 suggestion: `Add ${plural ? 'these dimensions' : 'this dimension'} to either the 'fix' or 'vary' clause.`,
                 code: 'W3C-IC-11',

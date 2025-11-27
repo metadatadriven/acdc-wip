@@ -164,7 +164,7 @@ describe('LSP Features', () => {
             const slice = program.elements[1];
 
             expect(slice.$type).toBe('SliceDefinition');
-            expect((slice as any).cubeRef).toBe('MyCube');
+            expect((slice as any).cubeRef.$refText).toBe('MyCube');
 
             // Langium's reference service should resolve this
             const references = services.references.References;
@@ -204,7 +204,7 @@ describe('LSP Features', () => {
             const model = program.elements[2];
 
             expect(model.$type).toBe('ModelDefinition');
-            expect((model as any).inputRef).toBe('AnalysisSlice');
+            expect((model as any).inputRef.$refText).toBe('AnalysisSlice');
         });
 
         it.skip('should handle multiple references to same cube', async () => {

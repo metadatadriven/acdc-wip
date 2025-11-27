@@ -56,7 +56,7 @@ function getInputCubeContext(program: Program, symbolTable: SymbolTable, deriveI
     // Get the input cube reference
     const inputCubeName = derive.inputRef;
     if (inputCubeName) {
-        const symbol = symbolTable.resolveGlobal(inputCubeName);
+        const symbol = symbolTable.resolveGlobal(inputCubeName.$refText);
         if (symbol) {
             return symbol.type;
         }

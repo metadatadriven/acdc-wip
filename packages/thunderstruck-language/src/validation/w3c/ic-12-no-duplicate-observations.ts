@@ -93,7 +93,7 @@ export class IC12_NoDuplicateObservations extends IntegrityConstraint {
         const violations: IntegrityConstraintViolation[] = [];
 
         // Get input cube type
-        const inputSymbol = symbolTable.resolveGlobal(aggregate.inputRef);
+        const inputSymbol = symbolTable.resolveGlobal(aggregate.inputRef.$refText);
         if (!inputSymbol || !(inputSymbol.type instanceof CubeType)) {
             // Reference error will be caught by reference validator
             return violations;

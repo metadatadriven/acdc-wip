@@ -346,7 +346,7 @@ export class SymbolTable {
      */
     private resolveSliceType(slice: SliceDefinition): boolean {
         // Get the source cube/slice
-        const sourceSymbol = this.globalScope.lookup(slice.cubeRef);
+        const sourceSymbol = this.globalScope.lookup(slice.cubeRef.$refText);
         if (!sourceSymbol) {
             // Error will be caught by reference validator
             return true; // Nothing more we can do
