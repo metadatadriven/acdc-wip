@@ -13,6 +13,7 @@ import {
   ThunderstruckGeneratedSharedModule,
 } from './generated/module.js';
 import { registerValidationChecks } from './thunderstruck-validator.js';
+import { ThunderstruckHoverProvider } from './lsp/thunderstruck-hover-provider.js';
 
 /**
  * Declaration of custom services for Thunderstruck
@@ -40,7 +41,9 @@ export const ThunderstruckModule: Module<
   ThunderstruckServices,
   PartialLangiumServices & ThunderstruckAddedServices
 > = {
-  // Add custom service implementations here in future increments
+  lsp: {
+    HoverProvider: (services) => new ThunderstruckHoverProvider(),
+  },
 };
 
 /**
