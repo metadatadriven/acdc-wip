@@ -2,3 +2,4 @@
 - before working on a project increment, read and understand the relevent PRD and PLAN documents
 - When working on Thunderstruck, understand LOP_PROPOSAL_CC_CUBE.md, THUNDERSTRUCK_PRD.md and THUNDERSTRUCK_PLAN.md
 -
+- when updating the VS Code extension, ensure the version number and change log is updated
