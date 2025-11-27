@@ -191,6 +191,12 @@ export function isProgramElement(item: unknown): item is ProgramElement {
     return reflection.isInstance(item, ProgramElement);
 }
 
+export type QualifiedName = string;
+
+export function isQualifiedName(item: unknown): item is QualifiedName {
+    return typeof item === 'string';
+}
+
 export type TypeReference = CodedValueType | IdentifierType | PrimitiveType;
 
 export const TypeReference = 'TypeReference';
@@ -375,6 +381,7 @@ export interface ConceptDefinition extends langium.AstNode {
     definition?: string;
     description?: string;
     name: string;
+    namespace?: QualifiedName;
     parentType?: langium.Reference<ConceptDefinition>;
     properties?: ConceptPropertyList;
     unit?: string;
@@ -1289,6 +1296,7 @@ export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
                         { name: 'definition' },
                         { name: 'description' },
                         { name: 'name' },
+                        { name: 'namespace' },
                         { name: 'parentType' },
                         { name: 'properties' },
                         { name: 'unit' }
