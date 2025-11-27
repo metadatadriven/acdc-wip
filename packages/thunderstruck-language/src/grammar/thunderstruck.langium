@@ -6,7 +6,7 @@ entry Program:
 ProgramElement:
     ImportStatement | StandardsDeclaration | CubeDefinition | ConceptDefinition | SliceDefinition |
     DeriveDefinition | ModelDefinition | AggregateDefinition |
-    DisplayDefinition | PipelineDefinition;
+    DisplayDefinition;
 
 // Import statements
 ImportStatement:
@@ -322,25 +322,6 @@ AestheticOption:
 
 FootnoteList:
     '[' (footnotes+=STRING (',' footnotes+=STRING)*)? ']';
-
-// ============================================================================
-// Pipeline Definitions
-// ============================================================================
-
-PipelineDefinition:
-    'pipeline' name=ID (description=STRING)? '{'
-        'stages' ':' stages=StageList
-    '}';
-
-StageList:
-    '[' (stages+=PipelineStage (',' stages+=PipelineStage)*)? ']';
-
-PipelineStage:
-    name=ID ':' operationRef=ID ('depends' 'on' dependencies=DependencyList)?;
-
-DependencyList:
-    dependencies+=ID |
-    '[' (dependencies+=ID (',' dependencies+=ID)*)? ']';
 
 // Terminals
 terminal NUMBER returns number: /[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?/;

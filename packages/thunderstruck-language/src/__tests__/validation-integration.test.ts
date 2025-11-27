@@ -17,7 +17,6 @@ import { SymbolTable } from '../validation/symbol-table.js';
 import { ReferenceValidator } from '../validation/reference-validator.js';
 import { SliceValidator } from '../validation/slice-validator.js';
 import { ModelValidator } from '../validation/model-validator.js';
-import { PipelineValidator } from '../validation/pipeline-validator.js';
 import { DependencyValidator } from '../validation/dependency-validator.js';
 import { ExpressionValidator } from '../validation/expression-validator.js';
 import { FormulaValidator } from '../validation/formula-validator.js';
@@ -58,7 +57,6 @@ function validateProgram(program: Program): TypeDiagnostic[] {
     const referenceValidator = new ReferenceValidator(symbolTable);
     const sliceValidator = new SliceValidator(symbolTable);
     const modelValidator = new ModelValidator(symbolTable);
-    const pipelineValidator = new PipelineValidator(symbolTable);
     const dependencyValidator = new DependencyValidator(symbolTable);
     const expressionValidator = new ExpressionValidator(symbolTable);
     const formulaValidator = new FormulaValidator(symbolTable);
@@ -72,10 +70,6 @@ function validateProgram(program: Program): TypeDiagnostic[] {
 
             case 'ModelDefinition':
                 diagnostics.push(...modelValidator.validateModel(element));
-                break;
-
-            case 'PipelineDefinition':
-                diagnostics.push(...pipelineValidator.validatePipeline(element));
                 break;
 
             case 'DeriveDefinition': {
@@ -187,38 +181,6 @@ describe('Validation Integration Tests', () => {
                     formula: CHG ~ TRT01A + BASE,
                     family: Gaussian,
                     link: Identity
-                }
-            `);
-
-            const diagnostics = validateProgram(program);
-
-            expect(diagnostics).toHaveLength(0);
-        });
-
-        it('should validate complete pipeline', async () => {
-            const program = await parseProgram(`
-                cube TestCube {
-                    namespace: "http://example.org#",
-                    structure: {
-                        dimensions: [ID: Identifier],
-                        measures: [VALUE: Numeric]
-                    }
-                }
-
-                slice S1 from TestCube { vary: [ID] }
-                slice S2 from TestCube { vary: [ID] }
-
-                model M1 {
-                    input: S1,
-                    formula: VALUE ~ 1
-                }
-
-                pipeline TestPipeline {
-                    stages: [
-                        LoadData: S1,
-                        ProcessData: S2 depends on [LoadData],
-                        AnalyzeData: M1 depends on [ProcessData]
-                    ]
                 }
             `);
 
@@ -392,33 +354,6 @@ describe('Validation Integration Tests', () => {
             const error = diagnostics.find(d => d.message.includes('Circular dependency'));
             expect(error).toBeDefined();
         });
-
-        it('should detect cycle in pipeline', async () => {
-            const program = await parseProgram(`
-                cube TestCube {
-                    namespace: "http://example.org#",
-                    structure: {
-                        dimensions: [ID: Identifier],
-                        measures: [VALUE: Numeric]
-                    }
-                }
-
-                slice S1 from TestCube { vary: [ID] }
-
-                pipeline CyclicPipeline {
-                    stages: [
-                        stage1: S1 depends on [stage2],
-                        stage2: S1 depends on [stage1]
-                    ]
-                }
-            `);
-
-            const diagnostics = validateProgram(program);
-
-            expect(diagnostics.length).toBeGreaterThan(0);
-            const error = diagnostics.find(d => d.message.includes('circular'));
-            expect(error).toBeDefined();
-        });
     });
 
     describe('Invalid Programs - Structural Errors', () => {
@@ -520,13 +455,6 @@ describe('Validation Integration Tests', () => {
                     formula: AVAL ~ 1,
                     family: Gaussian,
                     link: Identity
-                }
-
-                pipeline FullAnalysis {
-                    stages: [
-                        FilterData: Filtered,
-                        RunModel: Analysis depends on [FilterData]
-                    ]
                 }
             `);
 

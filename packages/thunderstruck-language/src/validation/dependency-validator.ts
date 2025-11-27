@@ -131,7 +131,7 @@ export class DependencyValidator {
                 break;
             }
 
-            // Other types (CubeDefinition, ConceptDefinition, PipelineDefinition)
+            // Other types (CubeDefinition, ConceptDefinition)
             // don't have input dependencies
         }
 

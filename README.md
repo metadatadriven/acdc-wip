@@ -84,7 +84,7 @@ Thunderstruck is an implementation of the **cube-centric intermediate representa
 #### Increment 3: Type System + Semantic Validation ✅
 - ✅ Type system foundation with inference and checking
 - ✅ Symbol table with scoping and reference resolution
-- ✅ Semantic validators (slice, model, pipeline, dependency, expression, formula)
+- ✅ Semantic validators (slice, model, dependency, expression, formula)
 - ✅ Type compatibility checking and conversions
 - ✅ Complete integration testing
 - See [docs/INCREMENT_3_PLAN.md](docs/INCREMENT_3_PLAN.md) for complete details
@@ -112,7 +112,7 @@ Thunderstruck is an implementation of the **cube-centric intermediate representa
 - Standards version management with compatibility matrix
 - Multi-format validation reports (JSON, Text, Markdown)
 - Type-safe cube definitions and transformations
-- Semantic validation for models, slices, and pipelines
+- Semantic validation for models, slices, and derivations
 - Real-time VS Code diagnostics
 - Performance optimized (<100ms typical validation)
 
