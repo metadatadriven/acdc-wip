@@ -19,6 +19,13 @@ import { registerValidationChecks } from './thunderstruck-validator.js';
  */
 export type ThunderstruckAddedServices = {
   // Add custom services here in future increments
+  // Note: Langium provides default LSP services out of the box:
+  // - Code completion
+  // - Go-to-definition
+  // - Find references
+  // - Document symbols
+  // - Hover information
+  // - Diagnostics (via validation)
 };
 
 /**
