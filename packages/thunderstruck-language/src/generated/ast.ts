@@ -74,7 +74,6 @@ export type ThunderstruckKeywordNames =
     | "count"
     | "cube"
     | "definition"
-    | "depends"
     | "derivations"
     | "derive"
     | "dimensions"
@@ -99,16 +98,13 @@ export type ThunderstruckKeywordNames =
     | "model"
     | "namespace"
     | "not"
-    | "on"
     | "or"
     | "output"
-    | "pipeline"
     | "quantile"
     | "random"
     | "rows"
     | "slice"
     | "source"
-    | "stages"
     | "standards"
     | "statistics"
     | "stddev"
@@ -193,7 +189,7 @@ export function isOutputCubeSpec(item: unknown): item is OutputCubeSpec {
     return reflection.isInstance(item, OutputCubeSpec);
 }
 
-export type ProgramElement = AggregateDefinition | ConceptDefinition | CubeDefinition | DeriveDefinition | DisplayDefinition | ImportStatement | ModelDefinition | PipelineDefinition | SliceDefinition | StandardsDeclaration;
+export type ProgramElement = AggregateDefinition | ConceptDefinition | CubeDefinition | DeriveDefinition | DisplayDefinition | ImportStatement | ModelDefinition | SliceDefinition | StandardsDeclaration;
 
 export const ProgramElement = 'ProgramElement';
 
@@ -435,18 +431,6 @@ export const CubeStructure = 'CubeStructure';
 
 export function isCubeStructure(item: unknown): item is CubeStructure {
     return reflection.isInstance(item, CubeStructure);
-}
-
-export interface DependencyList extends langium.AstNode {
-    readonly $container: PipelineStage;
-    readonly $type: 'DependencyList';
-    dependencies: Array<string>;
-}
-
-export const DependencyList = 'DependencyList';
-
-export function isDependencyList(item: unknown): item is DependencyList {
-    return reflection.isInstance(item, DependencyList);
 }
 
 export interface Derivation extends langium.AstNode {
@@ -849,34 +833,6 @@ export function isOutputCubeRef(item: unknown): item is OutputCubeRef {
     return reflection.isInstance(item, OutputCubeRef);
 }
 
-export interface PipelineDefinition extends langium.AstNode {
-    readonly $container: Program;
-    readonly $type: 'PipelineDefinition';
-    description?: string;
-    name: string;
-    stages: StageList;
-}
-
-export const PipelineDefinition = 'PipelineDefinition';
-
-export function isPipelineDefinition(item: unknown): item is PipelineDefinition {
-    return reflection.isInstance(item, PipelineDefinition);
-}
-
-export interface PipelineStage extends langium.AstNode {
-    readonly $container: StageList;
-    readonly $type: 'PipelineStage';
-    dependencies?: DependencyList;
-    name: string;
-    operationRef: string;
-}
-
-export const PipelineStage = 'PipelineStage';
-
-export function isPipelineStage(item: unknown): item is PipelineStage {
-    return reflection.isInstance(item, PipelineStage);
-}
-
 export interface PrimitiveType extends langium.AstNode {
     readonly $container: Component;
     readonly $type: 'PrimitiveType';
@@ -929,18 +885,6 @@ export const SliceDefinition = 'SliceDefinition';
 
 export function isSliceDefinition(item: unknown): item is SliceDefinition {
     return reflection.isInstance(item, SliceDefinition);
-}
-
-export interface StageList extends langium.AstNode {
-    readonly $container: PipelineDefinition;
-    readonly $type: 'StageList';
-    stages: Array<PipelineStage>;
-}
-
-export const StageList = 'StageList';
-
-export function isStageList(item: unknown): item is StageList {
-    return reflection.isInstance(item, StageList);
 }
 
 export interface StandardsDeclaration extends langium.AstNode {
@@ -1075,7 +1019,6 @@ export type ThunderstruckAstType = {
     CovarianceStructure: CovarianceStructure
     CubeDefinition: CubeDefinition
     CubeStructure: CubeStructure
-    DependencyList: DependencyList
     Derivation: Derivation
     DerivationList: DerivationList
     DeriveDefinition: DeriveDefinition
@@ -1110,14 +1053,11 @@ export type ThunderstruckAstType = {
     NumberLiteral: NumberLiteral
     OutputCubeRef: OutputCubeRef
     OutputCubeSpec: OutputCubeSpec
-    PipelineDefinition: PipelineDefinition
-    PipelineStage: PipelineStage
     PrimitiveType: PrimitiveType
     Program: Program
     ProgramElement: ProgramElement
     RandomEffects: RandomEffects
     SliceDefinition: SliceDefinition
-    StageList: StageList
     StandardVersion: StandardVersion
     StandardsDeclaration: StandardsDeclaration
     Statistic: Statistic
@@ -1133,7 +1073,7 @@ export type ThunderstruckAstType = {
 export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
 
     getAllTypes(): string[] {
-        return [AestheticOption, AestheticSpec, AggregateDefinition, BinaryExpression, BooleanLiteral, CodeListMapping, CodeListMappings, CodeListNamespace, CodeListRef, CodedValueType, ColumnFormat, Component, ComponentList, ConceptDefinition, CovarianceStructure, CubeDefinition, CubeStructure, DependencyList, Derivation, DerivationList, DeriveDefinition, DimensionConstraint, DimensionConstraints, DimensionList, DisplayDefinition, Expression, FigureSpec, FootnoteList, FormatOption, FormatSpec, Formula, FormulaAddition, FormulaConditioning, FormulaCrossing, FormulaFunction, FormulaInteraction, FormulaNesting, FormulaNumber, FormulaPower, FormulaTerm, FormulaVariable, FunctionCallExpression, IdentifierType, ImportPath, ImportStatement, Literal, MeasureList, MemberAccessExpression, ModelDefinition, NumberLiteral, OutputCubeRef, OutputCubeSpec, PipelineDefinition, PipelineStage, PrimitiveType, Program, ProgramElement, RandomEffects, SliceDefinition, StageList, StandardVersion, StandardsDeclaration, Statistic, StatisticList, StringLiteral, TableSpec, TypeReference, UnaryExpression, UnitSpec, VariableReference];
+        return [AestheticOption, AestheticSpec, AggregateDefinition, BinaryExpression, BooleanLiteral, CodeListMapping, CodeListMappings, CodeListNamespace, CodeListRef, CodedValueType, ColumnFormat, Component, ComponentList, ConceptDefinition, CovarianceStructure, CubeDefinition, CubeStructure, Derivation, DerivationList, DeriveDefinition, DimensionConstraint, DimensionConstraints, DimensionList, DisplayDefinition, Expression, FigureSpec, FootnoteList, FormatOption, FormatSpec, Formula, FormulaAddition, FormulaConditioning, FormulaCrossing, FormulaFunction, FormulaInteraction, FormulaNesting, FormulaNumber, FormulaPower, FormulaTerm, FormulaVariable, FunctionCallExpression, IdentifierType, ImportPath, ImportStatement, Literal, MeasureList, MemberAccessExpression, ModelDefinition, NumberLiteral, OutputCubeRef, OutputCubeSpec, PrimitiveType, Program, ProgramElement, RandomEffects, SliceDefinition, StandardVersion, StandardsDeclaration, Statistic, StatisticList, StringLiteral, TableSpec, TypeReference, UnaryExpression, UnitSpec, VariableReference];
     }
 
     protected override computeIsSubtype(subtype: string, supertype: string): boolean {
@@ -1144,7 +1084,6 @@ export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
             case DisplayDefinition:
             case ImportStatement:
             case ModelDefinition:
-            case PipelineDefinition:
             case SliceDefinition:
             case StandardsDeclaration: {
                 return this.isSubtype(ProgramElement, supertype);
@@ -1358,14 +1297,6 @@ export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
                         { name: 'attributes' },
                         { name: 'dimensions' },
                         { name: 'measures' }
-                    ]
-                };
-            }
-            case DependencyList: {
-                return {
-                    name: DependencyList,
-                    properties: [
-                        { name: 'dependencies', defaultValue: [] }
                     ]
                 };
             }
@@ -1649,26 +1580,6 @@ export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
                     ]
                 };
             }
-            case PipelineDefinition: {
-                return {
-                    name: PipelineDefinition,
-                    properties: [
-                        { name: 'description' },
-                        { name: 'name' },
-                        { name: 'stages' }
-                    ]
-                };
-            }
-            case PipelineStage: {
-                return {
-                    name: PipelineStage,
-                    properties: [
-                        { name: 'dependencies' },
-                        { name: 'name' },
-                        { name: 'operationRef' }
-                    ]
-                };
-            }
             case PrimitiveType: {
                 return {
                     name: PrimitiveType,
@@ -1705,14 +1616,6 @@ export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
                         { name: 'name' },
                         { name: 'varyingDimensions' },
                         { name: 'whereClause' }
-                    ]
-                };
-            }
-            case StageList: {
-                return {
-                    name: StageList,
-                    properties: [
-                        { name: 'stages', defaultValue: [] }
                     ]
                 };
             }

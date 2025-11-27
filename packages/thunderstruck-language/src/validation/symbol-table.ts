@@ -26,7 +26,6 @@ import {
     ModelDefinition,
     AggregateDefinition,
     DisplayDefinition,
-    PipelineDefinition,
     Component,
     TypeReference,
     PrimitiveType,
@@ -235,9 +234,6 @@ export class SymbolTable {
                 break;
             case 'DisplayDefinition':
                 kind = 'display';
-                break;
-            case 'PipelineDefinition':
-                kind = 'pipeline';
                 break;
             default:
                 return;

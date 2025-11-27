@@ -538,23 +538,6 @@ describe('Thunderstruck Parser Tests', () => {
     });
   });
 
-  describe('Pipeline Definitions', () => {
-    it('should parse pipeline with stages', async () => {
-      const text = `
-        pipeline AnalysisPipeline {
-          stages: [
-            LoadData: LoadDataTransform,
-            Analyze: AnalysisModel depends on [LoadData],
-            Summarize: SummaryAggregate depends on [Analyze]
-          ]
-        }
-      `;
-
-      const document = await parseDocument(services, text);
-      expect(document.parseResult.parserErrors).toHaveLength(0);
-    });
-  });
-
   describe('Complex Wilkinson Formulas', () => {
     it('should parse formula with nesting', async () => {
       const text = `
