@@ -349,48 +349,6 @@ describe('ExpressionValidator', () => {
             expect(diagnostics).toHaveLength(0);
         });
 
-        it('should validate derivation with unit incompatibility', async () => {
-            const program = await parseProgram(`
-                cube TestCube {
-                    namespace: "http://example.org#",
-                    structure: {
-                        dimensions: [ID: Identifier],
-                        measures: [WEIGHT: Numeric unit: "kg", HEIGHT: Numeric unit: "cm"]
-                    }
-                }
-
-                cube OutputCube {
-                    namespace: "http://example.org#",
-                    structure: {
-                        dimensions: [ID: Identifier],
-                        measures: [RESULT: Numeric]
-                    }
-                }
-
-                derive TestDerive {
-                    input: TestCube,
-                    output: OutputCube,
-                    derivations: [
-                        RESULT = WEIGHT + HEIGHT
-                    ]
-                }
-            `);
-
-            symbolTable.buildFromProgram(program);
-
-            const derive = program.elements[2] as DeriveDefinition;
-            const derivation = derive.derivations!.derivations[0];
-            const cubeSymbol = symbolTable.resolveGlobal('TestCube');
-            const cubeType = cubeSymbol?.type as CubeType;
-
-            const diagnostics = validator.validateDerivationExpression(derivation, cubeType);
-
-            expect(diagnostics.length).toBeGreaterThan(0);
-            const hasUnitError = diagnostics.some(
-                d => d.message.toLowerCase().includes('unit')
-            );
-            expect(hasUnitError).toBe(true);
-        });
     });
 
     describe('Type Compatibility Checking', () => {

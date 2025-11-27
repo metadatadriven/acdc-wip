@@ -52,7 +52,7 @@ describe('Thunderstruck Parser Tests', () => {
       expect(document.parseResult.parserErrors).toHaveLength(0);
     });
 
-    it('should parse cube with units', async () => {
+    it('should parse cube with multiple measures', async () => {
       const text = `
         cube ADVS {
           namespace: "http://example.org/study#",
@@ -62,8 +62,8 @@ describe('Thunderstruck Parser Tests', () => {
               PARAMCD: CodedValue
             ],
             measures: [
-              AVAL: Numeric unit: "mmHg",
-              CHG: Numeric unit: "mmHg"
+              AVAL: Numeric,
+              CHG: Numeric
             ]
           }
         }
@@ -83,6 +83,81 @@ describe('Thunderstruck Parser Tests', () => {
             ],
             measures: [
               ACTOT11: Numeric
+            ]
+          }
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+
+    it('should parse component with type_of concept linking', async () => {
+      const text = `
+        concept SystolicBP {
+          definition: "Systolic blood pressure"
+        }
+
+        cube ADVS {
+          namespace: "http://example.org/study#",
+          structure: {
+            dimensions: [
+              USUBJID: Identifier
+            ],
+            measures: [
+              AVAL: Numeric type_of SystolicBP
+            ]
+          }
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+
+    it('should parse component with is_a concept linking', async () => {
+      const text = `
+        concept DiastolicBP {
+          definition: "Diastolic blood pressure"
+        }
+
+        cube ADVS {
+          namespace: "http://example.org/study#",
+          structure: {
+            dimensions: [
+              USUBJID: Identifier
+            ],
+            measures: [
+              AVAL: Numeric is_a DiastolicBP
+            ]
+          }
+        }
+      `;
+
+      const document = await parseDocument(services, text);
+      expect(document.parseResult.parserErrors).toHaveLength(0);
+    });
+
+    it('should parse components with mixed concept linking', async () => {
+      const text = `
+        concept SubjectID {
+          definition: "Subject identifier"
+        }
+
+        concept ChangeValue {
+          definition: "Change from baseline"
+        }
+
+        cube ADADAS {
+          namespace: "http://example.org/study#",
+          structure: {
+            dimensions: [
+              USUBJID: Identifier type_of SubjectID,
+              AVISIT: Text
+            ],
+            measures: [
+              AVAL: Numeric,
+              CHG: Numeric is_a ChangeValue
             ]
           }
         }

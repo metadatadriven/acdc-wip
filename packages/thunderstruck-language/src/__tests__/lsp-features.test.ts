@@ -54,7 +54,7 @@ describe('LSP Features', () => {
                             USUBJID: Identifier
                         ],
                         measures: [
-                            AVAL: Numeric unit: "mg/dL"
+                            AVAL: Numeric
                         ]
                     }
                 }

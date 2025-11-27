@@ -344,9 +344,9 @@ export function isColumnFormat(item: unknown): item is ColumnFormat {
 export interface Component extends langium.AstNode {
     readonly $container: ComponentList;
     readonly $type: 'Component';
+    concept?: langium.Reference<ConceptDefinition>;
     name: string;
     type: TypeReference;
-    unit?: UnitSpec;
 }
 
 export const Component = 'Component';
@@ -997,18 +997,6 @@ export function isUnaryExpression(item: unknown): item is UnaryExpression {
     return reflection.isInstance(item, UnaryExpression);
 }
 
-export interface UnitSpec extends langium.AstNode {
-    readonly $container: Component;
-    readonly $type: 'UnitSpec';
-    unit: string;
-}
-
-export const UnitSpec = 'UnitSpec';
-
-export function isUnitSpec(item: unknown): item is UnitSpec {
-    return reflection.isInstance(item, UnitSpec);
-}
-
 export interface VariableReference extends langium.AstNode {
     readonly $container: BinaryExpression | Derivation | DimensionConstraint | FunctionCallExpression | MemberAccessExpression | SliceDefinition | UnaryExpression;
     readonly $type: 'VariableReference';
@@ -1088,14 +1076,13 @@ export type ThunderstruckAstType = {
     TableSpec: TableSpec
     TypeReference: TypeReference
     UnaryExpression: UnaryExpression
-    UnitSpec: UnitSpec
     VariableReference: VariableReference
 }
 
 export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
 
     getAllTypes(): string[] {
-        return [AestheticOption, AestheticSpec, AggregateDefinition, BinaryExpression, BooleanLiteral, CodeListMapping, CodeListMappings, CodeListNamespace, CodeListRef, CodedValueType, ColumnFormat, Component, ComponentList, ConceptDefinition, ConceptProperty, ConceptPropertyList, CovarianceStructure, CubeDefinition, CubeStructure, Derivation, DerivationList, DeriveDefinition, DimensionConstraint, DimensionConstraints, DimensionList, DisplayDefinition, Expression, FigureSpec, FootnoteList, FormatOption, FormatSpec, Formula, FormulaAddition, FormulaConditioning, FormulaCrossing, FormulaFunction, FormulaInteraction, FormulaNesting, FormulaNumber, FormulaPower, FormulaTerm, FormulaVariable, FunctionCallExpression, IdentifierType, ImportPath, ImportStatement, Literal, MeasureList, MemberAccessExpression, ModelDefinition, NumberLiteral, OutputCubeRef, OutputCubeSpec, PrimitiveType, Program, ProgramElement, RandomEffects, SliceDefinition, StandardVersion, StandardsDeclaration, Statistic, StatisticList, StringLiteral, TableSpec, TypeReference, UnaryExpression, UnitSpec, VariableReference];
+        return [AestheticOption, AestheticSpec, AggregateDefinition, BinaryExpression, BooleanLiteral, CodeListMapping, CodeListMappings, CodeListNamespace, CodeListRef, CodedValueType, ColumnFormat, Component, ComponentList, ConceptDefinition, ConceptProperty, ConceptPropertyList, CovarianceStructure, CubeDefinition, CubeStructure, Derivation, DerivationList, DeriveDefinition, DimensionConstraint, DimensionConstraints, DimensionList, DisplayDefinition, Expression, FigureSpec, FootnoteList, FormatOption, FormatSpec, Formula, FormulaAddition, FormulaConditioning, FormulaCrossing, FormulaFunction, FormulaInteraction, FormulaNesting, FormulaNumber, FormulaPower, FormulaTerm, FormulaVariable, FunctionCallExpression, IdentifierType, ImportPath, ImportStatement, Literal, MeasureList, MemberAccessExpression, ModelDefinition, NumberLiteral, OutputCubeRef, OutputCubeSpec, PrimitiveType, Program, ProgramElement, RandomEffects, SliceDefinition, StandardVersion, StandardsDeclaration, Statistic, StatisticList, StringLiteral, TableSpec, TypeReference, UnaryExpression, VariableReference];
     }
 
     protected override computeIsSubtype(subtype: string, supertype: string): boolean {
@@ -1160,6 +1147,7 @@ export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
             case 'ModelDefinition:inputRef': {
                 return ProgramElement;
             }
+            case 'Component:concept':
             case 'ConceptDefinition:parentType':
             case 'ConceptProperty:type': {
                 return ConceptDefinition;
@@ -1278,9 +1266,9 @@ export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
                 return {
                     name: Component,
                     properties: [
+                        { name: 'concept' },
                         { name: 'name' },
-                        { name: 'type' },
-                        { name: 'unit' }
+                        { name: 'type' }
                     ]
                 };
             }
@@ -1732,14 +1720,6 @@ export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
                     properties: [
                         { name: 'operand' },
                         { name: 'operator' }
-                    ]
-                };
-            }
-            case UnitSpec: {
-                return {
-                    name: UnitSpec,
-                    properties: [
-                        { name: 'unit' }
                     ]
                 };
             }

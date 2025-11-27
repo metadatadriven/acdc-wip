@@ -16,9 +16,9 @@ cube ADADAS "ADAS-Cog Analysis Dataset" {
         ],
 
         measures: [
-            AVAL: Numeric unit: "points",
-            BASE: Numeric unit: "points",
-            CHG: Numeric unit: "points"
+            AVAL: Numeric,
+            BASE: Numeric,
+            CHG: Numeric
         ],
 
         attributes: [
@@ -162,8 +162,8 @@ cube ADVS "Vital Signs Analysis Dataset" {
         ],
 
         measures: [
-            AVAL: Numeric unit: "mmHg",
-            CHG: Numeric unit: "mmHg"
+            AVAL: Numeric,
+            CHG: Numeric
         ],
 
         attributes: [
@@ -353,8 +353,8 @@ cube ExposureData "Treatment Exposure" {
         ],
 
         measures: [
-            EXDUR: Numeric unit: "days",
-            CUMDOSE: Numeric unit: "mg"
+            EXDUR: Numeric,
+            CUMDOSE: Numeric
         ],
 
         attributes: [
@@ -401,7 +401,7 @@ cube TimeToEvent "Time to First Adverse Event" {
         ],
 
         measures: [
-            AVAL: Numeric unit: "days",
+            AVAL: Numeric,
             CNSR: Flag
         ],
 

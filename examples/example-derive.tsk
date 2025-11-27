@@ -15,8 +15,8 @@ cube ADVS "Vital Signs Analysis Dataset" {
         ],
 
         measures: [
-            AVAL: Numeric unit: "mmHg",
-            BASE: Numeric unit: "mmHg"
+            AVAL: Numeric,
+            BASE: Numeric
         ],
 
         attributes: [
@@ -39,10 +39,10 @@ cube ADVS_Derived "Vital Signs with Derived Parameters" {
         ],
 
         measures: [
-            AVAL: Numeric unit: "mmHg",
-            BASE: Numeric unit: "mmHg",
-            CHG: Numeric unit: "mmHg",
-            PCHG: Numeric unit: "percent"
+            AVAL: Numeric,
+            BASE: Numeric,
+            CHG: Numeric,
+            PCHG: Numeric
         ],
 
         attributes: [

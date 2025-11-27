@@ -40,10 +40,7 @@ ComponentList:
     '[' (components+=Component (',' components+=Component)*)? ']';
 
 Component:
-    name=ID ':' type=TypeReference (unit=UnitSpec)?;
-
-UnitSpec:
-    'unit' ':' unit=STRING;
+    name=ID ':' type=TypeReference (('type_of' | 'is_a') concept=[ConceptDefinition:ID])?;
 
 // Type system
 TypeReference:

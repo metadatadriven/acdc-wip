@@ -16,9 +16,9 @@ cube ADADAS "ADAS-Cog Analysis Dataset" {
         ],
 
         measures: [
-            AVAL: Numeric unit: "points",
-            BASE: Numeric unit: "points",
-            CHG: Numeric unit: "points"
+            AVAL: Numeric,
+            BASE: Numeric,
+            CHG: Numeric
         ],
 
         attributes: [
@@ -204,7 +204,7 @@ cube ADDOSE "Dose Response Analysis" {
         measures: [
             CHG: Numeric,
             BASE: Numeric,
-            TRTDOSE: Numeric unit: "mg"
+            TRTDOSE: Numeric
         ],
 
         attributes: [

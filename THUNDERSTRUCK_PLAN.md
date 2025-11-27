@@ -560,7 +560,7 @@ thunderstruck/
 ### Deliverables
 
 #### 7.1 Concept Grammar Extensions
-- [ ] Add hierarchical concept definition syntax:
+- [x] Add hierarchical concept definition syntax:
   ```thunderstruck
   // Base concepts (no parent type)
   concept Value {
@@ -599,19 +599,33 @@ thunderstruck/
       ]
   }
   ```
-- [ ] Support hierarchical concept types:
+- [x] Support hierarchical concept types:
   - Concepts typed using `type_of` or `is_a` keywords (aliases)
   - Base concepts have no parent type
   - Standard base concepts in library: BiomedicalConcept, DerivationConcept, AnalysisConcept
-- [ ] Support concept properties:
+- [x] Support concept properties:
   - Named properties typed as concepts
   - Properties inherited from parent hierarchy
   - Both `property:` and `properties:` keywords supported
-- [ ] Link concepts to cube components:
+- [x] Link concepts to cube components (optional):
   ```thunderstruck
-  dimensions: [
-      VSTESTCD: CodedTest concept: SystolicBP
-  ]
+  // Component definitions (unit removed from component syntax)
+  cube ADVS {
+      structure: {
+          dimensions: [
+              USUBJID: Identifier type_of SubjectID,  // with concept link
+              PARAMCD: CodedValue                      // without concept link
+          ],
+          measures: [
+              AVAL: Numeric is_a SystolicBP,           // with concept link
+              CHG: Numeric                              // without concept link
+          ]
+      }
+  }
+
+  // Note: Units are now specified in concept definitions, not component definitions
+  // Concept linking uses type_of or is_a keywords (aliases)
+  // Concept linking is optional
   ```
 
 #### 7.2 Concept Namespaces

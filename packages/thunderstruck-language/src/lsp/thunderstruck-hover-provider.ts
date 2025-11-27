@@ -162,8 +162,8 @@ export class ThunderstruckHoverProvider implements HoverProvider {
             if (cube.structure.measures && cube.structure.measures.components.length > 0) {
                 parts.push('**Measures:**');
                 for (const measure of cube.structure.measures.components) {
-                    const unit = measure.unit ? ` (unit: ${measure.unit})` : '';
-                    parts.push(`- ${measure.name}: ${this.formatType(measure.type)}${unit}`);
+                    const concept = measure.concept ? ` (concept: ${measure.concept.$refText})` : '';
+                    parts.push(`- ${measure.name}: ${this.formatType(measure.type)}${concept}`);
                 }
                 parts.push('');
             }
