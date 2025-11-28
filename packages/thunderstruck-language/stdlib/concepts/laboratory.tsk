@@ -1,0 +1,365 @@
+// Thunderstruck Standard Library: Laboratory Test Concepts
+// This file defines standard laboratory test concepts for clinical trials.
+//
+// These concepts follow CDISC SDTM LB domain terminology and include
+// mappings to standard coding systems (CDISC CT, LOINC).
+
+// ============================================================================
+// Base Laboratory Concepts
+// ============================================================================
+
+concept LaboratoryTest type_of BiomedicalConcept {
+    namespace: CDISC.Glossary,
+    category: Laboratory,
+    definition: "Measurement or examination performed on a biological specimen"
+}
+
+// ============================================================================
+// Hematology Concepts
+// ============================================================================
+
+concept HematologyConcept type_of LaboratoryTest {
+    namespace: CDISC.Glossary,
+    category: Hematology,
+    definition: "Laboratory test related to blood cell counts and characteristics"
+}
+
+concept Hemoglobin "Hemoglobin" is_a HematologyConcept {
+    namespace: CDISC.Glossary,
+    category: Hematology,
+    definition: "Oxygen-carrying protein in red blood cells",
+    unit: "g/dL",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "HGB",
+        LOINC: "718-7"
+    ]
+}
+
+concept Hematocrit "Hematocrit" is_a HematologyConcept {
+    namespace: CDISC.Glossary,
+    category: Hematology,
+    definition: "Volume percentage of red blood cells in blood",
+    unit: "%",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "HCT",
+        LOINC: "4544-3"
+    ]
+}
+
+concept WBC "White Blood Cell Count" is_a HematologyConcept {
+    namespace: CDISC.Glossary,
+    category: Hematology,
+    definition: "Number of white blood cells per unit volume",
+    unit: "10^9/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "WBC",
+        LOINC: "6690-2"
+    ]
+}
+
+concept RBC "Red Blood Cell Count" is_a HematologyConcept {
+    namespace: CDISC.Glossary,
+    category: Hematology,
+    definition: "Number of red blood cells per unit volume",
+    unit: "10^12/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "RBC",
+        LOINC: "789-8"
+    ]
+}
+
+concept Platelet "Platelet Count" is_a HematologyConcept {
+    namespace: CDISC.Glossary,
+    category: Hematology,
+    definition: "Number of platelets per unit volume",
+    unit: "10^9/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "PLAT",
+        LOINC: "777-3"
+    ]
+}
+
+concept Neutrophils "Neutrophil Count" is_a HematologyConcept {
+    namespace: CDISC.Glossary,
+    category: Hematology,
+    definition: "Absolute neutrophil count",
+    unit: "10^9/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "NEUT",
+        LOINC: "751-8"
+    ]
+}
+
+concept Lymphocytes "Lymphocyte Count" is_a HematologyConcept {
+    namespace: CDISC.Glossary,
+    category: Hematology,
+    definition: "Absolute lymphocyte count",
+    unit: "10^9/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "LYMPH",
+        LOINC: "731-0"
+    ]
+}
+
+// ============================================================================
+// Clinical Chemistry Concepts
+// ============================================================================
+
+concept ChemistryConcept type_of LaboratoryTest {
+    namespace: CDISC.Glossary,
+    category: Chemistry,
+    definition: "Laboratory test measuring chemical components in body fluids"
+}
+
+concept Glucose "Glucose" is_a ChemistryConcept {
+    namespace: CDISC.Glossary,
+    category: Chemistry,
+    definition: "Blood glucose concentration",
+    unit: "mmol/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "GLUC",
+        LOINC: "2345-7"
+    ]
+}
+
+concept Creatinine "Creatinine" is_a ChemistryConcept {
+    namespace: CDISC.Glossary,
+    category: Chemistry,
+    definition: "Serum creatinine concentration",
+    unit: "umol/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "CREAT",
+        LOINC: "2160-0"
+    ]
+}
+
+concept BUN "Blood Urea Nitrogen" is_a ChemistryConcept {
+    namespace: CDISC.Glossary,
+    category: Chemistry,
+    definition: "Blood urea nitrogen concentration",
+    unit: "mmol/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "BUN",
+        LOINC: "3094-0"
+    ]
+}
+
+concept Sodium "Sodium" is_a ChemistryConcept {
+    namespace: CDISC.Glossary,
+    category: Chemistry,
+    definition: "Serum sodium concentration",
+    unit: "mmol/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "SODIUM",
+        LOINC: "2951-2"
+    ]
+}
+
+concept Potassium "Potassium" is_a ChemistryConcept {
+    namespace: CDISC.Glossary,
+    category: Chemistry,
+    definition: "Serum potassium concentration",
+    unit: "mmol/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "K",
+        LOINC: "2823-3"
+    ]
+}
+
+concept Chloride "Chloride" is_a ChemistryConcept {
+    namespace: CDISC.Glossary,
+    category: Chemistry,
+    definition: "Serum chloride concentration",
+    unit: "mmol/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "CL",
+        LOINC: "2075-0"
+    ]
+}
+
+concept Calcium "Calcium" is_a ChemistryConcept {
+    namespace: CDISC.Glossary,
+    category: Chemistry,
+    definition: "Serum calcium concentration",
+    unit: "mmol/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "CA",
+        LOINC: "17861-6"
+    ]
+}
+
+// ============================================================================
+// Liver Function Tests
+// ============================================================================
+
+concept LiverFunctionTest type_of ChemistryConcept {
+    namespace: CDISC.Glossary,
+    category: LiverFunction,
+    definition: "Laboratory test evaluating liver function"
+}
+
+concept ALT "Alanine Aminotransferase" is_a LiverFunctionTest {
+    namespace: CDISC.Glossary,
+    category: LiverFunction,
+    definition: "Enzyme primarily found in liver cells",
+    unit: "U/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "ALT",
+        LOINC: "1742-6"
+    ]
+}
+
+concept AST "Aspartate Aminotransferase" is_a LiverFunctionTest {
+    namespace: CDISC.Glossary,
+    category: LiverFunction,
+    definition: "Enzyme found in liver and other tissues",
+    unit: "U/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "AST",
+        LOINC: "1920-8"
+    ]
+}
+
+concept AlkalinePhosphatase "Alkaline Phosphatase" is_a LiverFunctionTest {
+    namespace: CDISC.Glossary,
+    category: LiverFunction,
+    definition: "Enzyme related to bile ducts",
+    unit: "U/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "ALP",
+        LOINC: "6768-6"
+    ]
+}
+
+concept TotalBilirubin "Total Bilirubin" is_a LiverFunctionTest {
+    namespace: CDISC.Glossary,
+    category: LiverFunction,
+    definition: "Breakdown product of hemoglobin",
+    unit: "umol/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "BILI",
+        LOINC: "1975-2"
+    ]
+}
+
+concept Albumin "Albumin" is_a LiverFunctionTest {
+    namespace: CDISC.Glossary,
+    category: LiverFunction,
+    definition: "Main protein produced by the liver",
+    unit: "g/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "ALB",
+        LOINC: "1751-7"
+    ]
+}
+
+// ============================================================================
+// Lipid Panel
+// ============================================================================
+
+concept LipidTest type_of ChemistryConcept {
+    namespace: CDISC.Glossary,
+    category: Lipids,
+    definition: "Laboratory test measuring blood lipid levels"
+}
+
+concept TotalCholesterol "Total Cholesterol" is_a LipidTest {
+    namespace: CDISC.Glossary,
+    category: Lipids,
+    definition: "Total cholesterol concentration in blood",
+    unit: "mmol/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "CHOL",
+        LOINC: "2093-3"
+    ]
+}
+
+concept HDLCholesterol "HDL Cholesterol" is_a LipidTest {
+    namespace: CDISC.Glossary,
+    category: Lipids,
+    definition: "High-density lipoprotein cholesterol",
+    unit: "mmol/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "HDL",
+        LOINC: "2085-9"
+    ]
+}
+
+concept LDLCholesterol "LDL Cholesterol" is_a LipidTest {
+    namespace: CDISC.Glossary,
+    category: Lipids,
+    definition: "Low-density lipoprotein cholesterol",
+    unit: "mmol/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "LDL",
+        LOINC: "13457-7"
+    ]
+}
+
+concept Triglycerides "Triglycerides" is_a LipidTest {
+    namespace: CDISC.Glossary,
+    category: Lipids,
+    definition: "Blood triglyceride concentration",
+    unit: "mmol/L",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "TRIG",
+        LOINC: "2571-8"
+    ]
+}
+
+// ============================================================================
+// Kidney Function Tests
+// ============================================================================
+
+concept eGFR "Estimated Glomerular Filtration Rate" is_a ChemistryConcept {
+    namespace: CDISC.Glossary,
+    category: KidneyFunction,
+    definition: "Estimated rate of kidney filtration",
+    unit: "mL/min/1.73m^2",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "EGFR",
+        LOINC: "33914-3"
+    ]
+}
+
+// ============================================================================
+// Coagulation Tests
+// ============================================================================
+
+concept CoagulationTest type_of LaboratoryTest {
+    namespace: CDISC.Glossary,
+    category: Coagulation,
+    definition: "Laboratory test measuring blood clotting function"
+}
+
+concept PT "Prothrombin Time" is_a CoagulationTest {
+    namespace: CDISC.Glossary,
+    category: Coagulation,
+    definition: "Time for blood plasma to clot",
+    unit: "s",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "PT",
+        LOINC: "5902-2"
+    ]
+}
+
+concept INR "International Normalized Ratio" is_a CoagulationTest {
+    namespace: CDISC.Glossary,
+    category: Coagulation,
+    definition: "Normalized prothrombin time ratio",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "INR",
+        LOINC: "6301-6"
+    ]
+}
+
+concept aPTT "Activated Partial Thromboplastin Time" is_a CoagulationTest {
+    namespace: CDISC.Glossary,
+    category: Coagulation,
+    definition: "Time for blood to clot via intrinsic pathway",
+    unit: "s",
+    codeLists: [
+        CDISC.CT.LBTESTCD: "APTT",
+        LOINC: "3173-2"
+    ]
+}

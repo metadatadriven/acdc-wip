@@ -1,0 +1,319 @@
+// Thunderstruck Standard Library: Adverse Event Concepts
+// This file defines standard adverse event concepts for clinical trials.
+//
+// These concepts follow CDISC SDTM AE domain terminology and include
+// mappings to standard coding systems (CDISC CT, MedDRA).
+
+// ============================================================================
+// Base Adverse Event Concepts
+// ============================================================================
+
+concept AdverseEvent type_of BiomedicalConcept {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Any untoward medical occurrence in a patient or clinical trial subject"
+}
+
+// ============================================================================
+// Severity Concepts
+// ============================================================================
+
+concept AESeverity type_of AnalysisConcept {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Severity grade of an adverse event"
+}
+
+concept MildAE "Mild Adverse Event" is_a AdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Adverse event of mild severity (Grade 1)",
+    codeLists: [
+        CDISC.CT.AESEV: "MILD"
+    ]
+}
+
+concept ModerateAE "Moderate Adverse Event" is_a AdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Adverse event of moderate severity (Grade 2)",
+    codeLists: [
+        CDISC.CT.AESEV: "MODERATE"
+    ]
+}
+
+concept SevereAE "Severe Adverse Event" is_a AdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Adverse event of severe intensity (Grade 3)",
+    codeLists: [
+        CDISC.CT.AESEV: "SEVERE"
+    ]
+}
+
+// ============================================================================
+// Serious Adverse Event Concepts
+// ============================================================================
+
+concept SeriousAdverseEvent "Serious Adverse Event" is_a AdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Adverse event that results in death, is life-threatening, requires hospitalization, or causes disability",
+    codeLists: [
+        CDISC.CT.AESER: "Y"
+    ]
+}
+
+concept LifeThreateningAE "Life-Threatening Adverse Event" is_a SeriousAdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Adverse event that places the subject at immediate risk of death",
+    codeLists: [
+        CDISC.CT.AESLIFE: "Y"
+    ]
+}
+
+concept HospitalizationAE "Adverse Event Requiring Hospitalization" is_a SeriousAdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Adverse event requiring inpatient hospitalization or prolongation of existing hospitalization",
+    codeLists: [
+        CDISC.CT.AESHOSP: "Y"
+    ]
+}
+
+concept DisabilityAE "Adverse Event Resulting in Disability" is_a SeriousAdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Adverse event resulting in persistent or significant disability/incapacity",
+    codeLists: [
+        CDISC.CT.AESDISAB: "Y"
+    ]
+}
+
+concept CongenitalAnomalyAE "Adverse Event - Congenital Anomaly" is_a SeriousAdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Adverse event that is a congenital anomaly or birth defect",
+    codeLists: [
+        CDISC.CT.AESCONG: "Y"
+    ]
+}
+
+concept FatalAE "Fatal Adverse Event" is_a SeriousAdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Adverse event that results in death",
+    codeLists: [
+        CDISC.CT.AEOUT: "FATAL"
+    ]
+}
+
+// ============================================================================
+// Causality Concepts
+// ============================================================================
+
+concept AECausality type_of AnalysisConcept {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Relationship of adverse event to study treatment"
+}
+
+concept RelatedAE "Treatment-Related Adverse Event" is_a AdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Adverse event assessed as related to study treatment",
+    codeLists: [
+        CDISC.CT.AEREL: "RELATED",
+        CDISC.CT.AEREL: "PROBABLY RELATED",
+        CDISC.CT.AEREL: "POSSIBLY RELATED"
+    ]
+}
+
+concept UnrelatedAE "Treatment-Unrelated Adverse Event" is_a AdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Adverse event assessed as not related to study treatment",
+    codeLists: [
+        CDISC.CT.AEREL: "NOT RELATED"
+    ]
+}
+
+// ============================================================================
+// Action Taken Concepts
+// ============================================================================
+
+concept AEActionTaken type_of AnalysisConcept {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Action taken with study treatment due to adverse event"
+}
+
+concept DrugWithdrawnAE "AE Resulting in Drug Withdrawal" is_a AdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Adverse event that resulted in permanent discontinuation of study drug",
+    codeLists: [
+        CDISC.CT.AEACN: "DRUG WITHDRAWN"
+    ]
+}
+
+concept DoseReducedAE "AE Resulting in Dose Reduction" is_a AdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Adverse event that resulted in dose reduction",
+    codeLists: [
+        CDISC.CT.AEACN: "DOSE REDUCED"
+    ]
+}
+
+concept DoseInterruptedAE "AE Resulting in Dose Interruption" is_a AdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Adverse event that resulted in temporary dose interruption",
+    codeLists: [
+        CDISC.CT.AEACN: "DOSE INTERRUPTED"
+    ]
+}
+
+// ============================================================================
+// System Organ Class Concepts (Common Categories)
+// ============================================================================
+
+concept CardiacDisorder "Cardiac Disorders" is_a AdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Adverse events affecting the cardiovascular system",
+    codeLists: [
+        MedDRA.SOC: "10007541"
+    ]
+}
+
+concept GastrointestinalDisorder "Gastrointestinal Disorders" is_a AdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Adverse events affecting the gastrointestinal system",
+    codeLists: [
+        MedDRA.SOC: "10017947"
+    ]
+}
+
+concept NervousSystemDisorder "Nervous System Disorders" is_a AdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Adverse events affecting the nervous system",
+    codeLists: [
+        MedDRA.SOC: "10029205"
+    ]
+}
+
+concept InfectionInfestation "Infections and Infestations" is_a AdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Infectious and parasitic adverse events",
+    codeLists: [
+        MedDRA.SOC: "10021881"
+    ]
+}
+
+concept RespiratorDisorder "Respiratory, Thoracic and Mediastinal Disorders" is_a AdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Adverse events affecting the respiratory system",
+    codeLists: [
+        MedDRA.SOC: "10038738"
+    ]
+}
+
+concept SkinDisorder "Skin and Subcutaneous Tissue Disorders" is_a AdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Adverse events affecting skin and subcutaneous tissue",
+    codeLists: [
+        MedDRA.SOC: "10040785"
+    ]
+}
+
+// ============================================================================
+// Common Specific Adverse Events
+// ============================================================================
+
+concept Nausea "Nausea" is_a GastrointestinalDisorder {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Feeling of sickness with an urge to vomit",
+    codeLists: [
+        MedDRA.PT: "10028813",
+        CDISC.CT.AETERM: "NAUSEA"
+    ]
+}
+
+concept Vomiting "Vomiting" is_a GastrointestinalDisorder {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Expulsion of stomach contents through the mouth",
+    codeLists: [
+        MedDRA.PT: "10047700",
+        CDISC.CT.AETERM: "VOMITING"
+    ]
+}
+
+concept Diarrhea "Diarrhea" is_a GastrointestinalDisorder {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Frequent loose or liquid bowel movements",
+    codeLists: [
+        MedDRA.PT: "10012735",
+        CDISC.CT.AETERM: "DIARRHEA"
+    ]
+}
+
+concept Headache "Headache" is_a NervousSystemDisorder {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Pain in the head or upper neck",
+    codeLists: [
+        MedDRA.PT: "10019211",
+        CDISC.CT.AETERM: "HEADACHE"
+    ]
+}
+
+concept Fatigue "Fatigue" is_a AdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Extreme tiredness resulting from mental or physical exertion",
+    codeLists: [
+        MedDRA.PT: "10016256",
+        CDISC.CT.AETERM: "FATIGUE"
+    ]
+}
+
+concept Dizziness "Dizziness" is_a NervousSystemDisorder {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Sensation of spinning or loss of balance",
+    codeLists: [
+        MedDRA.PT: "10013573",
+        CDISC.CT.AETERM: "DIZZINESS"
+    ]
+}
+
+concept Rash "Rash" is_a SkinDisorder {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Skin eruption or discoloration",
+    codeLists: [
+        MedDRA.PT: "10037844",
+        CDISC.CT.AETERM: "RASH"
+    ]
+}
+
+concept Pyrexia "Pyrexia" is_a AdverseEvent {
+    namespace: CDISC.Glossary,
+    category: AdverseEvent,
+    definition: "Elevated body temperature; fever",
+    codeLists: [
+        MedDRA.PT: "10037660",
+        CDISC.CT.AETERM: "PYREXIA"
+    ]
+}
