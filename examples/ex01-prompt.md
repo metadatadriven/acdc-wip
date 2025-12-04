@@ -79,20 +79,20 @@ Read the document examples/ex01-ANACOVA.md and identify nouns and noun phrases t
 I want everything classified at the top-level as either a concept, a structure or a derivation. 
 The classification is hierarchical, with 'concept', 'structure' and 'derivation' being the top-level categories and all other categories are sub-classes.
 
-Top-level classification of the analysis model is:
+Top-level classification of the AC/DC model is:
 
 ```yaml
 model:
-    concept:
+    concepts:
       - biomedical
       - derivation
       - analysis
-    structure:
+    structures:
       - dimension
       - attribute
       - measure
       - cube
-    results:
+    derivations:
       - slice
       - method
       - display
@@ -120,7 +120,7 @@ You can extend the model under the leaf nodes but do not add nodes at the root o
 - `attribute` structure entities are data components that **qualify and interpret** observation values e.g. units ("mm","kg",etc.), flags, categories, etc. Attributes don't identify observations but provide essential context for interpretation.
 - `cube` are the main structure entities that represent a collection of observations (measures) organized by dimensions and attributes.
 
-##### results definitions
+##### derivations definitions
 
 - `slice` is A subset of a cube which is defined by fixing one or more dimension values, while allowing other dimensions to vary
 - `method` is a statistical or mathematical computation that takes as input cubes or slices, and produces one or more cubes or slices as a result. Methods are concrete implementations of derivation or analysis concepts.
@@ -141,7 +141,13 @@ The output file should have the following structure:
 
 ## Structure
 
-- Add the model entity category structre here. Use YAML
+- Add the AC/DC model here. Use YAML
+
+## Dependency diagram
+
+- provide brief overview of the key dependencies between model entities with particular attention toend-to-end dependency linkage, i.e. from table outputs back through derivations, to structural entities, all the way back to concepts.
+
+Insert a mermaid class diagram here. The class diagram depics the AC/DC Model.
 
 ## Definitions
 
@@ -149,7 +155,7 @@ The output file should have the following structure:
 
 ## Issues
 
-- List any open issues, unknowns or questions here
+- List any open issues or open questions here
 ```
 
 ### Prompt 3 Results
