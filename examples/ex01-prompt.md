@@ -160,3 +160,5 @@ Insert a mermaid class diagram here. The class diagram depics the AC/DC Model.
 
 ### Prompt 3 Results
 
+FURTHER WORK ON THIS HAS MOVED TO [ISSUE #27](https://github.com/metadatadriven/acdc-wip/issues/27)
+- See associated branch
