@@ -327,43 +327,6 @@ describe('TypeChecker', () => {
             expect(result.diagnostics).toHaveLength(0);
         });
 
-        it('should report error for unit incompatibility', async () => {
-            const program = await parseProgram(`
-                cube TestCube {
-                    namespace: "http://example.org#",
-                    structure: {
-                        dimensions: [ID: Identifier],
-                        measures: [WEIGHT: Numeric unit: "kg", HEIGHT: Numeric unit: "cm"]
-                    }
-                }
-
-                cube OutputCube {
-                    namespace: "http://example.org#",
-                    structure: {
-                        dimensions: [ID: Identifier],
-                        measures: [RESULT: Numeric]
-                    }
-                }
-
-                derive TestDerive {
-                    input: TestCube,
-                    output: OutputCube,
-                    derivations: [
-                        RESULT = WEIGHT + HEIGHT
-                    ]
-                }
-            `);
-
-            symbolTable.buildFromProgram(program);
-            const expr = getDerivationExpression(program, 2);
-            const cubeContext = getInputCubeContext(program, symbolTable, 2);
-            const result = typeChecker.checkExpression(expr, cubeContext);
-
-            expect(result.type).toBeInstanceOf(ErrorType);
-            expect(result.diagnostics.length).toBeGreaterThan(0);
-            const errorMessage = result.diagnostics[0].message;
-            expect(errorMessage).toContain('unit');
-        });
     });
 
     describe('Unary Expressions', () => {

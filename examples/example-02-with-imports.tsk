@@ -36,7 +36,7 @@ cube ADAE "Adverse Events Analysis Dataset" {
             AENDY: Integer,
 
             // Duration of AE
-            ADURN: Integer unit: "days"
+            ADURN: Integer
         ],
 
         attributes: [

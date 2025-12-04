@@ -40,10 +40,7 @@ ComponentList:
     '[' (components+=Component (',' components+=Component)*)? ']';
 
 Component:
-    name=ID ':' type=TypeReference (unit=UnitSpec)?;
-
-UnitSpec:
-    'unit' ':' unit=STRING;
+    name=ID ':' type=TypeReference (('type_of' | 'is_a') concept=[ConceptDefinition:QualifiedName])?;
 
 // Type system
 TypeReference:
@@ -163,16 +160,23 @@ FormulaVariable:
 // ============================================================================
 
 ConceptDefinition:
-    'concept' name=ID (description=STRING)? '{'
-        ('type' ':' conceptType=ConceptType (',' | ';')?)?
+    'concept' name=ID (description=STRING)? (('type_of' | 'is_a') parentType=[ConceptDefinition:QualifiedName])? '{'
+        ('namespace' ':' namespace=QualifiedName (',' | ';')?)?
         ('category' ':' category=ID (',' | ';')?)?
         ('definition' ':' definition=STRING (',' | ';')?)?
+        (('property' | 'properties') ':' properties=ConceptPropertyList (',' | ';')?)?
         ('unit' ':' unit=STRING (',' | ';')?)?
         ('codeLists' ':' codeLists=CodeListMappings (',' | ';')?)?
     '}';
 
-ConceptType returns string:
-    'BiomedicalConcept' | 'DerivationConcept' | 'AnalysisConcept';
+ConceptPropertyList:
+    '[' (properties+=ConceptProperty (',' properties+=ConceptProperty)*)? ']';
+
+ConceptProperty:
+    name=ID ':' type=[ConceptDefinition:ID];
+
+QualifiedName returns string:
+    ID ('.' ID)*;
 
 CodeListMappings:
     '[' (mappings+=CodeListMapping (',' mappings+=CodeListMapping)*)? ']';

@@ -1,0 +1,380 @@
+// Thunderstruck Standard Library: Efficacy Endpoint Concepts
+// This file defines standard efficacy endpoint concepts for clinical trials.
+//
+// These concepts represent common efficacy measurements and outcomes
+// used in clinical trial analysis.
+
+// ============================================================================
+// Base Efficacy Concepts
+// ============================================================================
+
+concept EfficacyEndpoint type_of AnalysisConcept {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Measurement used to assess the effectiveness of an intervention"
+}
+
+concept PrimaryEndpoint "Primary Efficacy Endpoint" is_a EfficacyEndpoint {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "The main outcome measure used to evaluate treatment efficacy"
+}
+
+concept SecondaryEndpoint "Secondary Efficacy Endpoint" is_a EfficacyEndpoint {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Additional outcome measure to support or extend primary endpoint findings"
+}
+
+concept ExploratoryEndpoint "Exploratory Efficacy Endpoint" is_a EfficacyEndpoint {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Exploratory outcome measure for hypothesis generation"
+}
+
+// ============================================================================
+// Response and Outcome Concepts
+// ============================================================================
+
+concept ClinicalResponse type_of EfficacyEndpoint {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Categorical assessment of treatment response"
+}
+
+concept CompleteResponse "Complete Response" is_a ClinicalResponse {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Complete disappearance of all target lesions or disease",
+    codeLists: [
+        CDISC.CT.RSCAT: "COMPLETE RESPONSE"
+    ]
+}
+
+concept PartialResponse "Partial Response" is_a ClinicalResponse {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Partial reduction in tumor burden or disease severity",
+    codeLists: [
+        CDISC.CT.RSCAT: "PARTIAL RESPONSE"
+    ]
+}
+
+concept StableDisease "Stable Disease" is_a ClinicalResponse {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Neither sufficient shrinkage nor sufficient increase",
+    codeLists: [
+        CDISC.CT.RSCAT: "STABLE DISEASE"
+    ]
+}
+
+concept ProgressiveDisease "Progressive Disease" is_a ClinicalResponse {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Increase in tumor burden or disease progression",
+    codeLists: [
+        CDISC.CT.RSCAT: "PROGRESSIVE DISEASE"
+    ]
+}
+
+// ============================================================================
+// Survival Endpoints
+// ============================================================================
+
+concept SurvivalEndpoint type_of EfficacyEndpoint {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Time-to-event endpoint measuring survival"
+}
+
+concept OverallSurvival "Overall Survival" is_a SurvivalEndpoint {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Time from randomization to death from any cause",
+    unit: "days",
+    codeLists: [
+        CDISC.CT.PARAMCD: "OS"
+    ]
+}
+
+concept ProgressionFreeSurvival "Progression-Free Survival" is_a SurvivalEndpoint {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Time from randomization to disease progression or death",
+    unit: "days",
+    codeLists: [
+        CDISC.CT.PARAMCD: "PFS"
+    ]
+}
+
+concept EventFreeSurvival "Event-Free Survival" is_a SurvivalEndpoint {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Time from randomization to specified event or death",
+    unit: "days",
+    codeLists: [
+        CDISC.CT.PARAMCD: "EFS"
+    ]
+}
+
+concept TimeToProgression "Time to Progression" is_a SurvivalEndpoint {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Time from randomization to disease progression",
+    unit: "days",
+    codeLists: [
+        CDISC.CT.PARAMCD: "TTP"
+    ]
+}
+
+concept DiseaseFreeSurvival "Disease-Free Survival" is_a SurvivalEndpoint {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Time from complete remission to disease recurrence or death",
+    unit: "days",
+    codeLists: [
+        CDISC.CT.PARAMCD: "DFS"
+    ]
+}
+
+// ============================================================================
+// Tumor Assessment Concepts
+// ============================================================================
+
+concept TumorMeasurement type_of EfficacyEndpoint {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Quantitative measurement of tumor size or burden"
+}
+
+concept SumOfDiameters "Sum of Target Lesion Diameters" is_a TumorMeasurement {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Sum of longest diameters of target lesions per RECIST",
+    unit: "mm"
+}
+
+concept PercentChangeInTumorSize "Percent Change in Tumor Size" is_a TumorMeasurement {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Percent change from baseline in tumor measurements",
+    unit: "%"
+}
+
+concept TumorResponseRate "Tumor Response Rate" is_a EfficacyEndpoint {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Proportion of subjects with complete or partial response"
+}
+
+concept ObjectiveResponseRate "Objective Response Rate" is_a TumorResponseRate {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Proportion with confirmed complete or partial response",
+    codeLists: [
+        CDISC.CT.PARAMCD: "ORR"
+    ]
+}
+
+concept DiseaseControlRate "Disease Control Rate" is_a TumorResponseRate {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Proportion with CR, PR, or stable disease",
+    codeLists: [
+        CDISC.CT.PARAMCD: "DCR"
+    ]
+}
+
+// ============================================================================
+// Quality of Life Concepts
+// ============================================================================
+
+concept QualityOfLife type_of EfficacyEndpoint {
+    namespace: CDISC.Glossary,
+    category: QualityOfLife,
+    definition: "Patient-reported outcome measuring quality of life"
+}
+
+concept EORTCQLQC30 "EORTC QLQ-C30" is_a QualityOfLife {
+    namespace: CDISC.Glossary,
+    category: QualityOfLife,
+    definition: "European Organisation for Research and Treatment of Cancer Quality of Life Questionnaire"
+}
+
+concept EQ5D "EQ-5D" is_a QualityOfLife {
+    namespace: CDISC.Glossary,
+    category: QualityOfLife,
+    definition: "EuroQol 5-Dimension health-related quality of life"
+}
+
+concept FACTG "FACT-G" is_a QualityOfLife {
+    namespace: CDISC.Glossary,
+    category: QualityOfLife,
+    definition: "Functional Assessment of Cancer Therapy - General"
+}
+
+// ============================================================================
+// Cognitive and Functional Assessments
+// ============================================================================
+
+concept CognitiveAssessment type_of EfficacyEndpoint {
+    namespace: CDISC.Glossary,
+    category: Cognition,
+    definition: "Assessment of cognitive function"
+}
+
+concept MMSE "Mini-Mental State Examination" is_a CognitiveAssessment {
+    namespace: CDISC.Glossary,
+    category: Cognition,
+    definition: "30-point questionnaire measuring cognitive impairment"
+}
+
+concept ADAS_Cog "Alzheimer's Disease Assessment Scale - Cognitive" is_a CognitiveAssessment {
+    namespace: CDISC.Glossary,
+    category: Cognition,
+    definition: "Assessment of cognitive function in Alzheimer's disease"
+}
+
+concept MoCA "Montreal Cognitive Assessment" is_a CognitiveAssessment {
+    namespace: CDISC.Glossary,
+    category: Cognition,
+    definition: "Cognitive screening test for mild cognitive dysfunction"
+}
+
+// ============================================================================
+// Pain Assessment Concepts
+// ============================================================================
+
+concept PainAssessment type_of EfficacyEndpoint {
+    namespace: CDISC.Glossary,
+    category: Pain,
+    definition: "Measurement of pain intensity or relief"
+}
+
+concept VAS_Pain "Visual Analog Scale for Pain" is_a PainAssessment {
+    namespace: CDISC.Glossary,
+    category: Pain,
+    definition: "0-100mm visual analog scale for pain intensity",
+    unit: "mm"
+}
+
+concept NRS_Pain "Numeric Rating Scale for Pain" is_a PainAssessment {
+    namespace: CDISC.Glossary,
+    category: Pain,
+    definition: "0-10 numeric rating scale for pain intensity"
+}
+
+concept BriefPainInventory "Brief Pain Inventory" is_a PainAssessment {
+    namespace: CDISC.Glossary,
+    category: Pain,
+    definition: "Questionnaire assessing pain severity and interference"
+}
+
+// ============================================================================
+// Disease-Specific Scales
+// ============================================================================
+
+concept DiseaseActivityScore type_of EfficacyEndpoint {
+    namespace: CDISC.Glossary,
+    category: DiseaseActivity,
+    definition: "Composite measure of disease activity"
+}
+
+concept DAS28 "Disease Activity Score-28" is_a DiseaseActivityScore {
+    namespace: CDISC.Glossary,
+    category: DiseaseActivity,
+    definition: "Measure of rheumatoid arthritis disease activity based on 28 joints"
+}
+
+concept PASI "Psoriasis Area and Severity Index" is_a DiseaseActivityScore {
+    namespace: CDISC.Glossary,
+    category: DiseaseActivity,
+    definition: "Quantitative rating of psoriasis lesion severity"
+}
+
+concept EDSS "Expanded Disability Status Scale" is_a DiseaseActivityScore {
+    namespace: CDISC.Glossary,
+    category: DiseaseActivity,
+    definition: "Method of quantifying disability in multiple sclerosis"
+}
+
+concept HAM_D "Hamilton Depression Rating Scale" is_a DiseaseActivityScore {
+    namespace: CDISC.Glossary,
+    category: DiseaseActivity,
+    definition: "Clinician-rated scale for depression severity"
+}
+
+concept MADRS "Montgomery-Åsberg Depression Rating Scale" is_a DiseaseActivityScore {
+    namespace: CDISC.Glossary,
+    category: DiseaseActivity,
+    definition: "Ten-item diagnostic questionnaire for depression"
+}
+
+// ============================================================================
+// Pharmacokinetic Endpoints
+// ============================================================================
+
+concept PKEndpoint type_of AnalysisConcept {
+    namespace: CDISC.Glossary,
+    category: Pharmacokinetics,
+    definition: "Pharmacokinetic parameter or measurement"
+}
+
+concept Cmax "Maximum Concentration" is_a PKEndpoint {
+    namespace: CDISC.Glossary,
+    category: Pharmacokinetics,
+    definition: "Maximum observed plasma concentration",
+    codeLists: [
+        CDISC.CT.PARAMCD: "CMAX"
+    ]
+}
+
+concept AUC "Area Under the Curve" is_a PKEndpoint {
+    namespace: CDISC.Glossary,
+    category: Pharmacokinetics,
+    definition: "Area under the plasma concentration-time curve",
+    codeLists: [
+        CDISC.CT.PARAMCD: "AUC"
+    ]
+}
+
+concept Tmax "Time to Maximum Concentration" is_a PKEndpoint {
+    namespace: CDISC.Glossary,
+    category: Pharmacokinetics,
+    definition: "Time to reach maximum plasma concentration",
+    unit: "h",
+    codeLists: [
+        CDISC.CT.PARAMCD: "TMAX"
+    ]
+}
+
+concept HalfLife "Elimination Half-Life" is_a PKEndpoint {
+    namespace: CDISC.Glossary,
+    category: Pharmacokinetics,
+    definition: "Time required for concentration to decrease by half",
+    unit: "h",
+    codeLists: [
+        CDISC.CT.PARAMCD: "THALF"
+    ]
+}
+
+concept Clearance "Drug Clearance" is_a PKEndpoint {
+    namespace: CDISC.Glossary,
+    category: Pharmacokinetics,
+    definition: "Volume of plasma cleared of drug per unit time",
+    unit: "L/h",
+    codeLists: [
+        CDISC.CT.PARAMCD: "CL"
+    ]
+}
+
+concept VolumeOfDistribution "Volume of Distribution" is_a PKEndpoint {
+    namespace: CDISC.Glossary,
+    category: Pharmacokinetics,
+    definition: "Apparent volume in which drug is distributed",
+    unit: "L",
+    codeLists: [
+        CDISC.CT.PARAMCD: "VD"
+    ]
+}

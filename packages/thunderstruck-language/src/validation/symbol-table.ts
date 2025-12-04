@@ -270,7 +270,7 @@ export class SymbolTable {
         // Process dimensions
         if (cube.structure.dimensions) {
             for (const component of cube.structure.dimensions.components) {
-                const type = this.resolveTypeReference(component.type, component.unit?.unit);
+                const type = this.resolveTypeReference(component.type);
                 dimensions.set(component.name, type);
 
                 // Add to cube scope
@@ -291,7 +291,7 @@ export class SymbolTable {
         // Process measures
         if (cube.structure.measures) {
             for (const component of cube.structure.measures.components) {
-                const type = this.resolveTypeReference(component.type, component.unit?.unit);
+                const type = this.resolveTypeReference(component.type);
                 measures.set(component.name, type);
 
                 // Add to cube scope
@@ -312,7 +312,7 @@ export class SymbolTable {
         // Process attributes
         if (cube.structure.attributes) {
             for (const component of cube.structure.attributes.components) {
-                const type = this.resolveTypeReference(component.type, component.unit?.unit);
+                const type = this.resolveTypeReference(component.type);
                 attributes.set(component.name, type);
 
                 // Add to cube scope

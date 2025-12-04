@@ -1,0 +1,477 @@
+// Example 1: ANCOVA Statistical Analysis Plan - Concept Library
+// Extracted from CDISC ADaM Examples 1.0 document
+//
+// This file defines the concepts and entities identified in the ANCOVA example
+// for analyzing lumbar spine bone mineral density change from baseline
+
+// ============================================================================
+// CONCEPT TABLE - Nouns and Noun Phrases from SAP Document
+// ============================================================================
+//
+// Category              | Concept Name                    | Definition/Context
+// ----------------------|---------------------------------|-------------------
+// BIOMEDICAL CONCEPTS   |                                 |
+//                       | Bone Mineral Density (BMD)      | Measured outcome variable
+//                       | Lumbar Spine BMD                | Specific anatomical location measurement
+//                       | Baseline BMD                    | BMD measured at baseline visit
+//                       |                                 |
+// STUDY DESIGN          |                                 |
+//                       | Treatment                       | Intervention assigned to subject
+//                       | Drug ABC                        | Active treatment arm
+//                       | Placebo                         | Control treatment arm
+//                       | Planned Treatment               | Treatment as randomized (not as-treated)
+//                       | Visit                           | Time point of assessment
+//                       | Month 24                        | Specific visit at 24 months
+//                       | Baseline                        | Initial measurement timepoint
+//                       | Subject                         | Study participant
+//                       | Machine Type                    | Equipment used for BMD measurement
+//                       |                                 |
+// POPULATION            |                                 |
+//                       | ITT Population                  | Intent-to-Treat analysis population
+//                       | Efficacy Population             | Population for efficacy analyses
+//                       |                                 |
+// DERIVATIONS           |                                 |
+//                       | Change from Baseline            | Post-baseline value - baseline value
+//                       | Percent Change from Baseline    | ((Post-baseline - baseline) / baseline) * 100
+//                       |                                 |
+// ANALYSIS CONCEPTS     |                                 |
+//                       | Primary Efficacy Endpoint       | Main outcome measure for study
+//                       | ANCOVA Model                    | Analysis of Covariance statistical model
+//                       | Analysis Method                 | Statistical technique applied
+//                       |                                 |
+// STATISTICAL CONCEPTS  |                                 |
+//                       | Least Squares Mean              | Adjusted mean from regression model
+//                       | Confidence Interval             | Range of plausible values for parameter
+//                       | 95% Confidence Interval         | CI with 95% confidence level
+//                       | p-value                         | Statistical significance measure
+//                       | Treatment Difference            | Contrast between treatment arms
+//                       | Standard Error                  | Measure of estimation uncertainty
+//                       |                                 |
+// DATA HANDLING         |                                 |
+//                       | LOCF                            | Last Observation Carried Forward imputation
+//                       | Imputation                      | Method for handling missing data
+//                       | Missing Data                    | Absent observations
+//                       | Non-missing Value               | Present observation
+//                       |                                 |
+// MODEL COMPONENTS      |                                 |
+//                       | Independent Variable            | Predictor in statistical model
+//                       | Dependent Variable              | Response/outcome in model
+//                       | Categorical Variable            | Factor variable (e.g., treatment)
+//                       | Continuous Variable             | Numeric variable (e.g., baseline BMD)
+//                       | Covariate                       | Adjustment variable in model
+//                       | Interaction                     | Product term between variables
+//                       | Baseline BMD by Machine Type    | Specific interaction term
+//                       |                                 |
+// MEASUREMENT UNITS     |                                 |
+//                       | Unit of Measurement             | Scale/dimension of measurement
+//                       | Bone Density Unit               | g/cm² (grams per square centimeter)
+//                       |                                 |
+// DATASETS              |                                 |
+//                       | ADSL                            | Subject-Level Analysis Dataset
+//                       | ADBMD                           | Analysis Dataset for BMD
+//                       | SDTM Domain                     | Source tabulation dataset
+//
+// ============================================================================
+
+
+// ============================================================================
+// THUNDERSTRUCK CONCEPT DEFINITIONS
+// ============================================================================
+
+// Import standard base concepts from Thunderstruck standard library
+// (These would be defined in the standard library in a real implementation)
+
+// Base concepts (foundation hierarchy)
+concept MeasuredValue {
+    definition: "A value obtained through measurement or observation"
+}
+
+concept MeasurementUnit {
+    definition: "A standard unit for quantifying measurements"
+}
+
+concept TimePoint {
+    definition: "A point in time when an observation or assessment occurs"
+}
+
+concept Person {
+    definition: "An individual entity"
+}
+
+concept Intervention {
+    definition: "A treatment or action applied in a study"
+}
+
+concept Equipment {
+    definition: "Device or instrument used in measurements"
+}
+
+concept StatisticalParameter {
+    definition: "A numeric summary or estimate from statistical analysis"
+}
+
+concept DataHandlingMethod {
+    definition: "A technique for processing or managing data"
+}
+
+concept ModelTerm {
+    definition: "A component of a statistical model"
+}
+
+// ============================================================================
+// BIOMEDICAL CONCEPTS - Clinical observations and measurements
+// ============================================================================
+
+concept BoneMineralDensity "Bone Mineral Density (BMD)" type_of MeasuredValue {
+    definition: "Measurement of mineral matter per cubic centimeter of bone",
+    category: "Clinical Measurement",
+    properties: [
+        value: MeasuredValue,
+        unit: MeasurementUnit
+    ],
+    codeLists: [
+        CDISC.CT.QSTESTCD: "BMD",
+        LOINC: "24701-5"
+    ]
+}
+
+concept LumbarSpineBMD "Lumbar Spine Bone Mineral Density" type_of BoneMineralDensity {
+    definition: "Bone mineral density measured at the lumbar spine region",
+    category: "Clinical Measurement",
+    properties: [
+        anatomicalLocation: "Lumbar Spine",
+        measurementMethod: Equipment
+    ],
+    codeLists: [
+        CDISC.CT.BMLOC: "LUMBAR SPINE",
+        SNOMED: "312681000"
+    ]
+}
+
+concept BaselineBMD "Baseline BMD Value" type_of LumbarSpineBMD {
+    definition: "Bone mineral density value measured at baseline (pre-treatment)",
+    properties: [
+        timepoint: TimePoint
+    ]
+}
+
+// ============================================================================
+// STUDY DESIGN CONCEPTS
+// ============================================================================
+
+concept Treatment type_of Intervention {
+    definition: "An intervention or therapy assigned to a study subject",
+    category: "Study Design"
+}
+
+concept DrugABC "Drug ABC" type_of Treatment {
+    definition: "Active investigational drug treatment",
+    category: "Study Design",
+    codeLists: [
+        CDISC.CT.TRT01A: "DRUG ABC"
+    ]
+}
+
+concept Placebo type_of Treatment {
+    definition: "Inactive control treatment",
+    category: "Study Design",
+    codeLists: [
+        CDISC.CT.TRT01A: "PLACEBO"
+    ]
+}
+
+concept PlannedTreatment "Planned Treatment" type_of Treatment {
+    definition: "Treatment as randomized (intent-to-treat), not as actually received",
+    category: "Study Design"
+}
+
+concept Visit type_of TimePoint {
+    definition: "A scheduled study assessment timepoint",
+    category: "Study Design",
+    properties: [
+        visitNumber: MeasuredValue,
+        visitName: "Text"
+    ]
+}
+
+concept Month24 "Month 24 Visit" type_of Visit {
+    definition: "Study visit occurring at 24 months post-baseline",
+    properties: [
+        visitNumber: 24,
+        visitName: "Month 24"
+    ],
+    codeLists: [
+        CDISC.CT.VISIT: "MONTH 24"
+    ]
+}
+
+concept Baseline type_of TimePoint {
+    definition: "Initial assessment timepoint before treatment initiation",
+    category: "Study Design",
+    codeLists: [
+        CDISC.CT.VISIT: "BASELINE"
+    ]
+}
+
+concept Subject type_of Person {
+    definition: "A participant enrolled in a clinical study",
+    category: "Study Design",
+    properties: [
+        subjectID: "Identifier"
+    ]
+}
+
+concept MachineType type_of Equipment {
+    definition: "Type or model of equipment used for BMD measurement",
+    category: "Study Design",
+    properties: [
+        manufacturer: "Text",
+        model: "Text"
+    ]
+}
+
+// ============================================================================
+// POPULATION CONCEPTS
+// ============================================================================
+
+concept AnalysisPopulation {
+    definition: "A defined subset of subjects included in an analysis"
+}
+
+concept ITTPopulation "Intent-to-Treat Population" type_of AnalysisPopulation {
+    definition: "All randomized subjects analyzed according to their assigned treatment, regardless of treatment actually received",
+    category: "Analysis Population",
+    codeLists: [
+        CDISC.CT.POPFL: "ITT"
+    ]
+}
+
+concept EfficacyPopulation type_of AnalysisPopulation {
+    definition: "Population used for efficacy analyses",
+    category: "Analysis Population"
+}
+
+// ============================================================================
+// DERIVATION CONCEPTS - Computed or derived values
+// ============================================================================
+
+concept ChangeFromBaseline type_of MeasuredValue {
+    definition: "The difference between a post-baseline value and the baseline value",
+    category: "Derived Measurement",
+    properties: [
+        baselineValue: MeasuredValue,
+        postBaselineValue: MeasuredValue
+    ],
+    codeLists: [
+        CDISC.CT.PARAMCD: "CHG"
+    ]
+}
+
+concept PercentChangeFromBaseline type_of ChangeFromBaseline {
+    definition: "The percent change from baseline: ((Post-baseline - Baseline) / Baseline) * 100",
+    category: "Derived Measurement",
+    codeLists: [
+        CDISC.CT.PARAMCD: "PCHG"
+    ]
+}
+
+// ============================================================================
+// ANALYSIS CONCEPTS - Analytical constructs and methods
+// ============================================================================
+
+concept Endpoint {
+    definition: "A precisely defined variable intended to reflect outcomes of interest in a clinical trial"
+}
+
+concept PrimaryEfficacyEndpoint type_of Endpoint {
+    definition: "The primary outcome measure for demonstrating treatment efficacy",
+    category: "Analysis Concept"
+}
+
+concept AnalysisMethod {
+    definition: "A statistical technique or procedure for analyzing data"
+}
+
+concept ANCOVAModel "ANCOVA Model" type_of AnalysisMethod {
+    definition: "Analysis of Covariance - regression model adjusting for baseline covariates",
+    category: "Statistical Model",
+    properties: [
+        dependentVariable: ModelTerm,
+        independentVariables: ModelTerm,
+        covariates: ModelTerm
+    ]
+}
+
+// ============================================================================
+// STATISTICAL CONCEPTS - Statistical parameters and estimates
+// ============================================================================
+
+concept LeastSquaresMean "Least Squares Mean (LS Mean)" type_of StatisticalParameter {
+    definition: "Model-adjusted mean estimate from regression analysis",
+    category: "Statistical Estimate",
+    properties: [
+        estimateValue: MeasuredValue,
+        standardError: StatisticalParameter
+    ],
+    codeLists: [
+        CDISC.CT.AVAL: "LSMEAN"
+    ]
+}
+
+concept ConfidenceInterval type_of StatisticalParameter {
+    definition: "A range of values that is likely to contain a population parameter with a specified confidence level",
+    category: "Statistical Estimate",
+    properties: [
+        lowerLimit: MeasuredValue,
+        upperLimit: MeasuredValue,
+        confidenceLevel: MeasuredValue
+    ]
+}
+
+concept ConfidenceInterval95 "95% Confidence Interval" type_of ConfidenceInterval {
+    definition: "Confidence interval computed at 95% confidence level",
+    properties: [
+        confidenceLevel: 0.95
+    ]
+}
+
+concept PValue "p-value" type_of StatisticalParameter {
+    definition: "Probability of obtaining test results at least as extreme as observed, assuming null hypothesis is true",
+    category: "Statistical Estimate",
+    properties: [
+        significanceLevel: MeasuredValue
+    ]
+}
+
+concept TreatmentDifference type_of StatisticalParameter {
+    definition: "The estimated difference between treatment groups",
+    category: "Statistical Estimate",
+    properties: [
+        activeArm: Treatment,
+        controlArm: Treatment,
+        estimatedDifference: LeastSquaresMean
+    ]
+}
+
+concept StandardError type_of StatisticalParameter {
+    definition: "Measure of the statistical accuracy of an estimate",
+    category: "Statistical Estimate"
+}
+
+// ============================================================================
+// DATA HANDLING CONCEPTS - Methods for managing data quality and completeness
+// ============================================================================
+
+concept ImputationMethod type_of DataHandlingMethod {
+    definition: "A technique for replacing missing data with substituted values"
+}
+
+concept LOCF "Last Observation Carried Forward" type_of ImputationMethod {
+    definition: "Missing values replaced with the last non-missing observation for that subject",
+    category: "Data Handling",
+    codeLists: [
+        CDISC.CT.IMPFL: "LOCF"
+    ]
+}
+
+concept MissingData type_of DataHandlingMethod {
+    definition: "Observations that were expected but not recorded or available",
+    category: "Data Quality"
+}
+
+concept NonMissingValue type_of MeasuredValue {
+    definition: "An observation that has a recorded value (not missing)",
+    category: "Data Quality"
+}
+
+// ============================================================================
+// MODEL COMPONENT CONCEPTS - Elements of statistical models
+// ============================================================================
+
+concept IndependentVariable type_of ModelTerm {
+    definition: "A predictor or explanatory variable in a statistical model",
+    category: "Model Component"
+}
+
+concept DependentVariable type_of ModelTerm {
+    definition: "The response or outcome variable being modeled",
+    category: "Model Component"
+}
+
+concept CategoricalVariable type_of IndependentVariable {
+    definition: "A factor variable with discrete levels or categories",
+    category: "Model Component"
+}
+
+concept ContinuousVariable type_of IndependentVariable {
+    definition: "A numeric variable that can take any value within a range",
+    category: "Model Component"
+}
+
+concept Covariate type_of IndependentVariable {
+    definition: "A variable included in the model to reduce error variance and adjust estimates",
+    category: "Model Component"
+}
+
+concept Interaction type_of ModelTerm {
+    definition: "A model term representing the product of two or more variables",
+    category: "Model Component",
+    properties: [
+        variable1: ModelTerm,
+        variable2: ModelTerm
+    ]
+}
+
+concept BaselineBMD_MachineType_Interaction "Baseline BMD by Machine Type Interaction" type_of Interaction {
+    definition: "Interaction term between baseline BMD value and machine type in the ANCOVA model",
+    properties: [
+        variable1: BaselineBMD,
+        variable2: MachineType
+    ]
+}
+
+// ============================================================================
+// MEASUREMENT UNIT CONCEPTS
+// ============================================================================
+
+concept BoneDensityUnit type_of MeasurementUnit {
+    definition: "Unit for measuring bone mineral density",
+    properties: [
+        unitSymbol: "g/cm²",
+        unitName: "grams per square centimeter"
+    ]
+}
+
+// ============================================================================
+// DATASET CONCEPTS - CDISC standard datasets
+// ============================================================================
+
+concept Dataset {
+    definition: "A structured collection of data organized for analysis"
+}
+
+concept ADSL "Subject-Level Analysis Dataset" type_of Dataset {
+    definition: "CDISC ADaM standard dataset containing one record per subject with subject-level variables",
+    category: "Analysis Dataset",
+    codeLists: [
+        CDISC.ADaM: "ADSL"
+    ]
+}
+
+concept ADBMD "Analysis Dataset for Bone Mineral Density" type_of Dataset {
+    definition: "Study-specific analysis dataset containing bone mineral density measurements and derived variables",
+    category: "Analysis Dataset",
+    properties: [
+        structure: "BDS",  // Basic Data Structure
+        derivedFrom: "SDTM Domain"
+    ]
+}
+
+concept SDTMDomain type_of Dataset {
+    definition: "CDISC Study Data Tabulation Model domain containing source data",
+    category: "Tabulation Dataset"
+}
+
+// ============================================================================
+// END OF CONCEPT LIBRARY
+// ============================================================================

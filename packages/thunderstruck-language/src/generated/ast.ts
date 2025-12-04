@@ -35,13 +35,10 @@ export type ThunderstruckKeywordNames =
     | "=="
     | ">"
     | ">="
-    | "AnalysisConcept"
     | "Binomial"
-    | "BiomedicalConcept"
     | "CodedValue"
     | "Date"
     | "DateTime"
-    | "DerivationConcept"
     | "Flag"
     | "Gamma"
     | "Gaussian"
@@ -89,6 +86,7 @@ export type ThunderstruckKeywordNames =
     | "groupBy"
     | "import"
     | "input"
+    | "is_a"
     | "link"
     | "max"
     | "mean"
@@ -100,6 +98,8 @@ export type ThunderstruckKeywordNames =
     | "not"
     | "or"
     | "output"
+    | "properties"
+    | "property"
     | "quantile"
     | "random"
     | "rows"
@@ -113,7 +113,7 @@ export type ThunderstruckKeywordNames =
     | "sum"
     | "table"
     | "true"
-    | "type"
+    | "type_of"
     | "unit"
     | "variance"
     | "vary"
@@ -131,12 +131,6 @@ export type AggregateFunction = 'ci_lower' | 'ci_upper' | 'count' | 'max' | 'mea
 
 export function isAggregateFunction(item: unknown): item is AggregateFunction {
     return item === 'mean' || item === 'median' || item === 'stddev' || item === 'variance' || item === 'min' || item === 'max' || item === 'count' || item === 'sum' || item === 'quantile' || item === 'ci_lower' || item === 'ci_upper';
-}
-
-export type ConceptType = 'AnalysisConcept' | 'BiomedicalConcept' | 'DerivationConcept';
-
-export function isConceptType(item: unknown): item is ConceptType {
-    return item === 'BiomedicalConcept' || item === 'DerivationConcept' || item === 'AnalysisConcept';
 }
 
 export type DisplayType = 'figure' | 'table';
@@ -195,6 +189,12 @@ export const ProgramElement = 'ProgramElement';
 
 export function isProgramElement(item: unknown): item is ProgramElement {
     return reflection.isInstance(item, ProgramElement);
+}
+
+export type QualifiedName = string;
+
+export function isQualifiedName(item: unknown): item is QualifiedName {
+    return typeof item === 'string';
 }
 
 export type TypeReference = CodedValueType | IdentifierType | PrimitiveType;
@@ -350,9 +350,9 @@ export function isColumnFormat(item: unknown): item is ColumnFormat {
 export interface Component extends langium.AstNode {
     readonly $container: ComponentList;
     readonly $type: 'Component';
+    concept?: langium.Reference<ConceptDefinition>;
     name: string;
     type: TypeReference;
-    unit?: UnitSpec;
 }
 
 export const Component = 'Component';
@@ -378,10 +378,12 @@ export interface ConceptDefinition extends langium.AstNode {
     readonly $type: 'ConceptDefinition';
     category?: string;
     codeLists?: CodeListMappings;
-    conceptType?: ConceptType;
     definition?: string;
     description?: string;
     name: string;
+    namespace?: QualifiedName;
+    parentType?: langium.Reference<ConceptDefinition>;
+    properties?: ConceptPropertyList;
     unit?: string;
 }
 
@@ -389,6 +391,31 @@ export const ConceptDefinition = 'ConceptDefinition';
 
 export function isConceptDefinition(item: unknown): item is ConceptDefinition {
     return reflection.isInstance(item, ConceptDefinition);
+}
+
+export interface ConceptProperty extends langium.AstNode {
+    readonly $container: ConceptPropertyList;
+    readonly $type: 'ConceptProperty';
+    name: string;
+    type: langium.Reference<ConceptDefinition>;
+}
+
+export const ConceptProperty = 'ConceptProperty';
+
+export function isConceptProperty(item: unknown): item is ConceptProperty {
+    return reflection.isInstance(item, ConceptProperty);
+}
+
+export interface ConceptPropertyList extends langium.AstNode {
+    readonly $container: ConceptDefinition;
+    readonly $type: 'ConceptPropertyList';
+    properties: Array<ConceptProperty>;
+}
+
+export const ConceptPropertyList = 'ConceptPropertyList';
+
+export function isConceptPropertyList(item: unknown): item is ConceptPropertyList {
+    return reflection.isInstance(item, ConceptPropertyList);
 }
 
 export interface CovarianceStructure extends langium.AstNode {
@@ -977,18 +1004,6 @@ export function isUnaryExpression(item: unknown): item is UnaryExpression {
     return reflection.isInstance(item, UnaryExpression);
 }
 
-export interface UnitSpec extends langium.AstNode {
-    readonly $container: Component;
-    readonly $type: 'UnitSpec';
-    unit: string;
-}
-
-export const UnitSpec = 'UnitSpec';
-
-export function isUnitSpec(item: unknown): item is UnitSpec {
-    return reflection.isInstance(item, UnitSpec);
-}
-
 export interface VariableReference extends langium.AstNode {
     readonly $container: BinaryExpression | Derivation | DimensionConstraint | FunctionCallExpression | MemberAccessExpression | SliceDefinition | UnaryExpression;
     readonly $type: 'VariableReference';
@@ -1016,6 +1031,8 @@ export type ThunderstruckAstType = {
     Component: Component
     ComponentList: ComponentList
     ConceptDefinition: ConceptDefinition
+    ConceptProperty: ConceptProperty
+    ConceptPropertyList: ConceptPropertyList
     CovarianceStructure: CovarianceStructure
     CubeDefinition: CubeDefinition
     CubeStructure: CubeStructure
@@ -1066,14 +1083,13 @@ export type ThunderstruckAstType = {
     TableSpec: TableSpec
     TypeReference: TypeReference
     UnaryExpression: UnaryExpression
-    UnitSpec: UnitSpec
     VariableReference: VariableReference
 }
 
 export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
 
     getAllTypes(): string[] {
-        return [AestheticOption, AestheticSpec, AggregateDefinition, BinaryExpression, BooleanLiteral, CodeListMapping, CodeListMappings, CodeListNamespace, CodeListRef, CodedValueType, ColumnFormat, Component, ComponentList, ConceptDefinition, CovarianceStructure, CubeDefinition, CubeStructure, Derivation, DerivationList, DeriveDefinition, DimensionConstraint, DimensionConstraints, DimensionList, DisplayDefinition, Expression, FigureSpec, FootnoteList, FormatOption, FormatSpec, Formula, FormulaAddition, FormulaConditioning, FormulaCrossing, FormulaFunction, FormulaInteraction, FormulaNesting, FormulaNumber, FormulaPower, FormulaTerm, FormulaVariable, FunctionCallExpression, IdentifierType, ImportPath, ImportStatement, Literal, MeasureList, MemberAccessExpression, ModelDefinition, NumberLiteral, OutputCubeRef, OutputCubeSpec, PrimitiveType, Program, ProgramElement, RandomEffects, SliceDefinition, StandardVersion, StandardsDeclaration, Statistic, StatisticList, StringLiteral, TableSpec, TypeReference, UnaryExpression, UnitSpec, VariableReference];
+        return [AestheticOption, AestheticSpec, AggregateDefinition, BinaryExpression, BooleanLiteral, CodeListMapping, CodeListMappings, CodeListNamespace, CodeListRef, CodedValueType, ColumnFormat, Component, ComponentList, ConceptDefinition, ConceptProperty, ConceptPropertyList, CovarianceStructure, CubeDefinition, CubeStructure, Derivation, DerivationList, DeriveDefinition, DimensionConstraint, DimensionConstraints, DimensionList, DisplayDefinition, Expression, FigureSpec, FootnoteList, FormatOption, FormatSpec, Formula, FormulaAddition, FormulaConditioning, FormulaCrossing, FormulaFunction, FormulaInteraction, FormulaNesting, FormulaNumber, FormulaPower, FormulaTerm, FormulaVariable, FunctionCallExpression, IdentifierType, ImportPath, ImportStatement, Literal, MeasureList, MemberAccessExpression, ModelDefinition, NumberLiteral, OutputCubeRef, OutputCubeSpec, PrimitiveType, Program, ProgramElement, RandomEffects, SliceDefinition, StandardVersion, StandardsDeclaration, Statistic, StatisticList, StringLiteral, TableSpec, TypeReference, UnaryExpression, VariableReference];
     }
 
     protected override computeIsSubtype(subtype: string, supertype: string): boolean {
@@ -1137,6 +1153,11 @@ export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
             case 'DisplayDefinition:sourceRef':
             case 'ModelDefinition:inputRef': {
                 return ProgramElement;
+            }
+            case 'Component:concept':
+            case 'ConceptDefinition:parentType':
+            case 'ConceptProperty:type': {
+                return ConceptDefinition;
             }
             case 'OutputCubeRef:cubeRef':
             case 'SliceDefinition:cubeRef': {
@@ -1252,9 +1273,9 @@ export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
                 return {
                     name: Component,
                     properties: [
+                        { name: 'concept' },
                         { name: 'name' },
-                        { name: 'type' },
-                        { name: 'unit' }
+                        { name: 'type' }
                     ]
                 };
             }
@@ -1272,11 +1293,30 @@ export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
                     properties: [
                         { name: 'category' },
                         { name: 'codeLists' },
-                        { name: 'conceptType' },
                         { name: 'definition' },
                         { name: 'description' },
                         { name: 'name' },
+                        { name: 'namespace' },
+                        { name: 'parentType' },
+                        { name: 'properties' },
                         { name: 'unit' }
+                    ]
+                };
+            }
+            case ConceptProperty: {
+                return {
+                    name: ConceptProperty,
+                    properties: [
+                        { name: 'name' },
+                        { name: 'type' }
+                    ]
+                };
+            }
+            case ConceptPropertyList: {
+                return {
+                    name: ConceptPropertyList,
+                    properties: [
+                        { name: 'properties', defaultValue: [] }
                     ]
                 };
             }
@@ -1688,14 +1728,6 @@ export class ThunderstruckAstReflection extends langium.AbstractAstReflection {
                     properties: [
                         { name: 'operand' },
                         { name: 'operator' }
-                    ]
-                };
-            }
-            case UnitSpec: {
-                return {
-                    name: UnitSpec,
-                    properties: [
-                        { name: 'unit' }
                     ]
                 };
             }

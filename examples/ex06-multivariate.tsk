@@ -59,13 +59,13 @@ cube ADMOOD "Profile of Mood States Analysis Dataset" {
         // Measures - observed or computed values
         measures: [
             // Analysis value (subscale or total score)
-            AVAL: Integer unit: "points",
+            AVAL: Integer,
 
             // Baseline value
-            BASE: Integer unit: "points",
+            BASE: Integer,
 
             // Change from baseline
-            CHG: Integer unit: "points"
+            CHG: Integer
         ],
 
         // Attributes - metadata about observations
@@ -107,13 +107,13 @@ cube Week6_ITT_POMS "Week 6 ITT POMS Scores" {
 
         measures: [
             // Baseline score
-            BASE: Integer unit: "points",
+            BASE: Integer,
 
             // Week 6 score
-            AVAL: Integer unit: "points",
+            AVAL: Integer,
 
             // Change from baseline to Week 6
-            CHG: Integer unit: "points"
+            CHG: Integer
         ],
 
         attributes: [

@@ -201,7 +201,7 @@ describe('Symbol Table', () => {
                         measures: [
                             COUNT: Integer,
                             VALUE: Numeric,
-                            CHANGE: Numeric unit: "kg",
+                            CHANGE: Numeric,
                             TIMESTAMP: DateTime,
                             BIRTHDATE: Date
                         ],
@@ -227,10 +227,7 @@ describe('Symbol Table', () => {
             expect(cubeType.measures.get('TIMESTAMP')).toBeInstanceOf(DateTimeType);
             expect(cubeType.measures.get('BIRTHDATE')).toBeInstanceOf(DateType);
             expect(cubeType.attributes.get('FLAG')).toBeInstanceOf(FlagType);
-
-            // Check unit
-            const changeType = cubeType.measures.get('CHANGE') as NumericType;
-            expect(changeType.getUnit()).toBe('kg');
+            expect(cubeType.measures.get('CHANGE')).toBeInstanceOf(NumericType);
         });
 
         it('should resolve coded value types', async () => {

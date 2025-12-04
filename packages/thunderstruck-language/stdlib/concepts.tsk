@@ -1,0 +1,68 @@
+// Thunderstruck Standard Library: Base Concepts
+// This file defines the standard base concepts available to all Thunderstruck programs.
+//
+// These concepts provide the foundation for the type hierarchy and can be extended
+// by user-defined concepts using the type_of or is_a keywords.
+
+// ============================================================================
+// Core Property Concepts
+// ============================================================================
+
+concept Value {
+    definition: "A measured or observed value"
+}
+
+concept MeasurementUnit {
+    definition: "A unit of measurement"
+}
+
+concept BaselineValue {
+    definition: "A baseline measurement value for comparison"
+}
+
+concept Visit {
+    definition: "A study visit or timepoint"
+}
+
+// ============================================================================
+// Standard Base Concepts
+// ============================================================================
+
+concept BiomedicalConcept {
+    definition: "Clinical observations and measurements (e.g., 'Systolic Blood Pressure', 'ADAS-Cog Total Score')"
+}
+
+concept DerivationConcept {
+    definition: "Computed or derived values (e.g., 'Change from Baseline', 'Percent Change')"
+}
+
+concept AnalysisConcept {
+    definition: "Analytical constructs (e.g., 'Efficacy Endpoint', 'Safety Parameter')"
+}
+
+// ============================================================================
+// Common Derived Concepts
+// ============================================================================
+
+concept Change type_of DerivationConcept {
+    definition: "Change in a measurement over time",
+    properties: [
+        value: Value,
+        measurementUnit: MeasurementUnit
+    ]
+}
+
+concept ChangeFromBaseline is_a Change {
+    definition: "Change from baseline value",
+    properties: [
+        baseline: BaselineValue
+    ]
+}
+
+concept PercentChange type_of DerivationConcept {
+    definition: "Percent change in a measurement",
+    properties: [
+        value: Value,
+        baseline: BaselineValue
+    ]
+}

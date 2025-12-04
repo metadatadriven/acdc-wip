@@ -5,7 +5,6 @@
     { "include": "#comments" },
     { "include": "#keywords" },
     { "include": "#model-keywords" },
-    { "include": "#concept-types" },
     { "include": "#functions" },
     { "include": "#types" },
     { "include": "#constants" },
@@ -63,7 +62,7 @@
         },
         {
           "name": "keyword.other.concept.thunderstruck",
-          "match": "\\b(type|category|definition)\\b"
+          "match": "\\b(type_of|is_a|category|definition|property|properties)\\b"
         }
       ]
     },
@@ -76,14 +75,6 @@
         {
           "name": "support.class.link-function.thunderstruck",
           "match": "\\b(Identity|Log|Logit|Probit|Inverse|Sqrt)\\b"
-        }
-      ]
-    },
-    "concept-types": {
-      "patterns": [
-        {
-          "name": "support.class.concept-type.thunderstruck",
-          "match": "\\b(BiomedicalConcept|DerivationConcept|AnalysisConcept)\\b"
         }
       ]
     },

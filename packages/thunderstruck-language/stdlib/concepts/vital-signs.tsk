@@ -1,0 +1,198 @@
+// Thunderstruck Standard Library: Vital Signs Concepts
+// This file defines standard vital signs concepts for clinical trials.
+//
+// These concepts follow CDISC SDTM VS domain terminology and include
+// mappings to standard coding systems (CDISC CT, LOINC, SNOMED).
+
+// ============================================================================
+// Base Vital Sign Concept
+// ============================================================================
+
+concept VitalSign type_of BiomedicalConcept {
+    namespace: CDISC.Glossary,
+    category: VitalSign,
+    definition: "Measurements of the body's basic physiological functions"
+}
+
+// ============================================================================
+// Blood Pressure Concepts
+// ============================================================================
+
+concept SystolicBP "Systolic Blood Pressure" is_a VitalSign {
+    namespace: CDISC.Glossary,
+    category: VitalSign,
+    definition: "Maximum blood pressure during one heartbeat when the ventricles contract",
+    unit: "mmHg",
+    codeLists: [
+        CDISC.CT.VSTESTCD: "SYSBP",
+        LOINC: "8480-6",
+        SNOMED: "271649006"
+    ]
+}
+
+concept DiastolicBP "Diastolic Blood Pressure" is_a VitalSign {
+    namespace: CDISC.Glossary,
+    category: VitalSign,
+    definition: "Minimum blood pressure during one heartbeat when the ventricles relax",
+    unit: "mmHg",
+    codeLists: [
+        CDISC.CT.VSTESTCD: "DIABP",
+        LOINC: "8462-4",
+        SNOMED: "271650006"
+    ]
+}
+
+concept MeanArterialPressure "Mean Arterial Pressure" is_a VitalSign {
+    namespace: CDISC.Glossary,
+    category: VitalSign,
+    definition: "Average arterial blood pressure during a single cardiac cycle",
+    unit: "mmHg",
+    codeLists: [
+        CDISC.CT.VSTESTCD: "MAP",
+        LOINC: "8478-0"
+    ]
+}
+
+// ============================================================================
+// Heart Rate and Pulse Concepts
+// ============================================================================
+
+concept HeartRate "Heart Rate" is_a VitalSign {
+    namespace: CDISC.Glossary,
+    category: VitalSign,
+    definition: "Number of heartbeats per unit of time",
+    unit: "beats/min",
+    codeLists: [
+        CDISC.CT.VSTESTCD: "HR",
+        LOINC: "8867-4",
+        SNOMED: "364075005"
+    ]
+}
+
+concept PulseRate "Pulse Rate" is_a VitalSign {
+    namespace: CDISC.Glossary,
+    category: VitalSign,
+    definition: "Number of palpable arterial pulsations per unit of time",
+    unit: "beats/min",
+    codeLists: [
+        CDISC.CT.VSTESTCD: "PULSE",
+        LOINC: "8893-0"
+    ]
+}
+
+// ============================================================================
+// Respiratory Concepts
+// ============================================================================
+
+concept RespiratoryRate "Respiratory Rate" is_a VitalSign {
+    namespace: CDISC.Glossary,
+    category: VitalSign,
+    definition: "Number of breaths per unit of time",
+    unit: "breaths/min",
+    codeLists: [
+        CDISC.CT.VSTESTCD: "RESP",
+        LOINC: "9279-1",
+        SNOMED: "86290005"
+    ]
+}
+
+concept OxygenSaturation "Oxygen Saturation" is_a VitalSign {
+    namespace: CDISC.Glossary,
+    category: VitalSign,
+    definition: "Percentage of hemoglobin binding sites occupied by oxygen",
+    unit: "%",
+    codeLists: [
+        CDISC.CT.VSTESTCD: "SPO2",
+        LOINC: "59408-5",
+        SNOMED: "431314004"
+    ]
+}
+
+// ============================================================================
+// Temperature Concepts
+// ============================================================================
+
+concept BodyTemperature "Body Temperature" is_a VitalSign {
+    namespace: CDISC.Glossary,
+    category: VitalSign,
+    definition: "Measurement of body temperature",
+    unit: "C",
+    codeLists: [
+        CDISC.CT.VSTESTCD: "TEMP",
+        LOINC: "8310-5",
+        SNOMED: "386725007"
+    ]
+}
+
+concept OralTemperature "Oral Temperature" is_a BodyTemperature {
+    namespace: CDISC.Glossary,
+    category: VitalSign,
+    definition: "Body temperature measured in the mouth",
+    unit: "C",
+    codeLists: [
+        CDISC.CT.VSTESTCD: "TEMP",
+        LOINC: "8331-1"
+    ]
+}
+
+concept TympanicTemperature "Tympanic Temperature" is_a BodyTemperature {
+    namespace: CDISC.Glossary,
+    category: VitalSign,
+    definition: "Body temperature measured via tympanic membrane",
+    unit: "C",
+    codeLists: [
+        CDISC.CT.VSTESTCD: "TEMP",
+        LOINC: "8333-7"
+    ]
+}
+
+// ============================================================================
+// Anthropometric Measurements
+// ============================================================================
+
+concept Height "Height" is_a VitalSign {
+    namespace: CDISC.Glossary,
+    category: VitalSign,
+    definition: "Vertical measurement of body from head to toe",
+    unit: "cm",
+    codeLists: [
+        CDISC.CT.VSTESTCD: "HEIGHT",
+        LOINC: "8302-2",
+        SNOMED: "50373000"
+    ]
+}
+
+concept Weight "Weight" is_a VitalSign {
+    namespace: CDISC.Glossary,
+    category: VitalSign,
+    definition: "Measurement of body weight",
+    unit: "kg",
+    codeLists: [
+        CDISC.CT.VSTESTCD: "WEIGHT",
+        LOINC: "29463-7",
+        SNOMED: "27113001"
+    ]
+}
+
+concept BMI "Body Mass Index" is_a VitalSign {
+    namespace: CDISC.Glossary,
+    category: VitalSign,
+    definition: "Body mass index calculated as weight/height^2",
+    unit: "kg/m^2",
+    codeLists: [
+        CDISC.CT.VSTESTCD: "BMI",
+        LOINC: "39156-5",
+        SNOMED: "60621009"
+    ]
+}
+
+concept BSA "Body Surface Area" is_a VitalSign {
+    namespace: CDISC.Glossary,
+    category: VitalSign,
+    definition: "Total surface area of the human body",
+    unit: "m^2",
+    codeLists: [
+        CDISC.CT.VSTESTCD: "BSA",
+        LOINC: "8277-6"
+    ]
+}

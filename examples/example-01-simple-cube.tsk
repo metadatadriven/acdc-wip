@@ -16,9 +16,9 @@ cube ADADAS "Analysis Dataset for ADAS-Cog Total Score" {
 
         // Measures are the observed or computed values
         measures: [
-            AVAL: Numeric unit: "points",
-            BASE: Numeric unit: "points",
-            CHG: Numeric unit: "points"
+            AVAL: Numeric,
+            BASE: Numeric,
+            CHG: Numeric
         ],
 
         // Attributes provide metadata about observations

@@ -900,15 +900,25 @@ display table "Table 14.3.01: Dose Response Analysis" {
 
 #### FR-8.1: Concept Definitions as First-Class Constructs
 - **MUST** support concept definitions as first-class language elements
-- **MUST** support different concept types:
-  - **Biomedical Concepts** - clinical observations and measurements (e.g., "Systolic Blood Pressure", "ADAS-Cog Total Score")
-  - **Derivation Concepts** - computed or derived values (e.g., "Change from Baseline", "Percent Change")
-  - **Analysis Concepts** - analytical constructs (e.g., "Efficacy Endpoint", "Safety Parameter")
+- **MUST** support hierarchical concept types:
+  - Concepts without a parent type are **base concepts**
+  - Concepts can be typed as other concepts using `type_of` or `is_a` keywords
+  - **Standard base concepts** (defined in standard library):
+    - **BiomedicalConcept** - clinical observations and measurements (e.g., "Systolic Blood Pressure", "ADAS-Cog Total Score")
+    - **DerivationConcept** - computed or derived values (e.g., "Change from Baseline", "Percent Change")
+    - **AnalysisConcept** - analytical constructs (e.g., "Efficacy Endpoint", "Safety Parameter")
+  - **Custom concept hierarchies** - users can define their own concept hierarchies for domain-specific needs
+- **MUST** support concept properties:
+  - Properties are named and typed as concepts
+  - Properties are inherited from parent concepts throughout the hierarchy
+  - Both `property:` and `properties:` keywords supported as aliases
 - **MUST** allow concepts to have:
   - Unique identifier
   - Human-readable label
   - Description/definition
-  - Type/category
+  - Parent type (optional, using `type_of` or `is_a`)
+  - Properties (optional, list of named concept references)
+  - Category
   - Associated code lists or value domains
   - Links to external ontologies (CDISC, SNOMED CT, LOINC, etc.)
 
@@ -939,18 +949,55 @@ display table "Table 14.3.01: Dose Response Analysis" {
 - **SHOULD** import concepts from external ontologies/vocabularies
 - **SHOULD** support concept harmonization across studies
 
-**Example Concept Definition:**
+**Example Concept Definitions:**
 ```thunderstruck
-concept SystolicBP "Systolic Blood Pressure" {
-    type: BiomedicalConcept
-    category: VitalSign
-    definition: "Maximum blood pressure during contraction of the ventricles"
-    unit: "mmHg"
+// Base concepts (no parent type)
+concept Value {
+    definition: "A measured or observed value"
+}
+
+concept Unit {
+    definition: "A unit of measurement"
+}
+
+// Biomedical concept with properties (from standard library)
+concept SystolicBP "Systolic Blood Pressure" type_of BiomedicalConcept {
+    category: VitalSign,
+    definition: "Maximum blood pressure during contraction of the ventricles",
+    properties: [
+        value: Value,
+        unit: Unit
+    ],
+    unit: "mmHg",
     codeLists: [
         CDISC.CT.VSTESTCD: "SYSBP",
         LOINC: "8480-6",
         SNOMED: "271649006"
     ]
+}
+
+// Hierarchical concepts with property inheritance
+concept Change {
+    properties: [
+        value: Value,
+        unit: Unit
+    ]
+}
+
+concept ChangeFromBaseline is_a Change {
+    // Inherits value and unit properties from Change
+    properties: [
+        baseline: Value
+    ],
+    definition: "Change from baseline value"
+}
+
+concept ChangeFromBaseline_Week24 type_of ChangeFromBaseline {
+    // Inherits value, unit, and baseline from parent hierarchy
+    properties: [
+        visit: Visit
+    ],
+    definition: "Change from baseline at Week 24 visit"
 }
 
 // Link concept to cube dimension
