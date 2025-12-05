@@ -2,189 +2,156 @@
 
 This directory contains examples demonstrating two complementary efforts in the AC/DC (Analysis Concept / Derivation Concept) project:
 
-1. **Thunderstruck Language Examples** - A fully developed domain-specific language for clinical trial biometric analyses
-2. **AC/DC Model Refinement** - Foundational work to refine the underlying conceptual model
+1. **AC/DC Model Refinement** - Foundational work to refine the underlying conceptual model
+2. **Thunderstruck Language Examples** - A fully developed domain-specific language for clinical trial biometric analyses
+
+The examples are organized into subdirectories by purpose:
+
+```
+examples/
+├── SAP/            # Statistical Analysis Plan excerpts (source material)
+├── model/          # AC/DC model structures and documentation
+├── thunderstruck/  # Thunderstruck DSL code examples
+└── SDMX/           # SDMX metadata representations
+```
 
 ---
 
-## 1. Thunderstruck Language
+## Directory Overview
 
-Thunderstruck is a domain-specific language (DSL) for authoring Statistical Analysis Plans (SAPs) in clinical trials, using the W3C Data Cube standard as its foundational abstraction. For complete details, see [README.thunderstruck.md](../README.thunderstruck.md).
+### [SAP/](SAP/) - Statistical Analysis Plan Examples
 
-### Language Status
+Contains SAP excerpts from the [CDISC ADaM Examples 1.0 document](../docs/adam_examples_final.pdf) serving as source material for model refinement and language validation.
 
-The Thunderstruck language implementation is functional with working syntax, parser, validation, and VS Code extension. The **concept hierarchy is working** and an example **standard library** has been created demonstrating how AC/DC concepts can be defined and built up using the language (see [Standard Library README](../packages/thunderstruck-language/stdlib/README.md)).
+**Contents:**
+- Example 1: ANCOVA analysis (bone mineral density)
+- Examples 1-4: BMD analyses (ANCOVA, categorical, repeated measures, descriptive)
+- Example 5: Pain relief (logistic regression)
+- Example 6: Mood/depression (multivariate)
+- Example 7: FEV1 respiratory (crossover design)
+- Example 8: Hy's Law criteria (safety)
 
-**However**, the language is not final and has known issues. Most significantly, the underlying model is inconsistent and not able to cleanly describe derivations and statistical methods. This limitation is being addressed through the Model Refinement work described in Section 2.
+**See:** [SAP/README.md](SAP/README.md) for detailed descriptions
 
-### Thunderstruck Quick Example
+### [model/](model/) - AC/DC Model Structures
 
-Here's a simple Thunderstruck program demonstrating key language constructs:
+Contains comprehensive AC/DC model structures derived from SAP examples, demonstrating the three-tier classification (concepts, structures, derivations).
 
-```thunderstruck
-// Define a biomedical concept
-concept BoneMineralDensity type_of BiomedicalConcept {
-    definition: "Bone mineral density measurement at lumbar spine",
-    abbreviation: "BMD",
-    unit: "g/cm²",
-    cdisc_term: "SDTM.LB.LBTESTCD = 'BMD'"
-}
+**Contents:**
+- `ex01-prompt.md` - Evolution of modeling prompts and iterations
+- `ex01-STRUCTURE-p3.md` - Complete AC/DC model for Example 1 with:
+  - 18 concepts (biomedical, derivation, analysis)
+  - 24 structures (dimensions, measures, attributes, cubes)
+  - 11 derivations (slices, methods, displays)
+  - Mermaid dependency diagrams
+  - End-to-end traceability
 
-// Define an analysis cube
-cube ADBMD "BMD Analysis Dataset" {
-    namespace: "http://example.org/study/bmd#",
+**See:** [model/README.md](model/README.md) for model documentation and OOAD principles
 
-    structure: {
-        dimensions: [
-            USUBJID: Identifier,        // Subject ID
-            AVISITN: Integer,            // Visit number
-            TRT01A: CodedValue           // Treatment assigned
-        ],
+### [thunderstruck/](thunderstruck/) - Thunderstruck DSL Examples
 
-        measures: [
-            AVAL: Numeric,               // Analysis value
-            BASE: Numeric,               // Baseline value
-            CHG: Numeric                 // Change from baseline
-        ],
+Contains Thunderstruck domain-specific language code examples demonstrating syntax and capabilities.
 
-        attributes: [
-            PARAMCD: CodedValue,         // Parameter code
-            ITTFL: Flag                  // ITT population flag
-        ]
-    },
+**Feature Examples:**
+- `example-01-simple-cube.tsk` - Basic cube structure
+- `example-02-with-imports.tsk` - Using imports and standard library
+- `example-concept.tsk` - Defining concepts with hierarchies
+- `example-slice.tsk` - Creating data slices
+- `example-aggregate.tsk` - Computing aggregations
+- `example-derive.tsk` - Derived cubes and transformations
+- `example-model.tsk` - Statistical models
+- `example-display.tsk` - Tables and figures
 
-    linked_concept: BoneMineralDensity
-}
+**Complete Analysis Examples:**
+- `ex01-ANACOVA.tsk` - Full ANCOVA analysis implementation
+- `ex06-multivariate.tsk` - Multivariate analysis
 
-// Create a slice for Month 24 ITT population
-slice Month24_ITT from ADBMD {
-    where: {
-        AVISITN == 24,
-        ITTFL == "Y"
-    },
-    group_by: [TRT01A]
-}
+**See:** [thunderstruck/README.md](thunderstruck/README.md) for language features and known limitations
 
-// Define a display table
-display Table_1 type table {
-    title: "BMD Change from Baseline at Month 24",
-    subtitle: "Intent-to-Treat Population",
+### [SDMX/](SDMX/) - SDMX Metadata Examples
 
-    source: Month24_ITT,
+Contains SDMX (Statistical Data and Metadata eXchange) representations demonstrating how W3C Data Cube vocabulary applies to clinical trial analyses.
 
-    rows: TRT01A,
-    columns: [
-        {measure: "n", label: "N"},
-        {measure: "mean", variable: CHG, label: "Mean Change", format: "x.xx"},
-        {measure: "std", variable: CHG, label: "SD", format: "x.xxx"}
-    ],
+**Contents:**
+- `ex06-sdmx.xlsx` - SDMX metadata for Example 6
+- `examples_sdmx.xlsx` - General SDMX templates
 
-    footnotes: [
-        "ITT = Intent-to-Treat population",
-        "BMD = Bone Mineral Density measured in g/cm²"
-    ]
-}
-```
-
-### Standalone Examples
-
-The following example files demonstrate specific Thunderstruck language features:
-
-- [example-01-simple-cube.tsk](example-01-simple-cube.tsk) - Basic cube structure with dimensions, measures, and attributes
-- [example-02-with-imports.tsk](example-02-with-imports.tsk) - Using imports to reference standard CDISC definitions
-- [example-concept.tsk](example-concept.tsk) - Defining biomedical concepts with hierarchical types and terminology mappings
-- [example-slice.tsk](example-slice.tsk) - Creating slices by fixing dimensions and applying filters
-- [example-aggregate.tsk](example-aggregate.tsk) - Computing summary statistics grouped by dimensions
-- [example-derive.tsk](example-derive.tsk) - Creating derived cubes through calculations and transformations
-- [example-model.tsk](example-model.tsk) - Statistical models using Wilkinson formula notation
-- [example-display.tsk](example-display.tsk) - Defining tables and figures for clinical study reports
-
-### Standard Library
-
-Thunderstruck includes a standard library of reusable concept definitions organized by clinical domain. See the [Standard Library README](../packages/thunderstruck-language/stdlib/README.md) for details on:
-
-- Base concepts (Value, MeasurementUnit, Visit, etc.)
-- Domain-specific concept libraries (Efficacy, Safety, Vital Signs, Laboratory, Adverse Events)
-- How to extend and reuse standard concepts in your analyses
+**See:** [SDMX/README.md](SDMX/README.md) for SDMX and Data Cube background
 
 ---
 
-## 2. AC/DC Model Refinement
+## Quick Start
 
-To address the inconsistencies in the underlying AC/DC model, particularly around derivations and statistical methods, work has begun on refining the foundational conceptual model. This work uses real-world examples from the CDISC ADaM specification to identify and validate a clean, consistent model structure.
+### Understanding the AC/DC Model
 
-### Source Material
+Start with the comprehensive Example 1 model:
 
-The model refinement work is based on the [CDISC ADaM Examples 1.0 document](../docs/adam_examples_final.pdf), which provides concrete Statistical Analysis Plan (SAP) text and corresponding analysis datasets for common clinical trial analyses.
+1. Read the source SAP: [SAP/ex01-ANACOVA.md](SAP/ex01-ANACOVA.md)
+2. Review the AC/DC model: [model/ex01-STRUCTURE-p3.md](model/ex01-STRUCTURE-p3.md)
+3. Compare with Thunderstruck implementation: [thunderstruck/ex01-ANACOVA.tsk](thunderstruck/ex01-ANACOVA.tsk)
 
-### Approach
+### Learning Thunderstruck
 
-The approach involves systematically analyzing SAP text to:
+Explore language features in order:
 
-1. **Identify entities** - Extract nouns and noun phrases representing concepts, structures, and results
-2. **Classify entities** - Categorize each entity into the three-tier hierarchy:
-   - **Concepts** (abstract semantic entities: biomedical, derivation, analysis)
-   - **Structures** (concrete data organization: dimensions, measures, attributes, cubes)
-   - **Results** (relationships and outputs: slices, methods, displays)
-3. **Validate consistency** - Ensure the model can cleanly represent all aspects of the analysis
-4. **Iterate and refine** - Progressively improve the model through successive refinements
+1. **Basic structure**: [thunderstruck/example-01-simple-cube.tsk](thunderstruck/example-01-simple-cube.tsk)
+2. **Concepts**: [thunderstruck/example-concept.tsk](thunderstruck/example-concept.tsk)
+3. **Data operations**: [thunderstruck/example-slice.tsk](thunderstruck/example-slice.tsk), [example-aggregate.tsk](thunderstruck/example-aggregate.tsk)
+4. **Statistical models**: [thunderstruck/example-model.tsk](thunderstruck/example-model.tsk)
+5. **Displays**: [thunderstruck/example-display.tsk](thunderstruck/example-display.tsk)
 
-### Current Status: Example 1 (ANCOVA Analysis)
+See [README.thunderstruck.md](../README.thunderstruck.md) for complete language documentation.
 
-The refinement work is currently focused on **Example 1** from the CDISC ADaM document, which describes an ANCOVA analysis of bone mineral density:
+---
 
-#### Files
+## Three-Tier AC/DC Model
 
-- [ex01-ANACOVA.md](ex01-ANACOVA.md) - Extract from the CDISC PDF document with SAP text and display layout
-- [ex01-ANACOVA.tsk](ex01-ANACOVA.tsk) - Thunderstruck implementation (demonstrates current language limitations)
-- [ex01-prompt.md](ex01-prompt.md) - Documents the evolution of the analysis prompt and model iterations
-- [ex01-STRUCTURE.md](ex01-STRUCTURE.md) - Initial structural analysis (prompt 1 & 2 results)
-- [ex01-STRUCTURE-p3.md](ex01-STRUCTURE-p3.md) - **Current model** (prompt 3 result) - comprehensive hierarchical classification
+The AC/DC metamodel organizes entities into three top-level categories:
 
-#### Key Results
+### 1. Concepts (Abstract Semantic Entities)
 
-The prompt 3 analysis ([ex01-STRUCTURE-p3.md](ex01-STRUCTURE-p3.md)) provides a much cleaner and more consistent model, identifying:
+- **Biomedical**: Clinical observations and measurements (e.g., BoneMineralDensity)
+- **Derivation**: Computed or derived values (e.g., PercentChangeFromBaseline)
+- **Analysis**: Analytical constructs (e.g., ANCOVAModel, LeastSquaresMean)
 
-- **21 concept entities** across biomedical, derivation, and analysis categories
-- **17 structure entities** including dimensions, measures, attributes, and cubes
-- **16 result entities** including slices, methods, and display specifications
-- **10 open issues** requiring clarification for full model consistency
+### 2. Structures (Concrete Data Entities)
 
-The model successfully demonstrates:
-- Clear separation between abstract concepts and concrete structural implementations
-- Explicit representation of statistical methods and their inputs/outputs
-- Formal specification of display elements with full metadata
-- Hierarchical organization enabling progressive refinement
+- **Dimensions**: Components that identify observations (e.g., Subject, TreatmentArm, TimePoint)
+- **Measures**: Components containing values (e.g., BMDValue, PercentChangeValue)
+- **Attributes**: Components that qualify/interpret (e.g., Population, ImputationMethod)
+- **Cubes**: Collections of observations organized by dimensions (e.g., ADBMD)
 
-### Next Steps
+### 3. Derivations (Transformations and Displays)
 
-1. **Final refinement** - Address the 10 open issues identified in the prompt 3 analysis
-2. **Dataset comparison** - Compare the refined model structure with the actual ADaM datasets shown in the CDISC PDF document
-3. **Additional examples** - Apply the refined model to Examples 2-N from the CDISC document to validate generalizability
-4. **Language update** - Incorporate the refined model insights back into the Thunderstruck language specification
+- **Slices**: Subsets with fixed dimensions (e.g., ITT_Month24_LOCF)
+- **Methods**: Statistical computations (e.g., FitANCOVAModel, ComputeLSMeans)
+- **Displays**: Tables, figures, listings (e.g., Table_2_1_3_1)
 
-### Model Definition
+This model extends the W3C Data Cube vocabulary with clinical trial-specific concepts while maintaining compatibility with OLAP dimensional modeling.
 
-The current three-tier classification structure is:
+---
 
-```yaml
-model:
-  concept:
-    - biomedical      # Clinical observations and measurements
-    - derivation      # Computed or derived values
-    - analysis        # Analytical constructs
-  structure:
-    - dimension       # Components that identify observations
-    - attribute       # Components that qualify/interpret values
-    - measure         # Components containing observed values
-    - cube            # Collections of observations organized by dimensions
-  results:
-    - slice           # Subsets of cubes with fixed dimension values
-    - method          # Statistical computations producing results
-    - display         # Tables, figures, and listings
-```
+## Current Status
 
-This model extends the W3C Data Cube vocabulary with concepts specific to clinical trial biometric analyses while maintaining compatibility with OLAP dimensional modeling principles.
+### AC/DC Model Refinement
+
+✅ **Complete**: Example 1 (ANCOVA) comprehensive model with full traceability
+
+🔄 **In Progress**: Bottom-up OOAD analysis across multiple CDISC examples
+
+See [GitHub Issue #27](https://github.com/metadatadriven/acdc-wip/issues/27) for:
+- Phase 1: Survey and select 5+ diverse examples
+- Phase 2: Create detailed models for each example
+- Phase 3: Apply OOAD principles to derive general-purpose metamodel
+- Phase 4: Validate and document refined metamodel
+
+### Thunderstruck Language
+
+✅ **Working**: Syntax, parser, validation, VS Code extension, standard library
+
+⚠️ **Known Limitations**: Model inconsistencies around derivations and statistical methods
+
+The language limitations are being addressed through the model refinement work in [model/](model/).
 
 ---
 
@@ -192,12 +159,46 @@ This model extends the W3C Data Cube vocabulary with concepts specific to clinic
 
 When adding new examples:
 
-1. **Thunderstruck examples** should use the `.tsk` extension and include inline comments explaining the demonstrated features
-2. **Model refinement examples** should follow the `ex##-DESCRIPTION.md` naming pattern with corresponding analysis files
-3. Update this README to include links and descriptions of new examples
+1. **SAP examples**: Place source SAP text in `SAP/` with clear example numbering
+2. **Model structures**: Create detailed AC/DC models in `model/` following Example 1 template
+3. **Thunderstruck code**: Add `.tsk` files to `thunderstruck/` with inline comments
+4. **SDMX metadata**: Add SDMX representations to `SDMX/` in Excel or XML format
+5. **Update READMEs**: Add entries to relevant subdirectory README files
+
+### File Naming Conventions
+
+- SAP examples: `SAP_ex##_Description.md` or `ex##-DESCRIPTION.md`
+- Model structures: `ex##-STRUCTURE.md` or `ex##-STRUCTURE-p#.md` (for iterations)
+- Thunderstruck feature examples: `example-<feature>.tsk`
+- Thunderstruck analysis examples: `ex##-<analysis>.tsk`
+- SDMX examples: `ex##-sdmx.xlsx` or descriptive names
+
+---
+
+## References
+
+### Standards and Specifications
+
+- **W3C Data Cube Vocabulary**: https://www.w3.org/TR/vocab-data-cube/
+- **SDMX Standards**: https://sdmx.org/
+- **CDISC ADaM**: https://www.cdisc.org/standards/foundational/adam
+
+### Project Documentation
+
+- [Thunderstruck Language Documentation](../README.thunderstruck.md)
+- [Standard Library Reference](../packages/thunderstruck-language/stdlib/README.md)
+- [VS Code Extension Guide](../packages/thunderstruck-vscode/README.md)
+- [CDISC ADaM Examples (PDF)](../docs/adam_examples_final.pdf)
+
+### Related Issues
+
+- [Issue #27: Bottom-up OOAD analysis of CDISC ADaM examples](https://github.com/metadatadriven/acdc-wip/issues/27)
+- [PR #28: Example 1 Comprehensive AC/DC Model Structure](https://github.com/metadatadriven/acdc-wip/pull/28)
+
+---
 
 ## Questions or Issues?
 
-For questions about Thunderstruck language features, see [README.thunderstruck.md](../README.thunderstruck.md).
-
-For questions about the AC/DC model or approach, see the project documentation in the [docs/](../docs/) directory.
+- **Thunderstruck language**: See [README.thunderstruck.md](../README.thunderstruck.md)
+- **AC/DC model**: See [model/README.md](model/README.md) or [docs/](../docs/)
+- **General questions**: Open an issue on GitHub
