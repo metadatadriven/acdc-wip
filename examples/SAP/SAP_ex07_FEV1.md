@@ -15,7 +15,7 @@ In addition, both study and period baselines are defined to allow for sensitivit
 This trial includes two efficacy endpoints.  The efficacy endpoints are the FEV1 AUC(0-12) response and AUC(12-24) response after 6 weeks of treatment
 
 ### Table 2.7.1 Trial Diagram of Visit Schedule and Baseline Derivations
-
+```
   +-------+--------+-------------------------+------------------------------------+-------------------------+------------------------------------+
   |       |        | Baseline Relative to Study Start                             | Baseline Relative to Period Start                            |
   +-------+--------+-------------------------+------------------------------------+-------------------------+------------------------------------+
