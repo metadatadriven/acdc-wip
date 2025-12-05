@@ -26,7 +26,7 @@ This directory contains excerpts from Statistical Analysis Plans that serve as s
   - Crossover design with repeated measures
   - Multiple treatment periods with washout
 
-- **[SAP_ex08-HysLaw](SAP_ex08-HysLaw)** - Example 8: Hy's Law Criteria analysis
+- **[SAP_ex08-HysLaw](SAP_ex08-HysLaw.md)** - Example 8: Hy's Law Criteria analysis
   - Safety analysis for drug-induced liver injury
   - Categorical shift analysis
 
