@@ -15,6 +15,24 @@ In addition, both study and period baselines are defined to allow for sensitivit
 This trial includes two efficacy endpoints.  The efficacy endpoints are the FEV1 AUC(0-12) response and AUC(12-24) response after 6 weeks of treatment
 
 ### Table 2.7.1 Trial Diagram of Visit Schedule and Baseline Derivations
+
+
+
+  | Visit | Period | Planned study day (trial period) | Calculation (trial period) | Planned study day (each period) | Calculation (each period) |
+  |-------|--------|----------------------------------|----------------------------|--------------------------------|---------------------------|
+  |       |        | **Baseline Relative to Study Start** || **Baseline Relative to Period Start** ||
+  | 2 | 1 | 1 | 1 | 1 | 1 |
+  | 4 | 1 | 43 | Visit 4 date - Visit 2 date + 1 | 43 | Visit 4 date - Visit 2 date + 1 |
+  | **14 Day Washout period** ||||||
+  | 5 | 2 | 57 | Visit 5 date - Visit 2 date + 1 | 1 | 1 |
+  | 7 | 2 | 99 | Visit 7 date - Visit 2 date + 1 | 43 | Visit 7 date - Visit 5 date + 1 |
+  | **14 Day Washout period** ||||||
+  | 8 | 3 | 113 | Visit 8 date - Visit 2 date + 1 | 1 | 1 |
+  | 10 | 3 | 155 | Visit 10 date - Visit 2 date + 1 | 43 | Visit 10 date - Visit 8 date + 1 |
+  | **14 Day Washout period** ||||||
+  | 11 | 4 | 169 | Visit 11 date - Visit 2 date + 1 | 1 | 1 |
+  | 13 | 4 | 211 | Visit 13 date - Visit 2 date + 1 | 43 | Visit 13 date - Visit 11 date + 1 |
+
 ```
   +-------+--------+-------------------------+------------------------------------+-------------------------+------------------------------------+
   |       |        | Baseline Relative to Study Start                             | Baseline Relative to Period Start                            |
