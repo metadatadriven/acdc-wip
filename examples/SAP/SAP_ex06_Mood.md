@@ -1,8 +1,6 @@
-# Example 6: Multivariate Analysis of Variance
+# Statistical Analysis Plan
 
-The Analysis Derivation and Analysis Results sections of this document are taken from page 34 of the [ADaM Examples](../docs/adam_examples_final.pdf) source document.
-
-The second half of this document describes how this example can be modelled using [Statistical Data and Metadata eXchange](https://sdmx.org/) (SDMX)
+This document is an extract taken from page 34 of the [ADaM Examples](../docs/adam_examples_final.pdf) source document, Example 6
 
 ## Analysis Derivation
 
@@ -31,9 +29,11 @@ The total mood disturbance score ranging from 0 to 200 is calculated by adding u
 
 The analyses performed are based on the subscale and total scores, not on the individual item scores.
 
-## Analysis Results
-
 In Table 2.6.3.1, the mean change from baseline for each subscale is displayed. The p-value reflects a test for overall treatment effect (i.e., a test of the effect of study drug on the combined subscales).
+
+## List of planned displays
+
+### Table 2.6.3.1 Multivariate Analysis of Variance Testing the Hypothesis of No Overall Treatment Effect at Week 6
 ```
 Table 2.6.3.1
 Multivariate Analysis of Variance Testing the Hypothesis of No Overall Treatment Effect at Week 6
@@ -54,58 +54,10 @@ Multivariate Analysis of Variance Testing the Hypothesis of No Overall Treatment
       p-value                                                                           x.xxxx
   ═══════════════════════════════════════════════════════════════════════════════════════════
 
-                                                                                 Page 1 of 1
-
+Footnotes:
   N=ITT Population
   [1] Mixed Model Repeated Measures Analysis
   [2] Wilks' Lambda multivariate test of treatment effect, with the six mood subscale scores as the dependent
       variables in the model and treatment the only independent variable.
 ```
 
-# SDMX Modelling
-
-Modelling the analysis using SDMX is split into two parts - first we define the informational model foundational parts - Concepts, Codelists and Data Formats, and second we define the structure (Dimensions, Measures and Attributes) with reference to the Concepts, Codelists and Formats.
-
-## Concepts
-
-- Multivariate Variance (codelist STATO:MANOVA)
-- Profile of Mood (codelist SNOWMED-CT:POMS)
-- Profile of Mood Subscale (codelist POMS-Subscale)
-- Subscale score (format Integer)
-- Total score (format Total_score)
-
-## Codelists
-- Likert scale [0,4]
-- Visit [Baseline, Week6]
-- STATO [MANOVA]
-- SNOWMED-CT [POMS]
-- CDISC-CT [Likert]
-- POMS-Subscale [
-    - tension-anxiety
-    - depression
-    - anger-hostility
-    - vigor-activity
-    - fatigue
-    - confusion-bewilderment
-    ]
-
-## Data Formats
-- Integer
-- total_score [Range -32,200]
-
-## Dimenstions
-
-- Subject
-- Scale
-- Visit
-- Measure
-
-## Measures
-
-- Score
-- Change from Baseline
-
-## Attributes
-
-- Treatment
-- Population

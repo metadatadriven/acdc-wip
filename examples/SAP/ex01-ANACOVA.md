@@ -33,5 +33,4 @@ The following data display illustrates an ANCOVA analysis performed using ADBMD 
 
 ```
 
-## ACDC Modelling
 
