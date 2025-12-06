@@ -1156,9 +1156,9 @@ table_2_8_3_1:
 
 ---
 
-### Anti-Pattern 7: Ambiguous Cube Grain
+### Anti-Pattern 7: Ambiguous Cube Structure
 
-**Problem:** Some cubes don't clearly specify granularity (one record per what?).
+**Problem:** Some cubes don't clearly specify their record structure (one record per what?).
 
 **Good Examples:**
 
@@ -1167,23 +1167,23 @@ table_2_8_3_1:
 FEV1_Observations:
   dimensions: [subject, site, treatment, period, visit, timepoint]
   measures: [fev1]
-  grain: "implicit: one record per subject per visit per timepoint"
+  structure: "implicit: one record per subject per visit per timepoint"
 
 FEV1_AdjustedMeans:
   dimensions: [treatment, time_interval]
   measures: [adjusted_mean, standard_error, n]
-  grain: "implicit: one record per treatment per time interval"
+  structure: "implicit: one record per treatment per time interval"
 ```
 
 **Explicit Example: HysLaw (Model_ex08_HysLaw.md:247-314)**
 ```yaml
 adlbhy:
   dimensions: [subject, treatment, visit, lab_parameter]
-  grain: "One record per subject per visit per lab parameter"  # Explicit!
+  structure: "One record per subject per visit per lab parameter"  # Explicit!
 
 shift_cube:
   dimensions: [subject, treatment, visit, criteria_type, baseline_status]
-  grain: "One record per subject per post-baseline visit per criteria type"
+  structure: "One record per subject per post-baseline visit per criteria type"
 ```
 
 **Poor Example: BMD (Model_ex01-ex04_BMD.md:111-116)**
@@ -1191,7 +1191,7 @@ shift_cube:
 adbmd:
   dimensions: [subject, treatment, time_point, machine_type, analysis_population]
   measures: [bmd_value, percent_change_bmd, response_indicator]
-  # Missing: grain specification
+  # Missing: structure specification
   # Unclear: one record per subject per time_point?
   # Or one record per subject (with time_point as multiple records)?
 ```
@@ -1201,12 +1201,12 @@ adbmd:
 - Unclear aggregation semantics
 - Difficult to generate correct joins
 
-**Recommendation:** All cubes must declare grain explicitly:
+**Recommendation:** All cubes must declare structure explicitly:
 ```yaml
 cube_name:
   dimensions: []
   measures: []
-  grain: "One record per [dimension1] per [dimension2] per ..."
+  structure: "One record per [dimension1] per [dimension2] per ..."
 ```
 
 ---
@@ -1831,7 +1831,7 @@ Cube:
     dimensions: [Dimension] (required)
     measures: [Measure] (required)
     attributes: [Attribute]
-    grain: string (required)  # e.g., "One record per subject per visit"
+    record_structure: string (required)  # e.g., "One record per subject per visit"
     primary_key: [Dimension]
   provenance:
     derived_from: [Cube]
@@ -2084,7 +2084,7 @@ PowerCalculation:
 
 ValidationRules:
   # Structural integrity
-  - rule: "All cubes must declare grain"
+  - rule: "All cubes must declare record structure"
   - rule: "All methods must declare input and output signatures"
   - rule: "All displays must reference data sources"
   - rule: "Cube dependencies must form DAG (no cycles)"
@@ -2161,7 +2161,7 @@ This validates the core architectural principle of the AC/DC metamodel.
 
 1. **Enforce Immutability:** All cubes, slices, and derivations are immutable - methods produce new cubes, never modify existing ones
 2. **Standardize Naming:** Adopt plural forms for all collection categories
-3. **Formalize Grain:** Require explicit grain specification for all cubes
+3. **Formalize Record Structure:** Require explicit record structure specification for all cubes (aligns with CDISC standards)
 4. **Require Signatures:** All methods must declare complete input/output schemas with explicit new cubes produced
 5. **Display Type Support:** Ensure metamodel fully supports tables, figures, and listings with appropriate structure schemas
 6. **Baseline Framework:** Standardize baseline definition, calculation, and handling
