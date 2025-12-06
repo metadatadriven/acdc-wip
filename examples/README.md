@@ -100,7 +100,7 @@ Explore language features in order:
 4. **Statistical models**: [thunderstruck/example-model.tsk](thunderstruck/example-model.tsk)
 5. **Displays**: [thunderstruck/example-display.tsk](thunderstruck/example-display.tsk)
 
-See [README.thunderstruck.md](../README.thunderstruck.md) for complete language documentation.
+See [ABOUT.md](../thunderstruck/ABOUT.md) for complete language documentation.
 
 ---
 
@@ -185,9 +185,9 @@ When adding new examples:
 
 ### Project Documentation
 
-- [Thunderstruck Language Documentation](../README.thunderstruck.md)
-- [Standard Library Reference](../packages/thunderstruck-language/stdlib/README.md)
-- [VS Code Extension Guide](../packages/thunderstruck-vscode/README.md)
+- [Thunderstruck Language Documentation](../thunderstruck/ABOUT.md)
+- [Standard Library Reference](../thunderstruck/packages/thunderstruck-language/stdlib/README.md)
+- [VS Code Extension Guide](../thunderstruck/packages/thunderstruck-vscode/README.md)
 - [CDISC ADaM Examples (PDF)](../docs/adam_examples_final.pdf)
 
 ### Related Issues
@@ -199,6 +199,6 @@ When adding new examples:
 
 ## Questions or Issues?
 
-- **Thunderstruck language**: See [README.thunderstruck.md](../README.thunderstruck.md)
+- **Thunderstruck language**: See [ABOUT.md](../thunderstruck/ABOUT.md)
 - **AC/DC model**: See [model/README.md](model/README.md) or [docs/](../docs/)
 - **General questions**: Open an issue on GitHub

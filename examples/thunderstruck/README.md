@@ -13,7 +13,7 @@ Thunderstruck is a DSL for clinical trial biometric analyses, using the W3C Data
 
 **Status**: The language implementation is functional but not final. The underlying model has known inconsistencies around derivations and statistical methods, which are being addressed through the model refinement work in [../model/](../model/).
 
-For complete language documentation, see [../../README.thunderstruck.md](../../README.thunderstruck.md).
+For complete language documentation, see [../../thunderstruck/ABOUT.md](../../thunderstruck/ABOUT.md).
 
 ## Language Feature Examples
 
@@ -92,7 +92,7 @@ These examples implement full analyses from CDISC ADaM Examples:
 Thunderstruck includes a standard library of reusable concepts organized by clinical domain:
 
 ```
-packages/thunderstruck-language/stdlib/
+thunderstruck/packages/thunderstruck-language/stdlib/
 ├── base/           # Core concepts (Value, Visit, Population, etc.)
 ├── efficacy/       # Efficacy outcome concepts
 ├── safety/         # Adverse events, lab values, vital signs
@@ -100,7 +100,7 @@ packages/thunderstruck-language/stdlib/
 └── ...
 ```
 
-See [../../packages/thunderstruck-language/stdlib/README.md](../../packages/thunderstruck-language/stdlib/README.md) for details.
+See [../../thunderstruck/packages/thunderstruck-language/stdlib/README.md](../../thunderstruck/packages/thunderstruck-language/stdlib/README.md) for details.
 
 ## Known Limitations
 
@@ -123,7 +123,7 @@ Install the Thunderstruck VS Code extension for:
 - Code completion
 - Error diagnostics
 
-See [../../packages/thunderstruck-vscode/README.md](../../packages/thunderstruck-vscode/README.md) for installation instructions.
+See [../../thunderstruck/packages/thunderstruck-vscode/README.md](../../thunderstruck/packages/thunderstruck-vscode/README.md) for installation instructions.
 
 ### Command Line
 
@@ -163,6 +163,6 @@ When adding new examples:
 ## Language Reference
 
 For complete language specification and documentation:
-- [Thunderstruck Language Documentation](../../README.thunderstruck.md)
-- [Standard Library Reference](../../packages/thunderstruck-language/stdlib/README.md)
-- [VS Code Extension Guide](../../packages/thunderstruck-vscode/README.md)
+- [Thunderstruck Language Documentation](../../thunderstruck/ABOUT.md)
+- [Standard Library Reference](../../thunderstruck/packages/thunderstruck-language/stdlib/README.md)
+- [VS Code Extension Guide](../../thunderstruck/packages/thunderstruck-vscode/README.md)

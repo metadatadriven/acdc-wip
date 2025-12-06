@@ -248,9 +248,9 @@ MIT License - See LICENSE file in the repository root.
 
 ## Links
 
-- [Thunderstruck Documentation](../../README.thunderstruck.md)
-- [Product Requirements](../../THUNDERSTRUCK_PRD.md)
-- [Implementation Plan](../../THUNDERSTRUCK_PLAN.md)
+- [Thunderstruck Documentation](../../ABOUT.md)
+- [Product Requirements](../../docs/THUNDERSTRUCK_PRD.md)
+- [Implementation Plan](../../docs/THUNDERSTRUCK_PLAN.md)
 - [GitHub Repository](https://github.com/metadatadriven/acdc-wip)
 
 ## Release Notes

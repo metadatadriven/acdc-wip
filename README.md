@@ -9,7 +9,7 @@ This repository contains work-in-progress on **Language-Oriented Programming** a
 This project explores using **domain-specific languages (DSLs)** and **formal language design** to capture Statistical Analysis Plans as typed, executable specifications. Three alternative approaches have been considered:
 
 ### 1. Concept-Centric Approach
-**Document:** [LOP-PROPOSAL-CC.md](LOP-PROPOSAL-CC.md)
+**Document:** [LOP-PROPOSAL-CC.md](thunderstruck/proposal/LOP-PROPOSAL-CC.md)
 
 A comprehensive language design treating **concepts as first-class types**:
 - **BiomedicalConcept**: Clinical/biological meaning (e.g., ADAS-Cog Total Score)
@@ -19,7 +19,7 @@ A comprehensive language design treating **concepts as first-class types**:
 Built on **Langium** with strong typing, functional paradigm, and multi-target code generation (R, SAS, Python). Emphasizes type safety, immutability, pure functions, and composability.
 
 ### 2. W3C Data Cube-Centric Approach
-**Document:** [LOP_PROPOSAL_CC_CUBE.md](LOP_PROPOSAL_CC_CUBE.md)
+**Document:** [LOP_PROPOSAL_CC_CUBE.md](thunderstruck/proposal/LOP_PROPOSAL_CC_CUBE.md)
 
 Makes the **W3C Data Cube standard the primary organizing principle**:
 - All data structures are cubes (SDTM, ADaM, Results)
@@ -30,7 +30,7 @@ Makes the **W3C Data Cube standard the primary organizing principle**:
 Provides semantic precision, provenance tracking, SPARQL queryability, and seamless integration with CDISC standards.
 
 ### 3. Streamlined DSL Approach
-**Document:** [LOP-PROPOSAL-GPT5.md](LOP-PROPOSAL-GPT5.md)
+**Document:** [LOP-PROPOSAL-GPT5.md](thunderstruck/proposal/LOP-PROPOSAL-GPT5.md)
 
 A more compact DSL specification with:
 - Clean separation of concerns (concepts, cubes, derivations, analyses, displays)
@@ -129,9 +129,9 @@ Thunderstruck is an implementation of the **cube-centric intermediate representa
 
 ### Quick Links
 
-- **Full Documentation:** [README.thunderstruck.md](README.thunderstruck.md)
-- **Product Requirements:** [THUNDERSTRUCK_PRD.md](THUNDERSTRUCK_PRD.md)
-- **Implementation Plan:** [THUNDERSTRUCK_PLAN.md](THUNDERSTRUCK_PLAN.md)
+- **Full Documentation:** [ABOUT.md](thunderstruck/ABOUT.md)
+- **Product Requirements:** [THUNDERSTRUCK_PRD.md](thunderstruck/docs/THUNDERSTRUCK_PRD.md)
+- **Implementation Plan:** [THUNDERSTRUCK_PLAN.md](thunderstruck/docs/THUNDERSTRUCK_PLAN.md)
 - **W3C Data Cube Primer:** [W3C_CUBE_PRIMER.md](W3C_CUBE_PRIMER.md)
 
 ### Example Syntax
@@ -188,7 +188,7 @@ model ANCOVA {
 - Type checking and inference
 - Real-time diagnostics in VS Code
 
-See [examples/](examples/) directory for complete analysis specifications and [packages/thunderstruck-language/src/__tests__/fixtures/](packages/thunderstruck-language/src/__tests__/fixtures/) for validation test examples.
+See [examples/](examples/) directory for complete analysis specifications and [thunderstruck/packages/thunderstruck-language/src/__tests__/fixtures/](thunderstruck/packages/thunderstruck-language/src/__tests__/fixtures/) for validation test examples.
 
 ---
 
@@ -196,22 +196,25 @@ See [examples/](examples/) directory for complete analysis specifications and [p
 
 ```
 acdc-wip/
-├── packages/
-│   ├── thunderstruck-language/    # Langium language definition
-│   └── thunderstruck-vscode/      # VS Code extension
-├── examples/                       # Example .tsk files
-├── docs/                           # Supporting documentation
-├── LOP-PROPOSAL-CC.md             # Concept-centric approach
-├── LOP_PROPOSAL_CC_CUBE.md        # Cube-centric approach
-├── LOP-PROPOSAL-GPT5.md           # Streamlined DSL approach
-├── THUNDERSTRUCK_PRD.md           # Product requirements
-├── THUNDERSTRUCK_PLAN.md          # Implementation plan
-└── README.thunderstruck.md        # Full Thunderstruck documentation
+├── thunderstruck/                  # Thunderstruck DSL implementation
+│   ├── packages/
+│   │   ├── thunderstruck-language/    # Langium language definition
+│   │   └── thunderstruck-vscode/      # VS Code extension
+│   ├── proposal/                   # Language design proposals
+│   │   ├── LOP-PROPOSAL-CC.md     # Concept-centric approach
+│   │   ├── LOP_PROPOSAL_CC_CUBE.md # Cube-centric approach
+│   │   └── LOP-PROPOSAL-GPT5.md   # Streamlined DSL approach
+│   ├── docs/                       # Thunderstruck documentation
+│   │   ├── THUNDERSTRUCK_PRD.md   # Product requirements
+│   │   └── THUNDERSTRUCK_PLAN.md  # Implementation plan
+│   └── ABOUT.md                    # Full Thunderstruck documentation
+├── examples/                       # Example .tsk files and models
+└── docs/                           # Supporting documentation
 ```
 
 ## Contributing
 
-This project is in early development. See [THUNDERSTRUCK_PLAN.md](THUNDERSTRUCK_PLAN.md) for the implementation roadmap and current status.
+This project is in early development. See [THUNDERSTRUCK_PLAN.md](thunderstruck/docs/THUNDERSTRUCK_PLAN.md) for the implementation roadmap and current status.
 
 ## License
 

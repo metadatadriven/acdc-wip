@@ -1,5 +1,5 @@
 - git branch naming convention is: dev/username/issue-# for example dev/stuart/issue-4 or dev/claude/issue-123 (using github issue number)
 - before working on a project increment, read and understand the relevent PRD and PLAN documents
-- When working on Thunderstruck, understand LOP_PROPOSAL_CC_CUBE.md, THUNDERSTRUCK_PRD.md and THUNDERSTRUCK_PLAN.md
+- When working on Thunderstruck, understand thunderstruck/proposal/LOP_PROPOSAL_CC_CUBE.md, thunderstruck/docs/THUNDERSTRUCK_PRD.md and thunderstruck/docs/THUNDERSTRUCK_PLAN.md
 -
 - when updating the VS Code extension, ensure the version number and change log is updated

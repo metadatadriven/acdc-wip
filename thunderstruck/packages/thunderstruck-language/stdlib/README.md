@@ -315,9 +315,9 @@ Future enhancements will include:
 
 ## Related Documentation
 
-- [Thunderstruck Language README](../../../README.thunderstruck.md) - Overview of the Thunderstruck DSL
-- [Examples README](../../../examples/README.md) - Example Thunderstruck programs
-- [AC/DC Model Refinement](../../../examples/README.md#2-acdc-model-refinement) - Foundational model work
+- [Thunderstruck Language README](../../../ABOUT.md) - Overview of the Thunderstruck DSL
+- [Examples README](../../../../examples/README.md) - Example Thunderstruck programs
+- [AC/DC Model Refinement](../../../../examples/README.md#2-acdc-model-refinement) - Foundational model work
 
 ## Questions?
 

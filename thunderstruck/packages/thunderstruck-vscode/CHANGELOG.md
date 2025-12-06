@@ -136,6 +136,6 @@ Each release will include:
 **Project Status**: Alpha - Active Development
 
 For more information, see:
-- [Thunderstruck Documentation](https://github.com/metadatadriven/acdc-wip/blob/main/README.thunderstruck.md)
-- [Product Requirements](https://github.com/metadatadriven/acdc-wip/blob/main/THUNDERSTRUCK_PRD.md)
-- [Implementation Plan](https://github.com/metadatadriven/acdc-wip/blob/main/THUNDERSTRUCK_PLAN.md)
+- [Thunderstruck Documentation](https://github.com/metadatadriven/acdc-wip/blob/main/thunderstruck/ABOUT.md)
+- [Product Requirements](https://github.com/metadatadriven/acdc-wip/blob/main/thunderstruck/docs/THUNDERSTRUCK_PRD.md)
+- [Implementation Plan](https://github.com/metadatadriven/acdc-wip/blob/main/thunderstruck/docs/THUNDERSTRUCK_PLAN.md)
