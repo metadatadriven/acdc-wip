@@ -18,10 +18,13 @@
 1. [Commonalities: Metamodel Core](#commonalities-metamodel-core)
 2. [Variations: Extension Points](#variations-extension-points)
 3. [Patterns](#patterns)
+   - Pattern 1-8: Various successful patterns
+   - Pattern 9: Immutability of Data Structures (NEW)
 4. [Anti-Patterns](#anti-patterns)
 5. [Consolidated Issues](#consolidated-issues)
 6. [Proposed Unified Metamodel](#proposed-unified-metamodel)
 7. [Traceability Matrix](#traceability-matrix)
+8. [Summary and Recommendations](#summary-and-recommendations)
 
 ---
 
@@ -656,11 +659,11 @@ cmh_test:
 
 ### Pattern 5: Display Structure Separation
 
-**Observation:** Best displays separate data from presentation:
+**Observation:** Best displays separate data from presentation. Displays can be **tables**, **figures** (plots), or **listings**.
 
 **Components:**
 1. **Data Sources:** Which cubes/slices/methods (all models)
-2. **Structure:** Rows, columns, cells (all models)
+2. **Structure:** Rows, columns, cells (tables); axes, aesthetics (figures); records (listings)
 3. **Formatting:** Number formats, alignment (all models)
 4. **Metadata:** Titles, subtitles, footnotes (all models)
 
@@ -782,6 +785,68 @@ manova_test(DependentVars, Treatment, WilksLambda, PValue) :-
 - Executable specification
 
 **Recommendation:** Metamodel should support optional logic programming representation for complex derivations.
+
+---
+
+### Pattern 9: Immutability of Data Structures
+
+**Observation:** All entities in the AC/DC model are **immutable** - nothing is modified in-place.
+
+**Key Principle:**
+- **Cubes are immutable:** Operations on cubes always produce new cubes
+- **Slices are immutable:** Slicing creates new views without modifying source
+- **Methods produce new outputs:** Methods transform inputs to new outputs, never modifying inputs
+
+**Implications:**
+
+1. **Clear Data Lineage:** Every cube has unambiguous provenance
+   - Source cubes remain unchanged
+   - Derived cubes explicitly reference their sources
+   - Full audit trail maintained
+
+2. **Safe Parallelization:** Multiple analyses can safely read same source cubes
+   - No race conditions or data corruption
+   - Reproducible results
+
+3. **Version Control Friendly:** Each step produces new artifacts
+   - Easy to compare versions
+   - Rollback is trivial
+
+4. **Testing and Validation:** Source data remains pristine
+   - Can rerun derivations from source
+   - Intermediate results can be validated independently
+
+**Example Pattern from All Models:**
+```yaml
+# Source cube (immutable)
+FEV1_Observations → [Trapezoidal_AUC_Calculation] → FEV1_AUC (new cube)
+                                                      ↓
+                                     [Calculate_Change_From_Baseline]
+                                                      ↓
+                                              FEV1_Response (new cube)
+                                                      ↓
+                                           [Mixed_Effects_REML]
+                                                      ↓
+                                          FEV1_AdjustedMeans (new cube)
+```
+
+**Pattern Evidence:**
+- **BMD:** Multiple slices from same source `adbmd` (Model_ex01-ex04_BMD.md:120-154)
+- **Pain:** Cubes produced by methods never modify inputs (Model_ex05_Pain.md:203-220)
+- **Mood:** Explicit cube pipeline (Model_ex06_Mood.md:251-298)
+- **FEV1:** Clear cube DAG with distinct stages (Model_ex07_FEV1.md:297-337)
+- **HysLaw:** Multiple derived cubes from single source (Model_ex08_HysLaw.md:247-327)
+
+**Benefits:**
+- **Reproducibility:** Rerun any step with same inputs → same outputs
+- **Debuggability:** Inspect intermediate results at any stage
+- **Composability:** Build complex analyses from simple transformations
+- **Safety:** No accidental data corruption
+
+**Recommendation:** Metamodel must enforce immutability principle:
+1. Methods declare outputs as **new cubes**, never as modifications
+2. Validation rules check that no cube is listed as both input and output
+3. Slice operations are pure functions (no side effects)
 
 ---
 
@@ -910,7 +975,7 @@ dimensions:
 
 ### Anti-Pattern 4: Methods Without Input/Output Specification
 
-**Problem:** Some methods lack clear declaration of inputs and outputs.
+**Problem:** Some methods lack clear declaration of inputs and outputs, making data lineage ambiguous.
 
 **Example 1: BMD LOCF Imputation (Model_ex01-ex04_BMD.md:222-227)**
 ```yaml
@@ -923,9 +988,9 @@ locf_imputation:
 ```
 
 **Missing:**
-- Input cube (which cube contains `bmd_value`?)
-- Output cube (does it modify in-place or create new cube?)
-- Temporal ordering (how is "last observation" determined?)
+- **Input cube:** Which cube contains `bmd_value`?
+- **Output cube:** What is the name of the new cube produced?
+- **Temporal ordering:** How is "last observation" determined?
 
 **Example 2: BMD ANCOVA (Model_ex01-ex04_BMD.md:157-173)**
 ```yaml
@@ -939,23 +1004,40 @@ ancova_primary:
 ```
 
 **Better, but missing:**
-- Output cube name (where do LS means, p-values go?)
-- Whether input slice is modified or new cube created
+- **Output cube name:** Where do LS means, p-values go? (should be explicit new cube)
+- **Complete signature:** What new cube is produced?
 
 **Impact:**
 - Ambiguous data lineage
 - Difficult to generate processing pipeline
 - Hard to validate correct implementation
+- Cannot verify immutability principle
 
-**Recommendation:** Require all methods to declare:
+**Recommendation:** Require all methods to declare complete signatures. Since all entities are **immutable**, methods must specify the new cubes they produce:
 ```yaml
 method_name:
-  input_cubes: []
-  input_slices: []
-  output_cubes: []
-  output_measures: []
-  parameters: {}
-  side_effects: []  # e.g., "modifies input in-place"
+  input_cubes: [Cube]        # Source cubes (read-only)
+  input_slices: [Slice]      # Source slices (read-only)
+  output_cubes: [Cube]       # NEW cubes produced (immutable)
+  output_measures: [Measure] # Measures in output cubes
+  parameters: {}             # Method parameters
+  # NOTE: No "side_effects" or "modifies in-place" - all outputs are NEW
+```
+
+**Example of Complete Specification:**
+```yaml
+locf_imputation:
+  type: "Imputation"
+  input_cubes:
+    - adbmd_raw
+  output_cubes:
+    - adbmd_locf  # NEW cube with imputed values
+  output_measures:
+    - bmd_value  # Now includes imputed values
+  parameters:
+    method: "LOCF"
+    applied_to: bmd_value
+    ordering: subject, time_point
 ```
 
 ---
@@ -2007,15 +2089,23 @@ ValidationRules:
   - rule: "All displays must reference data sources"
   - rule: "Cube dependencies must form DAG (no cycles)"
 
+  # Immutability
+  - rule: "No cube may appear in both input and output of same method"
+  - rule: "Methods must declare new output cubes, not modifications"
+  - rule: "Slice operations must be pure (no side effects)"
+  - rule: "All cube provenance must reference source cubes, not modifications"
+
   # Consistency
   - rule: "Dimension values in slices must match dimension definitions"
   - rule: "Measures in methods must exist in input cubes"
   - rule: "Display structure dimensions must exist in source cubes"
+  - rule: "Display type (table/figure/listing) must match structure specification"
 
   # Completeness
   - rule: "Primary endpoints must have analysis methods"
   - rule: "All concepts must be realized in structures or derivations"
   - rule: "All cubes must have CDISC mapping (if applicable)"
+  - rule: "All display types (table/figure/listing) must have complete structure definitions"
 
   # Traceability
   - rule: "Displays must trace back to concepts via methods and cubes"
@@ -2053,38 +2143,44 @@ This validates the core architectural principle of the AC/DC metamodel.
 
 1. **Strong Core:** The three-tier architecture (concepts, structures, derivations) is universal and stable.
 
-2. **Clear Patterns:** Common patterns emerge around baseline handling, treatment comparisons, DAG dependencies, and display structure.
+2. **Immutability Principle:** All entities (cubes, slices, measures) are immutable - operations produce new entities, never modify existing ones. This ensures reproducibility, safe parallelization, and clear data lineage.
 
-3. **Systematic Variations:** Variations in study design, endpoint types, and statistical methods follow predictable patterns suitable for metamodel extension.
+3. **Display Diversity:** Displays encompass tables, figures (plots), and listings, each with appropriate structure and formatting specifications.
 
-4. **Consistent Anti-Patterns:** Naming inconsistencies and incomplete specifications affect all models similarly.
+4. **Clear Patterns:** Common patterns emerge around baseline handling, treatment comparisons, DAG dependencies, immutability, and display structure separation.
 
-5. **Consolidated Issues:** Missing data, baseline definitions, CDISC mapping, and statistical specifications are common gaps.
+5. **Systematic Variations:** Variations in study design, endpoint types, and statistical methods follow predictable patterns suitable for metamodel extension.
+
+6. **Consistent Anti-Patterns:** Naming inconsistencies and incomplete specifications affect all models similarly.
+
+7. **Consolidated Issues:** Missing data, baseline definitions, CDISC mapping, and statistical specifications are common gaps.
 
 ### Recommendations for Metamodel Evolution
 
 #### High Priority
 
-1. **Standardize Naming:** Adopt plural forms for all collection categories
-2. **Formalize Grain:** Require explicit grain specification for all cubes
-3. **Require Signatures:** All methods must declare input/output schemas
-4. **Baseline Framework:** Standardize baseline definition, calculation, and handling
-5. **Missing Data:** Formalize imputation as methods with explicit properties
+1. **Enforce Immutability:** All cubes, slices, and derivations are immutable - methods produce new cubes, never modify existing ones
+2. **Standardize Naming:** Adopt plural forms for all collection categories
+3. **Formalize Grain:** Require explicit grain specification for all cubes
+4. **Require Signatures:** All methods must declare complete input/output schemas with explicit new cubes produced
+5. **Display Type Support:** Ensure metamodel fully supports tables, figures, and listings with appropriate structure schemas
+6. **Baseline Framework:** Standardize baseline definition, calculation, and handling
+7. **Missing Data:** Formalize imputation as methods with explicit properties
 
 #### Medium Priority
 
-6. **CDISC Integration:** Add comprehensive CDISC mapping layer
-7. **Statistical Models:** Extend method schema for complete model specification
-8. **Multiplicity Control:** Add formal multiplicity handling framework
-9. **Display Templates:** Create reusable display structure templates
-10. **Logic Programming:** Support predicate-based derivation specifications
+1. **CDISC Integration:** Add comprehensive CDISC mapping layer
+2. **Statistical Models:** Extend method schema for complete model specification
+3. **Multiplicity Control:** Add formal multiplicity handling framework
+4. **Display Templates:** Create reusable display structure templates for tables, figures, and listings
+5. **Logic Programming:** Support predicate-based derivation specifications
 
 #### Lower Priority
 
-11. **Sensitivity Analysis:** Add configuration for sensitivity/subgroup analyses
-12. **Sample Size:** Include sample size and power calculation metadata
-13. **Visit Windowing:** Formalize visit window definitions and handling
-14. **Safety vs Efficacy:** Distinguish safety and efficacy analysis patterns
+1. **Sensitivity Analysis:** Add configuration for sensitivity/subgroup analyses
+2. **Sample Size:** Include sample size and power calculation metadata
+3. **Visit Windowing:** Formalize visit window definitions and handling
+4. **Safety vs Efficacy:** Distinguish safety and efficacy analysis patterns
 
 ### Next Steps
 
