@@ -132,7 +132,7 @@ Thunderstruck is an implementation of the **cube-centric intermediate representa
 - **Full Documentation:** [ABOUT.md](thunderstruck/ABOUT.md)
 - **Product Requirements:** [THUNDERSTRUCK_PRD.md](thunderstruck/docs/THUNDERSTRUCK_PRD.md)
 - **Implementation Plan:** [THUNDERSTRUCK_PLAN.md](thunderstruck/docs/THUNDERSTRUCK_PLAN.md)
-- **W3C Data Cube Primer:** [W3C_CUBE_PRIMER.md](W3C_CUBE_PRIMER.md)
+- **W3C Data Cube Primer:** [W3C_CUBE_PRIMER.md](thunderstruck/docs/W3C_CUBE_PRIMER.md)
 
 ### Example Syntax
 
