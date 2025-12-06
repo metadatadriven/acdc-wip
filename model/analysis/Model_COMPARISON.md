@@ -16,15 +16,19 @@
 ## Table of Contents
 
 1. [Commonalities: Metamodel Core](#commonalities-metamodel-core)
+   - 1.1: Three-Tier Architecture with Unidirectional Dependency Flow (UPDATED)
+   - 1.2-1.5: Core categories and universal dependencies
 2. [Variations: Extension Points](#variations-extension-points)
 3. [Patterns](#patterns)
    - Pattern 1-8: Various successful patterns
-   - Pattern 9: Immutability of Data Structures (NEW)
+   - Pattern 9: Immutability of Data Structures
 4. [Anti-Patterns](#anti-patterns)
 5. [Consolidated Issues](#consolidated-issues)
 6. [Proposed Unified Metamodel](#proposed-unified-metamodel)
+   - Updated schemas with clean architecture enforcement
 7. [Traceability Matrix](#traceability-matrix)
 8. [Summary and Recommendations](#summary-and-recommendations)
+   - Clean Architecture added as Key Finding #2 and High Priority #1
 
 ---
 
@@ -61,6 +65,51 @@ model:
 - HysLaw: Lines 13-124 (concepts), 122-327 (structures), 329-563 (derivations)
 
 **Pattern:** This three-tier separation of concerns is the fundamental organizing principle of AC/DC.
+
+#### Unidirectional Dependency Flow
+
+**Critical Architectural Principle:** Dependencies flow in ONE direction through the tiers:
+
+```
+Derivations → Structures → Concepts
+   (top)       (middle)     (bottom)
+```
+
+**Dependency Rules:**
+
+1. **Concepts (Independent Layer)**
+   - Concepts have NO dependencies on structures or derivations
+   - Concepts may reference other concepts (e.g., parent-child relationships)
+   - Concepts are purely abstract definitions
+
+2. **Structures (Middle Layer)**
+   - Structures depend ONLY on concepts
+   - Structures reference concepts via "realizes", "qualifies" relationships
+   - Structures do NOT reference derivations
+   - Example: `Measure` realizes `BiomedicalConcept`
+
+3. **Derivations (Dependent Layer)**
+   - Derivations depend on BOTH structures and concepts
+   - Derivations reference structures via "input_cubes", "input_measures"
+   - Derivations reference concepts via "implements"
+   - Example: `Method` implements `DerivationConcept` and operates on `Cube`
+
+**Benefits of Clean Architecture:**
+- **Testability:** Each tier can be validated independently
+- **Reusability:** Concepts and structures are reusable across analyses
+- **Maintainability:** Changes in derivations don't affect lower tiers
+- **Clear semantics:** Direction of dependency makes interpretation unambiguous
+- **No circular dependencies:** Ensures acyclic dependency graph
+
+**Violations to Avoid:**
+- ❌ Concepts referencing structures (e.g., `BiomedicalConcept.realizes_as: [Measure]`)
+- ❌ Concepts referencing derivations (e.g., `AnalysisConcept.implements_via: [Method]`)
+- ❌ Structures referencing derivations (e.g., `Cube.derivation_method: [Method]`)
+
+**Correct Pattern:**
+- ✓ Structures reference concepts (e.g., `Measure.realizes: [BiomedicalConcept]`)
+- ✓ Derivations reference structures (e.g., `Method.input_cubes: [Cube]`)
+- ✓ Derivations reference concepts (e.g., `Method.implements: [DerivationConcept]`)
 
 ---
 
@@ -1728,7 +1777,8 @@ BiomedicalConcept:
       code: string
   relationships:
     parent: BiomedicalConcept
-    realizes_as: [Measure | Dimension]
+  # NOTE: Clean architecture - concepts do not reference structures
+  # Structures (Dimension, Measure) reference concepts via "realizes"
 
 DerivationConcept:
   name: string (required)
@@ -1739,7 +1789,8 @@ DerivationConcept:
     method_type: enum[arithmetic, statistical, rule_based]
   relationships:
     applies_to: [BiomedicalConcept | DerivationConcept]
-    realizes_as: [Method]
+  # NOTE: Clean architecture - concepts do not reference derivations
+  # Derivations (Method) reference concepts via "implements"
 
 AnalysisConcept:
   name: string (required)
@@ -1750,8 +1801,9 @@ AnalysisConcept:
     study_design: StudyDesign
     statistical_method: string
   relationships:
-    implements_via: [Method]
     endpoint_of: Study
+  # NOTE: Clean architecture - concepts do not reference derivations
+  # Derivations (Method) reference concepts via "implements"
 ```
 
 ### Study Design Schema
@@ -1766,7 +1818,9 @@ StudyDesign:
     duration: string
   randomization:
     method: string
-    stratification_factors: [Dimension]
+    stratification_factors: [string]  # Names of stratification factors, not references
+  # NOTE: Clean architecture - concepts do not reference structures
+  # Use dimension names as strings, not direct references to Dimension entities
 ```
 
 ### Structure Schemas
@@ -1835,7 +1889,7 @@ Cube:
     primary_key: [Dimension]
   provenance:
     derived_from: [Cube]
-    derivation_method: [Method]
+    derivation_method_name: string  # Method name, not direct reference
     source_datasets: [string]  # CDISC dataset names
   cdisc_mapping:
     dataset: string  # e.g., "ADLB", "ADEFF"
@@ -1843,6 +1897,8 @@ Cube:
   constraints:
     filters: [Condition]
     required_attributes: [Attribute]
+  # NOTE: Clean architecture - structures do not reference derivations
+  # Use method name as string; Method references Cube via input/output
 ```
 
 ### Derivation Schemas
@@ -2083,6 +2139,13 @@ PowerCalculation:
 # ============================================
 
 ValidationRules:
+  # Clean Architecture (Unidirectional Dependencies)
+  - rule: "Concepts must NOT reference structures or derivations"
+  - rule: "Structures must NOT reference derivations"
+  - rule: "Structures may ONLY reference concepts"
+  - rule: "Derivations may reference both structures and concepts"
+  - rule: "All inter-tier references must follow: Derivations → Structures → Concepts"
+
   # Structural integrity
   - rule: "All cubes must declare record structure"
   - rule: "All methods must declare input and output signatures"
@@ -2109,7 +2172,7 @@ ValidationRules:
 
   # Traceability
   - rule: "Displays must trace back to concepts via methods and cubes"
-  - rule: "Derived cubes must reference derivation methods"
+  - rule: "Cube provenance must reference derivation method by name (not direct reference)"
 ```
 
 ---
@@ -2143,29 +2206,32 @@ This validates the core architectural principle of the AC/DC metamodel.
 
 1. **Strong Core:** The three-tier architecture (concepts, structures, derivations) is universal and stable.
 
-2. **Immutability Principle:** All entities (cubes, slices, measures) are immutable - operations produce new entities, never modify existing ones. This ensures reproducibility, safe parallelization, and clear data lineage.
+2. **Clean Architecture:** Dependencies flow unidirectionally: Derivations → Structures → Concepts. This ensures concepts are independent, structures depend only on concepts, and derivations depend on both. No circular dependencies exist.
 
-3. **Display Diversity:** Displays encompass tables, figures (plots), and listings, each with appropriate structure and formatting specifications.
+3. **Immutability Principle:** All entities (cubes, slices, measures) are immutable - operations produce new entities, never modify existing ones. This ensures reproducibility, safe parallelization, and clear data lineage.
 
-4. **Clear Patterns:** Common patterns emerge around baseline handling, treatment comparisons, DAG dependencies, immutability, and display structure separation.
+4. **Display Diversity:** Displays encompass tables, figures (plots), and listings, each with appropriate structure and formatting specifications.
 
-5. **Systematic Variations:** Variations in study design, endpoint types, and statistical methods follow predictable patterns suitable for metamodel extension.
+5. **Clear Patterns:** Common patterns emerge around baseline handling, treatment comparisons, DAG dependencies, immutability, and display structure separation.
 
-6. **Consistent Anti-Patterns:** Naming inconsistencies and incomplete specifications affect all models similarly.
+6. **Systematic Variations:** Variations in study design, endpoint types, and statistical methods follow predictable patterns suitable for metamodel extension.
 
-7. **Consolidated Issues:** Missing data, baseline definitions, CDISC mapping, and statistical specifications are common gaps.
+7. **Consistent Anti-Patterns:** Naming inconsistencies and incomplete specifications affect all models similarly.
+
+8. **Consolidated Issues:** Missing data, baseline definitions, CDISC mapping, and statistical specifications are common gaps.
 
 ### Recommendations for Metamodel Evolution
 
 #### High Priority
 
-1. **Enforce Immutability:** All cubes, slices, and derivations are immutable - methods produce new cubes, never modify existing ones
-2. **Standardize Naming:** Adopt plural forms for all collection categories
-3. **Formalize Record Structure:** Require explicit record structure specification for all cubes (aligns with CDISC standards)
-4. **Require Signatures:** All methods must declare complete input/output schemas with explicit new cubes produced
-5. **Display Type Support:** Ensure metamodel fully supports tables, figures, and listings with appropriate structure schemas
-6. **Baseline Framework:** Standardize baseline definition, calculation, and handling
-7. **Missing Data:** Formalize imputation as methods with explicit properties
+1. **Enforce Clean Architecture:** Maintain unidirectional dependencies (Derivations → Structures → Concepts) with validation rules preventing upward references
+2. **Enforce Immutability:** All cubes, slices, and derivations are immutable - methods produce new cubes, never modify existing ones
+3. **Standardize Naming:** Adopt plural forms for all collection categories
+4. **Formalize Record Structure:** Require explicit record structure specification for all cubes (aligns with CDISC standards)
+5. **Require Signatures:** All methods must declare complete input/output schemas with explicit new cubes produced
+6. **Display Type Support:** Ensure metamodel fully supports tables, figures, and listings with appropriate structure schemas
+7. **Baseline Framework:** Standardize baseline definition, calculation, and handling
+8. **Missing Data:** Formalize imputation as methods with explicit properties
 
 #### Medium Priority
 
