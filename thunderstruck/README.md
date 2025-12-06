@@ -52,11 +52,24 @@ thunderstruck/
 
 ## Project Status
 
-**Current Phase:** Increment 5 Complete ✅ | Next: Increment 6 - Standard Library + Examples
+**Current Phase:** Increment 6 Complete ✅ | Next: Increment 7 - Concept Management
 
 ### Completed Increments
 
 Thunderstruck follows an incremental development approach outlined in [docs/THUNDERSTRUCK_PLAN.md](docs/THUNDERSTRUCK_PLAN.md).
+
+#### ✅ Increment 6: Standard Library + Examples
+- Standard library with reusable concept definitions
+- Base concepts (Value, Visit, Population, etc.)
+- Domain-specific concept libraries:
+  - Vital signs (blood pressure, heart rate, temperature, etc.)
+  - Laboratory tests (hemoglobin, glucose, liver enzymes, etc.)
+  - Efficacy endpoints (ADAS-Cog, MMSE, FEV1, etc.)
+  - Adverse events (severity, causality, MedDRA classifications)
+- Concept hierarchy with inheritance
+- CDISC/NCI/STATO terminology mappings
+- Located in `packages/thunderstruck-language/stdlib/`
+- See [packages/thunderstruck-language/stdlib/README.md](packages/thunderstruck-language/stdlib/README.md)
 
 #### ✅ Increment 5: Advanced LSP Features
 - Code completion (keywords, types, references)
@@ -104,8 +117,8 @@ Thunderstruck follows an incremental development approach outlined in [docs/THUN
 ### GitHub Issues
 
 Implementation tracked through GitHub issues:
-- Increment 1-5 work: See closed issues with labels `increment-1` through `increment-5`
-- Upcoming work: See open issues labeled `increment-6`
+- Increment 1-6 work: See closed issues with labels `increment-1` through `increment-6`
+- Upcoming work: See open issues labeled `increment-7`
 
 ## Getting Started
 
@@ -246,7 +259,7 @@ See [../examples/thunderstruck/](../examples/thunderstruck/) for:
 
 ## Features
 
-### Current Features (Increments 1-5)
+### Current Features (Increments 1-6)
 
 - ✅ **Full Language Grammar** - All core constructs implemented
 - ✅ **VS Code Integration** - Syntax highlighting, real-time diagnostics
@@ -257,10 +270,10 @@ See [../examples/thunderstruck/](../examples/thunderstruck/) for:
 - ✅ **Semantic Validators** - Slice, model, formula, expression, dependency validation
 - ✅ **Version Management** - Support for multiple SDTM/ADaM versions
 - ✅ **Reporting** - JSON, Text, Markdown validation reports
+- ✅ **Standard Library** - Reusable concept definitions (vital signs, labs, efficacy, AEs)
 
-### Planned Features (Increments 6-14)
+### Planned Features (Increments 7-14)
 
-- 🔄 **Standard Library** - Reusable concept definitions (Increment 6)
 - 🔄 **Concept Management** - Namespaces, inheritance, validation (Increment 7)
 - 📋 **Visualizations** - Cube structure, pipeline DAG viewers (Increment 8)
 - 📋 **R Code Generation** - tidyverse/rlang output (Increment 9)
