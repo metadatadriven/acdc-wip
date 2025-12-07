@@ -4,13 +4,20 @@ This directory contains formal Domain-Driven Design (DDD) models for the electro
 
 ## Files
 
-- **eSAP.cml** - Complete eSAP domain model including:
+- **eSAP_DOMAIN_DESIGN.md** - Comprehensive DDD analysis document (source for CML model):
+  - Domain-Driven Design analysis of the eSAP domain
+  - Bounded context definitions and responsibilities
+  - Context relationships and integration patterns
+  - Aggregate design and tactical patterns
+  - Strategic domain classification
+
+- **eSAP.cml** - Formal ContextMapper DSL model (generated from eSAP_DOMAIN_DESIGN.md):
   - Domain and subdomain definitions
   - 8 bounded contexts with aggregates
   - Context map showing relationships
   - Tactical DDD patterns (entities, value objects, services)
 
-- **diagrams/** - Generated architecture visualizations:
+- **diagrams/** - Generated architecture visualizations (generated from eSAP.cml):
   - **eSAP_ContextMap.png** - Context map showing all bounded contexts and relationships (PNG)
   - **eSAP_ContextMap.svg** - Context map (scalable vector graphics)
   - **eSAP_ContextMap.puml** - Context map (PlantUML source)
@@ -20,7 +27,7 @@ This directory contains formal Domain-Driven Design (DDD) models for the electro
 ## Source Documentation
 
 The CML model is derived from:
-- **model/analysis/eSAP_DOMAIN_DESIGN.md** - Comprehensive DDD analysis of the eSAP domain
+- **eSAP_DOMAIN_DESIGN.md** - Comprehensive DDD analysis of the eSAP domain
 
 ## Domain Structure
 
@@ -201,14 +208,14 @@ The validator checks:
 
 The `eSAP.cml` file is generated from the comprehensive domain analysis document:
 
-**Source:** `model/analysis/eSAP_DOMAIN_DESIGN.md`
+**Source:** `eSAP_DOMAIN_DESIGN.md` (in this directory)
 
 **Process:**
 
 1. **Read the source analysis:**
    ```bash
    # Review the domain design document
-   less model/analysis/eSAP_DOMAIN_DESIGN.md
+   less eSAP_DOMAIN_DESIGN.md
    ```
 
 2. **Identify key DDD components:**

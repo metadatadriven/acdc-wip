@@ -34,13 +34,8 @@ Cross-model comparison analyzing how different metamodels (Define-XML, ODM, Data
 
 ### Domain-Driven Design
 
-**eSAP_DOMAIN_DESIGN.md**
-Comprehensive Domain-Driven Design (DDD) analysis of the electronic Statistical Analysis Plan (eSAP) domain:
-- 8 bounded contexts (Study Design, Statistical Analysis, Data Management, Safety, Efficacy, Interim Analysis, Regulatory, Reporting)
-- 8 core aggregates (Protocol, SAP, Analysis Set, Derived Variable, Adverse Event, Estimand, Sample Size, TFL)
-- Ubiquitous language aligned with ICH E3/E9/E9(R1) and CDISC standards
-- Domain events, services, and business rules
-- Context mappings and integration patterns
+**Moved to model/design/eSAP_DOMAIN_DESIGN.md**
+Comprehensive Domain-Driven Design (DDD) analysis of the electronic Statistical Analysis Plan (eSAP) domain has been moved to the model/design directory along with its ContextMapper DSL implementation (eSAP.cml) and generated diagrams. See model/design/README.md for details.
 
 ### Example Use Cases
 
@@ -94,9 +89,10 @@ Model_REQUIREMENTS.md ← (consolidates) ← Model_USER_REQUIREMENTS.md
        ↓ (informs)
 Model_COMPARISON.md
        ↓ (validates)
-eSAP_DOMAIN_DESIGN.md
        ↓ (demonstrates)
 Model_ex*.md (examples)
+       ↓ (informs design)
+../design/eSAP_DOMAIN_DESIGN.md → ../design/eSAP.cml → ../design/diagrams/
 ```
 
 ## Standards Alignment
@@ -111,7 +107,7 @@ All documentation aligns with:
 1. **For Requirements Analysis**: Start with Model_REQUIREMENTS.md for complete specification
 2. **For Architecture Design**: Review Model_PRINCIPLES.md for design constraints and patterns
 3. **For Standards Comparison**: Consult Model_COMPARISON.md for cross-model insights
-4. **For Domain Modeling**: Reference eSAP_DOMAIN_DESIGN.md for DDD patterns and bounded contexts
+4. **For Domain Modeling**: See ../design/eSAP_DOMAIN_DESIGN.md for DDD analysis and ../design/eSAP.cml for formal ContextMapper DSL model
 5. **For Implementation Examples**: Examine Model_ex*.md files for concrete use cases
 
 ## Version Control
