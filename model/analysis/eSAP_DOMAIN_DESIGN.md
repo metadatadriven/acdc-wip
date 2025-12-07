@@ -1807,6 +1807,18 @@ Domain services represent operations that don't naturally belong to a single ent
 - Standardized vocabularies for variables and values
 - Consistent representation across studies and sponsors
 
+**CDISC USDM (Unified Study Data Model)**
+- Standardized representation of study design and protocol metadata
+- Machine-readable protocol definitions
+- Supports automated study start-up and protocol digitization
+- Enables interoperability between clinical trial management systems
+
+**CDISC ARS (Analysis Results Standard)**
+- Standardized structure for representing statistical analysis results
+- Captures analysis outputs in machine-readable format
+- Enables automated report generation and results aggregation
+- Supports regulatory submissions and clinical study reports
+
 ### 12.3 Medical Coding Dictionaries
 
 **MedDRA (Medical Dictionary for Regulatory Activities)**
