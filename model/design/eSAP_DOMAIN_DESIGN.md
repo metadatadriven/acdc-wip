@@ -4,7 +4,7 @@
 
 **Purpose:** Domain-Driven Design analysis of the electronic Statistical Analysis Plan (eSAP) domain for regulated clinical trials biometrics workflows.
 
-**Approach:** This document applies DDD principles to identify bounded contexts, aggregates, entities, value objects, and ubiquitous language within the statistical analysis planning domain for clinical trials.
+**Approach:** This document applies [DDD principles](https://en.wikipedia.org/wiki/Domain-driven_design) to identify bounded contexts, aggregates, entities, value objects, and ubiquitous language within the statistical analysis planning domain for clinical trials.
 
 **Standards Alignment:** CDISC, ICH E3, ICH E9, ICH E9(R1) Addendum on Estimands
 
@@ -12,7 +12,7 @@
 
 ## Executive Summary
 
-The eSAP domain represents a complex, highly regulated environment for planning and executing statistical analyses in clinical trials. The domain exhibits clear separation of concerns across eight primary bounded contexts, each with distinct responsibilities, workflows, and regulatory requirements. The core domain model centers around the **Study Protocol** as the source of truth, with the **Statistical Analysis Plan** acting as the detailed operational specification derived from the protocol.
+The SAP domain represents a complex, highly regulated environment for planning and executing statistical analyses in clinical trials. The domain exhibits clear separation of concerns across eight primary bounded contexts, each with distinct responsibilities, workflows, and regulatory requirements. The core domain model centers around the **Study Protocol** as the source of truth, with the **Statistical Analysis Plan** acting as the detailed operational specification derived from the protocol.
 
 ---
 
