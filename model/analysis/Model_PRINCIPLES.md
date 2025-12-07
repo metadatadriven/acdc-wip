@@ -4,9 +4,9 @@
 
 **Source Document:** Model_COMPARISON.md (Analysis of 5 CDISC ADaM examples)
 
-**Date:** 2025-12-06
+**Date:** 2025-12-07
 
-**Version:** 1.0
+**Version:** 2.0
 
 ---
 
@@ -25,7 +25,12 @@
 11. [GP-11: Progressive Refinement and Varying Levels of Detail](#gp-11-progressive-refinement-and-varying-levels-of-detail)
 12. [GP-12: Concepts as First-Class Citizens](#gp-12-concepts-as-first-class-citizens)
 13. [GP-13: Language Oriented Approach](#gp-13-language-oriented-approach)
-14. [Appendix: Glossary](#appendix-glossary)
+14. [GP-14: Estimand Framework First-Class Support](#gp-14-estimand-framework-first-class-support)
+15. [GP-15: Pre-Specification and Temporal Integrity](#gp-15-pre-specification-and-temporal-integrity)
+16. [GP-16: Validation Rules as Domain Invariants](#gp-16-validation-rules-as-domain-invariants)
+17. [GP-17: Bounded Context Integration Patterns](#gp-17-bounded-context-integration-patterns)
+18. [Appendix: Glossary](#appendix-glossary)
+19. [Appendix: Change History](#appendix-change-history)
 
 ---
 
@@ -1097,6 +1102,613 @@ This approach mirrors successful programming language design (e.g., Scheme, Pyth
 
 ---
 
+## GP-14: Estimand Framework First-Class Support
+
+**Principle:** The AC/DC metamodel SHALL provide first-class support for the ICH E9(R1) estimand framework, treating estimands as explicit, structured entities with well-defined components (population, variable, intercurrent event handling strategies, and population-level summaries).
+
+**Estimand Components:**
+
+An estimand SHALL be explicitly specified with all required ICH E9(R1) components:
+
+1. **Treatment Condition** - The treatments or interventions being compared
+2. **Population** - The patient population for which the treatment effect is being estimated
+3. **Variable (Endpoint)** - The outcome or endpoint being measured
+4. **Intercurrent Events** - Events occurring after treatment initiation that affect interpretation
+5. **Population-Level Summary** - How individual outcomes are combined (e.g., mean difference, hazard ratio)
+
+**Intercurrent Event Handling Strategies:**
+
+The metamodel SHALL support all five ICH E9(R1) strategies:
+
+1. **Treatment Policy Strategy** - Include all data regardless of intercurrent events
+   - Example: Include data after treatment discontinuation or rescue medication use
+   - Reflects "real-world" treatment effect
+
+2. **Composite Strategy** - Treat intercurrent event occurrence as component of outcome
+   - Example: Death or hospitalization as composite endpoint
+   - Intercurrent event incorporated into variable definition
+
+3. **Hypothetical Strategy** - Estimate outcome as if intercurrent event had not occurred
+   - Example: Effect if patients had not discontinued treatment
+   - Requires imputation or modeling
+
+4. **While-On-Treatment Strategy** - Consider only data collected while on treatment
+   - Example: Efficacy evaluated only during active treatment period
+   - Data censored at intercurrent event
+
+5. **Principal Stratum Strategy** - Estimate effect in subpopulation unaffected by intercurrent event
+   - Example: Effect in patients who would complete treatment under both arms
+   - Requires principal stratification statistical methods
+
+**Estimand-First Design Pattern:**
+
+The metamodel SHALL support the recommended "Estimand-First" workflow:
+
+```
+Protocol Objectives → Estimand Definition → Analysis Specification → Method Selection → Displays
+```
+
+**Specific Requirements:**
+
+1. **Estimand Entity:** Explicit estimand structure with all five components
+2. **Analysis-to-Estimand Traceability:** Every analysis SHALL trace to one or more estimands
+3. **Strategy-Driven Data Handling:** Intercurrent event handling strategy determines data inclusion/exclusion rules
+4. **Multiple Estimands per Endpoint:** Support primary estimand plus sensitivity/supplementary estimands
+5. **Pre-Specification:** Estimands SHALL be specified before database lock (temporal integrity - GP-15)
+
+**Example:**
+
+```yaml
+Estimand:
+  name: "Primary_Efficacy_Estimand"
+  components:
+    treatment: ["Active_Drug", "Placebo"]
+    population: "ITT_Population"
+    variable: "FEV1_Change_Week_12"
+    intercurrent_events:
+      - event: "Treatment_Discontinuation"
+        strategy: "Hypothetical"  # Effect if patients had not discontinued
+      - event: "Rescue_Medication"
+        strategy: "Treatment_Policy"  # Include data after rescue medication
+    summary_measure: "Mean_Difference_Between_Treatment_Arms"
+
+Analysis:
+  name: "Primary_Efficacy_Analysis"
+  implements_estimand: "Primary_Efficacy_Estimand"
+  method: "MMRM"  # Chosen to align with hypothetical strategy
+  # ...
+```
+
+**Rationale:** Estimand framework support ensures:
+- **Alignment with ICH E9(R1)** - Regulatory expectation for new trials
+- **Clear Clinical Questions** - Explicit statement of what is being estimated
+- **Appropriate Method Selection** - Statistical methods chosen to match estimand strategy
+- **Interpretability** - Unambiguous interpretation of analysis results
+- **Sensitivity Analysis Structure** - Multiple estimands explore robustness
+- **Regulatory Acceptance** - Demonstrable alignment with guideline expectations
+
+**Evidence:**
+- ICH E9(R1) Addendum (2019) mandates estimand framework for confirmatory trials
+- eSAP Domain Design patterns (eSAP_DOMAIN_DESIGN.md, Pattern 11.1.1, Lines 1588-1593)
+- Anti-pattern: Ignoring intercurrent events (eSAP_DOMAIN_DESIGN.md, Anti-Pattern 11.2.5, Lines 1658-1662)
+
+**Impact:**
+- Metamodel schema must include Estimand entity with all ICH E9(R1) components
+- Analysis specifications must reference estimands explicitly
+- Validation rules must verify estimand completeness before database lock
+- Data handling rules derived from intercurrent event strategies
+- Display metadata traces through analysis to estimand to protocol objective
+- CDISC mappings: Estimand → USDM Protocol definitions, Analysis → ARS metadata
+
+---
+
+## GP-15: Pre-Specification and Temporal Integrity
+
+**Principle:** The AC/DC metamodel SHALL support explicit versioning, timestamps, approval workflows, and locking mechanisms to enable pre-specification requirements and maintain temporal integrity throughout the analysis lifecycle.
+
+**Pre-Specification Requirements:**
+
+For confirmatory analyses, the metamodel SHALL enforce the principle that analysis specifications are finalized BEFORE seeing unblinded data:
+
+1. **Statistical Analysis Plan (SAP) Finalized** - Before database lock
+2. **Analysis Set Membership Assigned** - Before database lock (blinded review)
+3. **Estimands Defined** - Before database lock
+4. **Analysis Programs Validated** - Before database unlock
+
+**Temporal Integrity Mechanisms:**
+
+1. **Version Control:**
+   ```yaml
+   AnalysisSpecification:
+     metadata:
+       version: "2.1"
+       created_date: "2024-01-15"
+       modified_date: "2024-03-22"
+       finalized_date: "2024-06-30"  # Before database lock
+       locked: true
+       lock_reason: "SAP finalized before database lock"
+   ```
+
+2. **Approval Workflows:**
+   ```yaml
+   ApprovalHistory:
+     - approver: "Lead_Statistician"
+       role: "Statistical_Lead"
+       date: "2024-06-28"
+       version: "2.1"
+       status: "Approved"
+     - approver: "Medical_Monitor"
+       role: "Medical_Review"
+       date: "2024-06-29"
+       version: "2.1"
+       status: "Approved"
+   ```
+
+3. **Temporal Constraints:**
+   ```yaml
+   TemporalConstraints:
+     database_lock_date: "2024-07-01"
+     constraints:
+       - rule: "SAP_finalized_before_lock"
+         check: "sap.finalized_date < database_lock_date"
+         severity: "ERROR"
+       - rule: "Analysis_sets_assigned_before_lock"
+         check: "analysis_sets.assigned_date < database_lock_date"
+         severity: "ERROR"
+   ```
+
+4. **Audit Trail:**
+   ```yaml
+   AuditTrail:
+     - timestamp: "2024-03-15T14:30:00Z"
+       action: "MODIFY"
+       entity: "Analysis_1_1"
+       field: "statistical_model.covariance"
+       old_value: "Compound_Symmetry"
+       new_value: "Unstructured"
+       user: "statistician_jsmith"
+       reason: "SAP Amendment 01: Updated per protocol amendment"
+   ```
+
+**Amendment Process:**
+
+The metamodel SHALL support formal amendment workflows:
+
+```yaml
+Amendment:
+  amendment_number: "01"
+  amendment_date: "2024-03-15"
+  reason: "Protocol amendment changed primary endpoint analysis timepoint"
+  affected_entities:
+    - "Primary_Efficacy_Analysis"
+    - "Estimand_Primary"
+  changes:
+    - entity: "Estimand_Primary"
+      field: "variable.timepoint"
+      old_value: "Week_12"
+      new_value: "Week_16"
+  approval_required: true
+  approved_by: "Data_Monitoring_Committee"
+  approval_date: "2024-03-20"
+```
+
+**Locking Mechanism:**
+
+Once specifications are finalized:
+
+1. **SAP Lock** - Prevents modifications after finalization
+2. **Analysis Set Lock** - Prevents membership changes after assignment
+3. **Database Lock** - Marks point where data collection ceases
+4. **Unlock Authorization** - Only authorized roles can unlock (with justification and audit)
+
+**Scientific Integrity Anti-Patterns (to be prevented):**
+
+- **Post-Hoc Primary Analysis** - Changing primary analysis after unblinding (eSAP Anti-Pattern 11.2.1)
+- **Analysis Set Assignment After Unblinding** - Determining population membership after seeing treatment codes (eSAP Anti-Pattern 11.2.4)
+- **Undocumented SAP Amendments** - Making changes without formal amendment process (eSAP Anti-Pattern 11.2.7)
+
+**Rationale:** Pre-specification and temporal integrity ensure:
+- **Scientific Integrity** - Prevents data-driven bias
+- **Regulatory Acceptance** - Demonstrates prospective analysis planning
+- **Reproducibility** - Clear versioning enables exact reproduction
+- **Auditability** - Complete history of all changes
+- **Transparency** - Explicit documentation of when specifications were defined
+- **Quality** - Formal approval processes catch errors before execution
+
+**Evidence:**
+- ICH E9 Statistical Principles mandate pre-specification of confirmatory analyses
+- eSAP Domain Design pattern (Pattern 11.1.3, Lines 1600-1605)
+- eSAP Anti-patterns (11.2.1, 11.2.4, 11.2.7)
+- FDA Guidance on Statistical Principles requires documented SAP finalization
+
+**Impact:**
+- Metamodel must include versioning, timestamps, and approval metadata for all key entities
+- Validation rules must check temporal constraints (finalization before database lock)
+- Tooling must support locking mechanisms and authorization controls
+- Audit trail is mandatory, not optional
+- Amendment workflows must be explicit and traceable
+- Version control system integration for reproducibility
+
+---
+
+## GP-16: Validation Rules as Domain Invariants
+
+**Principle:** The AC/DC metamodel SHALL support encoding validation rules, business rules, quality checks, and regulatory constraints as explicit, declarative domain invariants rather than external QA processes. These invariants SHALL be first-class entities that can be versioned, tested, and automatically enforced.
+
+**Domain Invariants Categories:**
+
+1. **Structural Invariants:**
+   - Every cube must have at least one dimension (GP-1)
+   - All method inputs must exist before method execution (GP-8 DAG)
+   - Dependencies must be acyclic (GP-8)
+   - Measure must reference a valid concept (GP-12)
+
+2. **Temporal Invariants:**
+   - SAP finalized before database lock (GP-15)
+   - Analysis sets assigned before unblinding (GP-15)
+   - Baseline occurs before post-baseline (temporal ordering)
+
+3. **Statistical Invariants:**
+   - Significance level must be between 0 and 1
+   - Confidence intervals must have lower bound ≤ upper bound
+   - Sample sizes must be non-negative integers
+   - P-values must be between 0 and 1
+
+4. **Regulatory Invariants:**
+   - Primary analysis must be pre-specified (ICH E9)
+   - Estimands must include all five components (ICH E9(R1))
+   - Safety analyses must include all treated subjects (ICH E3)
+   - ADaM datasets must trace to SDTM (CDISC)
+
+5. **Clinical Invariants:**
+   - Hy's Law criteria: ALT > 3×ULN AND Bilirubin > 2×ULN
+   - Subject age must be ≥ minimum age per protocol
+   - Baseline value must exist for change-from-baseline analyses
+
+**Declarative Invariant Specification:**
+
+```yaml
+Invariant:
+  id: "INV-001"
+  name: "SAP_Finalized_Before_Database_Lock"
+  category: "Temporal"
+  severity: "ERROR"
+  description: "Statistical Analysis Plan must be finalized before database lock"
+  rule:
+    type: "temporal_constraint"
+    condition: "sap.finalized_date < study.database_lock_date"
+  entities_affected: ["AnalysisSpecification", "Study"]
+  enforcement_point: "Before database unlock"
+  regulatory_basis: "ICH E9 Section 5.7"
+
+Invariant:
+  id: "INV-002"
+  name: "Estimand_Completeness"
+  category: "Regulatory"
+  severity: "ERROR"
+  description: "All estimands must specify treatment, population, variable, intercurrent events, and summary measure"
+  rule:
+    type: "completeness_check"
+    required_fields:
+      - "treatment"
+      - "population"
+      - "variable"
+      - "intercurrent_events"
+      - "summary_measure"
+  entities_affected: ["Estimand"]
+  enforcement_point: "Estimand creation"
+  regulatory_basis: "ICH E9(R1) Section 2"
+
+Invariant:
+  id: "INV-003"
+  name: "Primary_Analysis_Uniqueness"
+  category: "Statistical"
+  severity: "ERROR"
+  description: "Exactly one primary efficacy analysis must be designated"
+  rule:
+    type: "cardinality_constraint"
+    count_of: "Analysis where category == 'Primary_Efficacy'"
+    operator: "equals"
+    value: 1
+  entities_affected: ["Analysis"]
+  enforcement_point: "SAP finalization"
+
+Invariant:
+  id: "INV-004"
+  name: "Baseline_Before_Post_Baseline"
+  category: "Temporal"
+  severity: "ERROR"
+  description: "Baseline visit must occur before post-baseline visits"
+  rule:
+    type: "temporal_ordering"
+    sequence:
+      - "Baseline_Visit"
+      - "Post_Baseline_Visits"
+  entities_affected: ["Visit", "Timepoint"]
+  enforcement_point: "Analysis execution"
+```
+
+**Invariant Enforcement:**
+
+1. **Design-Time Validation:**
+   - Invariants checked during model specification
+   - Errors prevent SAP finalization
+   - Warnings allow finalization with documented exception
+
+2. **Runtime Validation:**
+   - Invariants checked during analysis execution
+   - Data quality rules enforced on cubes
+   - Clinical thresholds validated against data
+
+3. **Audit-Time Validation:**
+   - Retrospective checking for regulatory audit
+   - Confirmation of all invariants satisfied
+   - Exception documentation review
+
+**Quality as Domain Concern:**
+
+Traditional approach: QC programmer independently reproduces results, compares outputs
+
+DDD approach: Quality rules as domain invariants:
+
+```yaml
+QualityInvariant:
+  id: "QC-001"
+  name: "Statistical_Result_Reproducibility"
+  description: "Production and QC statistical results must match within tolerance"
+  rule:
+    type: "output_comparison"
+    tolerance: 0.0001
+    entities: ["StatisticalResult"]
+  enforcement: "QC_phase"
+  severity: "ERROR"
+```
+
+**Rationale:** Validation rules as domain invariants ensure:
+- **Automated Enforcement** - Rules checked automatically, not manually
+- **Consistency** - Same rules applied uniformly across all analyses
+- **Traceability** - Each rule linked to regulatory basis or clinical rationale
+- **Documentation** - Rules are self-documenting
+- **Testability** - Rules can be unit tested independently
+- **Versioning** - Rules evolve with regulations and standards
+- **Quality by Design** - Quality built into model, not bolted on afterward
+
+**Evidence:**
+- eSAP Domain Design (Recommendation 14.2.8, Lines 1912-1914): "Validation as Domain Concern"
+- eSAP Anti-Patterns demonstrate problems from missing invariant checking (11.2.1, 11.2.4, 11.2.6)
+- Domain-Driven Design principle: Encode business rules as domain model invariants
+
+**Impact:**
+- Metamodel schema must include Invariant entity type
+- All critical business rules should be declaratively specified as invariants
+- Validation engine required to evaluate invariants
+- Invariants must be versioned with the model
+- Documentation automatically generated from invariant specifications
+- Exception handling must support documented justifications for invariant violations
+- Regulatory submissions include invariant specifications and verification reports
+
+---
+
+## GP-17: Bounded Context Integration Patterns
+
+**Principle:** The AC/DC metamodel SHALL support well-defined integration patterns for composing analyses across bounded contexts, using Domain-Driven Design patterns (Shared Kernel, Customer-Supplier, Anticorruption Layer, Published Language) and event-driven coordination to maintain loose coupling while enabling complex multi-context workflows.
+
+**Bounded Contexts in Clinical Trial Analysis:**
+
+Based on eSAP Domain Design, clinical trial statistical analysis involves multiple bounded contexts:
+
+1. **Study Design Context** - Protocol, objectives, endpoints, estimands
+2. **Statistical Analysis Context** - SAP, analysis specifications, methods
+3. **Data Management Context** - Analysis datasets, derivations, populations
+4. **Safety Monitoring Context** - Adverse events, laboratory, vital signs
+5. **Efficacy Assessment Context** - Treatment effects, hypothesis testing
+6. **Interim Analysis Context** - DMC analyses, stopping rules
+7. **Regulatory Compliance Context** - ICH guidelines, quality standards
+8. **Reporting Context** - Tables, figures, listings
+
+**Integration Patterns:**
+
+### Pattern 1: Shared Kernel
+
+**Definition:** Two contexts share a common subset of domain model.
+
+**Example:** Study Design Context ↔ Statistical Analysis Context share Estimand framework
+
+```yaml
+SharedKernel:
+  name: "Estimand_Framework"
+  shared_between:
+    - "StudyDesignContext"
+    - "StatisticalAnalysisContext"
+  shared_entities:
+    - "Estimand"
+    - "InterurrentEvent"
+    - "PopulationDefinition"
+  coordination_requirement: "High - both contexts must agree on estimand changes"
+  implementation: "Shared library, joint ownership"
+```
+
+**When to use:** Close collaboration required, frequent communication, joint ownership acceptable
+
+### Pattern 2: Customer-Supplier (Upstream-Downstream)
+
+**Definition:** Upstream context provides services/data that downstream context consumes.
+
+**Example:** Data Management Context → Statistical Analysis Context (ADaM datasets)
+
+```yaml
+CustomerSupplier:
+  upstream: "DataManagementContext"
+  downstream: "StatisticalAnalysisContext"
+  interface:
+    provided_by_upstream:
+      - "ADSL: Subject-level analysis dataset"
+      - "ADAE: Adverse events dataset"
+      - "BDS: Efficacy datasets"
+    consumed_by_downstream:
+      - "Analysis populations (ITT, Safety, PP)"
+      - "Derived variables (change from baseline, etc.)"
+  contract:
+    - "ADaM datasets conform to CDISC standard"
+    - "Datasets delivered before analysis execution"
+    - "Dataset specifications reviewed by downstream before production"
+  downstream_rights: "VETO_RIGHT"  # Statistical can veto dataset design
+```
+
+**When to use:** Clear provider-consumer relationship, well-defined interface
+
+### Pattern 3: Anticorruption Layer (ACL)
+
+**Definition:** Downstream context translates upstream model to protect its own domain.
+
+**Example:** Statistical Analysis Context consumes Data Management Context via ACL
+
+```yaml
+AnticorruptionLayer:
+  downstream: "StatisticalAnalysisContext"
+  upstream: "DataManagementContext"
+  purpose: "Translate ADaM datasets to analysis-specific cube structures"
+  translation_rules:
+    - upstream_entity: "ADSL"
+      downstream_entity: "SubjectLevelCube"
+      mapping:
+        - "USUBJID → subject_id"
+        - "SAFFL → is_in_safety_population"
+        - "ITTFL → is_in_itt_population"
+    - upstream_entity: "BDS"
+      downstream_entity: "EfficacyMeasureCube"
+      mapping:
+        - "AVAL → observed_value"
+        - "CHG → change_from_baseline"
+```
+
+**When to use:** Downstream needs to protect its domain model from upstream changes
+
+### Pattern 4: Published Language
+
+**Definition:** Upstream publishes well-specified language/protocol that downstream must conform to.
+
+**Example:** Regulatory Compliance Context publishes ICH/CDISC standards
+
+```yaml
+PublishedLanguage:
+  publisher: "RegulatoryComplianceContext"
+  language: "CDISC_Standards"
+  components:
+    - "CDISC SDTM"
+    - "CDISC ADaM"
+    - "CDISC Controlled Terminology"
+    - "ICH E9(R1) Estimand Framework"
+  consumers:
+    - "DataManagementContext"  # Must produce CDISC-compliant datasets
+    - "StatisticalAnalysisContext"  # Must use ICH E9(R1) estimands
+    - "ReportingContext"  # Must use CDISC terminology
+  conformance_requirement: "MANDATORY for regulatory submissions"
+```
+
+**When to use:** Industry standards, regulatory requirements, broad adoption needed
+
+### Pattern 5: Event-Driven Coordination
+
+**Definition:** Contexts coordinate via domain events rather than direct coupling.
+
+**Example:** Database lock triggers analysis execution
+
+```yaml
+DomainEvents:
+  - event_name: "DatabaseLocked"
+    publisher: "DataManagementContext"
+    payload:
+      - "database_lock_date"
+      - "final_dataset_versions"
+    subscribers:
+      - context: "StatisticalAnalysisContext"
+        action: "Begin analysis execution"
+        preconditions:
+          - "SAP finalized"
+          - "Analysis programs validated"
+      - context: "InterimAnalysisContext"
+        action: "Execute final analysis (if ongoing)"
+
+  - event_name: "SAPFinalized"
+    publisher: "StatisticalAnalysisContext"
+    payload:
+      - "sap_version"
+      - "finalization_date"
+    subscribers:
+      - context: "DataManagementContext"
+        action: "Freeze dataset specifications"
+      - context: "RegulatoryComplianceContext"
+        action: "Archive SAP version"
+```
+
+**When to use:** Loose coupling desired, asynchronous coordination, audit trail needed
+
+**Metamodel Support for Integration:**
+
+1. **Context Declarations:**
+   ```yaml
+   BoundedContext:
+     name: "StatisticalAnalysisContext"
+     responsibilities:
+       - "Define analysis specifications"
+       - "Execute statistical analyses"
+     interfaces:
+       provides:
+         - "AnalysisResults"
+         - "StatisticalTests"
+       consumes:
+         - "AnalysisDatasets from DataManagementContext"
+         - "Estimands from StudyDesignContext"
+   ```
+
+2. **Integration Declarations:**
+   ```yaml
+   ContextIntegration:
+     pattern: "CustomerSupplier"
+     upstream: "DataManagementContext"
+     downstream: "StatisticalAnalysisContext"
+     interface_definition: "CDISC_ADaM_Contract"
+     anticorruption_layer: true
+   ```
+
+3. **Event Declarations:**
+   ```yaml
+   EventSchema:
+     event: "DatabaseLocked"
+     payload_schema:
+       database_lock_date: {type: date, required: true}
+       locked_datasets: {type: array, items: dataset_reference}
+     subscribers:
+       - StatisticalAnalysisContext
+       - InterimAnalysisContext
+   ```
+
+**Rationale:** Bounded context integration patterns ensure:
+- **Loose Coupling** - Contexts evolve independently
+- **Clear Interfaces** - Integration points explicitly defined
+- **Maintainability** - Changes localized to single context
+- **Scalability** - New contexts added without disrupting existing ones
+- **Testability** - Contexts tested in isolation with mocked interfaces
+- **Auditability** - Event-driven coordination provides audit trail
+- **Regulatory Alignment** - Published Language pattern supports CDISC/ICH conformance
+
+**Evidence:**
+- eSAP Domain Design Section 7 (Lines 1122-1583): Context Mapping and Integration Patterns
+- eSAP Recommendations 14.2.3 (Event-Driven Integration), 14.2.5 (Anticorruption Layers), 14.2.7 (CDISC as Published Language)
+- Domain-Driven Design strategic patterns (Eric Evans, Blue Book)
+
+**Impact:**
+- Metamodel must support bounded context declarations
+- Integration patterns must be explicitly specified (not implicit)
+- Event schema definitions required for event-driven coordination
+- Interface contracts must be versioned and validated
+- Tools must support context-aware validation (different rules per context)
+- CDISC Published Language mappings are first-class integration specifications
+- Multi-context workflows represented as event choreography
+
+---
+
 ## Appendix: Glossary
 
 **AC/DC:** Analysis Conceptualization and Derivation Cube - a metamodel for clinical trial analysis specification
@@ -1164,6 +1776,58 @@ This approach mirrors successful programming language design (e.g., Scheme, Pyth
 **TLF:** Tables, Listings, and Figures - standard clinical trial outputs
 
 **USDM:** Unified Study Definitions Model - CDISC standard for protocol definitions (study design, objectives, endpoints, estimands, populations, workflows)
+
+---
+
+## Appendix: Change History
+
+### Version 2.0 (2025-12-07)
+
+**Changes:**
+- Added GP-14: Estimand Framework First-Class Support
+- Added GP-15: Pre-Specification and Temporal Integrity
+- Added GP-16: Validation Rules as Domain Invariants
+- Added GP-17: Bounded Context Integration Patterns
+
+**Rationale:**
+These four new guiding principles were derived from comprehensive analysis of the eSAP Domain Design document (eSAP_DOMAIN_DESIGN.md), specifically from:
+- Section 11: Strategic Domain Patterns and Anti-Patterns (Lines 1584-1688)
+- Section 14: Summary and Recommendations (Lines 1873-1968)
+
+The new principles address critical gaps identified in the original v1.0 principles:
+
+1. **GP-14 (Estimand Framework)** - Addresses Pattern 11.1.1 (Estimand-First Design) and Anti-Pattern 11.2.5 (Ignoring Intercurrent Events). Provides first-class support for ICH E9(R1) requirements that were implicit in original GP-9 (Analysis Purpose) but not explicitly specified.
+
+2. **GP-15 (Pre-Specification and Temporal Integrity)** - Addresses Pattern 11.1.3 (Version-Controlled SAP) and Anti-Patterns 11.2.1 (Post-Hoc Primary Analysis), 11.2.4 (Analysis Set Assignment After Unblinding), and 11.2.7 (Undocumented SAP Amendments). Makes explicit the temporal integrity mechanisms that were mentioned in GP-11 (Progressive Refinement) but not elevated to a core principle.
+
+3. **GP-16 (Validation Rules as Domain Invariants)** - Addresses Recommendation 14.2.8 (Validation as Domain Concern). Introduces the concept of encoding validation rules, business rules, and quality checks as first-class domain invariants rather than external QA processes. This was not covered in v1.0 principles.
+
+4. **GP-17 (Bounded Context Integration Patterns)** - Addresses Section 7 (Context Mapping and Integration Patterns) and Recommendations 14.2.3 (Event-Driven Integration), 14.2.5 (Anticorruption Layers), and 14.2.7 (CDISC as Published Language). Extends GP-10 (Domain-Agnostic Core with Extensions) with explicit integration patterns for multi-context workflows.
+
+**Impact:**
+These principles significantly enhance the metamodel's ability to support:
+- Regulatory compliance (ICH E9, E9(R1), E3)
+- Scientific integrity (pre-specification, no post-hoc changes)
+- Quality by design (validation as domain concern)
+- Complex multi-context clinical trial workflows
+- Domain-Driven Design patterns for large-scale systems
+
+### Version 1.0 (2025-12-06)
+
+**Initial release** with 13 guiding principles (GP-1 through GP-13):
+- GP-1: Cube as Fundamental Structural Unit
+- GP-2: Dimension-First Data Organization
+- GP-3: Measures as Contextual Quantities
+- GP-4: Attributes Qualify Dimensions and Measures
+- GP-5: Methods are First-Class Entities
+- GP-6: Explicit, Immutable Provenance
+- GP-7: Slice Operations Preserve Structure
+- GP-8: Computational Dependencies as DAG
+- GP-9: Analysis Purpose Drives Structure
+- GP-10: Domain-Agnostic Core with Extensions
+- GP-11: Progressive Refinement Through Layering
+- GP-12: Declarative Specification Over Imperative Programming
+- GP-13: Machine-Readable, Human-Interpretable
 
 ---
 
