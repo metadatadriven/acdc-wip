@@ -1,0 +1,973 @@
+/* ============================================
+ * eSAP Domain Model - ContextMapper DSL
+ * ============================================
+ *
+ * Electronic Statistical Analysis Plan (eSAP) Domain
+ * for Regulated Clinical Trials Biometrics Workflows
+ *
+ * Standards: CDISC, ICH E3, ICH E9, ICH E9(R1)
+ * Source: model/analysis/eSAP_DOMAIN_DESIGN.md
+ * ============================================ */
+
+/* ============================================
+ * DOMAIN MODEL
+ * ============================================ */
+
+Domain ClinicalTrialsDomain {
+  domainVisionStatement = "Comprehensive domain for planning, executing, and reporting statistical analyses in regulated clinical trials"
+
+  Subdomain StudyDesignManagement {
+    type = CORE_DOMAIN
+    domainVisionStatement = "Protocol definition, study objectives, endpoints, and estimands framework - source of truth for clinical trial design"
+  }
+
+  Subdomain StatisticalMethodology {
+    type = CORE_DOMAIN
+    domainVisionStatement = "Statistical methods, models, hypothesis testing, and analytical approaches for evaluating study objectives"
+  }
+
+  Subdomain EfficacyEvaluation {
+    type = CORE_DOMAIN
+    domainVisionStatement = "Analysis and evaluation of treatment effects on efficacy endpoints to support study objectives"
+  }
+
+  Subdomain DataManagement {
+    type = SUPPORTING_DOMAIN
+    domainVisionStatement = "Analysis datasets, data derivations, missing data handling, and data quality for statistical analyses"
+  }
+
+  Subdomain SafetyMonitoring {
+    type = SUPPORTING_DOMAIN
+    domainVisionStatement = "Capture, coding, analysis, and reporting of safety data throughout clinical trial lifecycle"
+  }
+
+  Subdomain InterimAnalysisControl {
+    type = SUPPORTING_DOMAIN
+    domainVisionStatement = "Management of planned interim looks at accumulating data for adaptive decision-making"
+  }
+
+  Subdomain OutputGeneration {
+    type = SUPPORTING_DOMAIN
+    domainVisionStatement = "Production of standardized Tables, Figures, and Listings (TFLs) for regulatory and scientific communication"
+  }
+
+  Subdomain RegulatoryCompliance {
+    type = GENERIC_SUBDOMAIN
+    domainVisionStatement = "Ensuring conformance to regulatory guidelines, protocol specifications, and quality standards"
+  }
+}
+
+/* ============================================
+ * BOUNDED CONTEXTS
+ * ============================================ */
+
+BoundedContext StudyDesignContext implements StudyDesignManagement {
+  type = APPLICATION
+  domainVisionStatement = "Defines the fundamental structure, objectives, and methodology of a clinical trial"
+  implementationTechnology = "Java, Spring Boot, CDISC USDM"
+  responsibilities = "Protocol definition and versioning", "Study objectives hierarchy", "Endpoints and Estimands framework", "Study configuration and experimental design", "Randomization and blinding strategies"
+
+  Aggregate Protocols {
+    responsibilities = "Protocol lifecycle management and version control"
+
+    Entity Protocol {
+      aggregateRoot
+
+      - ProtocolId id
+      - ProtocolNumber protocolNumber
+      String protocolTitle
+      - ProtocolVersion currentVersion
+      Date approvalDate
+      - List<StudyObjective> objectives
+      - List<Estimand> estimands
+      - StudyDesign design
+
+      Repository ProtocolRepository {
+        @Protocol findById(@ProtocolId id);
+        @Protocol findByProtocolNumber(@ProtocolNumber number);
+        List<@Protocol> findAll();
+      }
+    }
+
+    Entity StudyObjective {
+      - ObjectiveId id
+      - ObjectiveType type
+      String description
+      - List<Endpoint> endpoints
+    }
+
+    Entity Endpoint {
+      - EndpointId id
+      String name
+      String description
+      - EndpointType type
+      - MeasurementScale scale
+    }
+
+    Entity Estimand {
+      - EstimandId id
+      - PopulationDefinition population
+      - TreatmentCondition treatment
+      - Endpoint endpoint
+      - List<IntercurrentEvent> intercurrentEvents
+      - PopulationLevelSummary summary
+    }
+
+    Entity IntercurrentEvent {
+      - EventId id
+      String eventType
+      - HandlingStrategy strategy
+    }
+
+    ValueObject ProtocolId {
+      String id key
+    }
+
+    ValueObject ProtocolNumber {
+      String number key
+    }
+
+    ValueObject ProtocolVersion {
+      String version
+      Date versionDate
+      boolean finalized
+    }
+
+    ValueObject ObjectiveId {
+      String id key
+    }
+
+    ValueObject ObjectiveType {
+      String value  // Primary, Secondary, Exploratory
+    }
+
+    ValueObject EndpointId {
+      String id key
+    }
+
+    ValueObject EndpointType {
+      String value  // Primary, Secondary, Exploratory, Safety
+    }
+
+    ValueObject EstimandId {
+      String id key
+    }
+
+    ValueObject EventId {
+      String id key
+    }
+
+    ValueObject PopulationDefinition {
+      String definition
+      - List<InclusionCriteria> inclusions
+      - List<ExclusionCriteria> exclusions
+    }
+
+    ValueObject TreatmentCondition {
+      String treatmentArm
+      String dosing
+    }
+
+    ValueObject PopulationLevelSummary {
+      String measure  // e.g., mean difference, odds ratio
+    }
+
+    ValueObject HandlingStrategy {
+      String strategy  // treatment policy, hypothetical, composite, while on treatment, principal stratum
+    }
+
+    ValueObject MeasurementScale {
+      String scale  // continuous, ordinal, categorical, time-to-event
+    }
+
+    ValueObject InclusionCriteria {
+      String criterion
+    }
+
+    ValueObject ExclusionCriteria {
+      String criterion
+    }
+
+    ValueObject StudyDesign {
+      String designType  // parallel, crossover, factorial, adaptive
+      int numberOfArms
+      boolean blinded
+      String randomizationStrategy
+    }
+
+    DomainEvent ProtocolFinalized {
+      - ProtocolId protocolId
+      Date finalizedAt
+    }
+
+    DomainEvent ProtocolAmended {
+      - ProtocolId protocolId
+      - ProtocolVersion newVersion
+      String amendmentReason
+      Date amendedAt
+    }
+
+    DomainEvent EstimandDefined {
+      - EstimandId estimandId
+      - ObjectiveId objectiveId
+      Date definedAt
+    }
+
+    Service EstimandSpecificationService {
+      boolean validateEstimandCompleteness(@Estimand estimand);
+      List<@IntercurrentEvent> identifyIntercurrentEvents(@Protocol protocol);
+      @HandlingStrategy recommendStrategy(@IntercurrentEvent event);
+    }
+  }
+}
+
+BoundedContext StatisticalAnalysisContext implements StatisticalMethodology {
+  type = APPLICATION
+  domainVisionStatement = "Defines statistical methods, models, and analytical approaches for evaluating study objectives"
+  implementationTechnology = "R, SAS, Python"
+  responsibilities = "Analysis methods and statistical models", "Hypothesis testing framework", "Sample size determination", "Multiple testing procedures", "Sensitivity and subgroup analyses"
+
+  Aggregate StatisticalAnalysisPlans {
+    responsibilities = "SAP lifecycle management and analysis specifications"
+
+    Entity StatisticalAnalysisPlan {
+      aggregateRoot
+
+      - SAPId id
+      - ProtocolId protocolReference
+      - SAPVersion currentVersion
+      - SAPStatus status
+      Date creationDate
+      Date finalizationDate
+      - List<AnalysisSpecification> specifications
+      - SampleSizeCalculation sampleSize
+
+      Repository SAPRepository {
+        @StatisticalAnalysisPlan findById(@SAPId id);
+        @StatisticalAnalysisPlan findByProtocolId(@ProtocolId protocolId);
+      }
+    }
+
+    Entity AnalysisSpecification {
+      - SpecificationId id
+      - ObjectiveId objectiveReference
+      - EstimandId estimandReference
+      - StatisticalModel model
+      - HypothesisTest test
+      - SignificanceLevel alpha
+      - List<SensitivityAnalysis> sensitivities
+      - List<SubgroupAnalysis> subgroups
+    }
+
+    Entity SensitivityAnalysis {
+      - SensitivityId id
+      String description
+      - StatisticalModel alternativeModel
+    }
+
+    Entity SubgroupAnalysis {
+      - SubgroupId id
+      String subgroupVariable
+      boolean preplanned
+    }
+
+    Entity SampleSizeCalculation {
+      - CalculationId id
+      int targetSampleSize
+      BigDecimal power
+      - SignificanceLevel alpha
+      BigDecimal effectSize
+      String assumptions
+    }
+
+    ValueObject SAPId {
+      String id key
+    }
+
+    ValueObject SAPVersion {
+      String version
+      Date versionDate
+    }
+
+    ValueObject SAPStatus {
+      String status  // Draft, Final, Amended
+    }
+
+    ValueObject SpecificationId {
+      String id key
+    }
+
+    ValueObject StatisticalModel {
+      String modelType  // ANCOVA, MMRM, Logistic, Cox, etc.
+      - List<Covariate> covariates
+      String formulaSyntax
+    }
+
+    ValueObject HypothesisTest {
+      String testType  // superiority, non-inferiority, equivalence
+      String nullHypothesis
+      String alternativeHypothesis
+    }
+
+    ValueObject SignificanceLevel {
+      BigDecimal alpha
+    }
+
+    ValueObject Covariate {
+      String variable
+      String role  // stratification, adjustment
+    }
+
+    ValueObject SensitivityId {
+      String id key
+    }
+
+    ValueObject SubgroupId {
+      String id key
+    }
+
+    ValueObject CalculationId {
+      String id key
+    }
+
+    DomainEvent SAPFinalized {
+      - SAPId sapId
+      Date finalizedAt
+    }
+
+    DomainEvent SAPAmended {
+      - SAPId sapId
+      String amendmentReason
+      Date amendedAt
+    }
+
+    Service MultipleTestingControlService {
+      @AdjustmentProcedure determineAdjustment(List<@AnalysisSpecification> specs);
+      BigDecimal adjustAlpha(@SignificanceLevel alpha, int numberOfTests);
+    }
+
+    Service SampleSizeService {
+      @SampleSizeCalculation calculateSampleSize(@EffectSize effect, @SignificanceLevel alpha, BigDecimal power);
+    }
+  }
+}
+
+BoundedContext DataManagementContext implements DataManagement {
+  type = APPLICATION
+  domainVisionStatement = "Manages analysis datasets, data derivations, missing data handling, and data quality"
+  implementationTechnology = "SAS, R, CDISC ADaM"
+  responsibilities = "Analysis Sets definition", "Analysis Data Sets creation", "Derived variables computation", "Missing data handling", "Data quality validation"
+
+  Aggregate AnalysisSets {
+    responsibilities = "Analysis population definitions and subject assignment"
+
+    Entity AnalysisSet {
+      aggregateRoot
+
+      - AnalysisSetId id
+      - AnalysisSetName name
+      - AnalysisSetType type
+      - List<SubjectAssignment> subjects
+      - List<InclusionRule> inclusionRules
+      - List<ExclusionRule> exclusionRules
+      Date assignmentDate
+      boolean locked
+
+      Repository AnalysisSetRepository {
+        @AnalysisSet findById(@AnalysisSetId id);
+        List<@AnalysisSet> findByType(@AnalysisSetType type);
+      }
+    }
+
+    Entity SubjectAssignment {
+      - SubjectId subjectId
+      - TreatmentAssignment plannedTreatment
+      - TreatmentAssignment actualTreatment
+      boolean included
+      String exclusionReason
+    }
+
+    ValueObject AnalysisSetId {
+      String id key
+    }
+
+    ValueObject AnalysisSetName {
+      String name  // FAS, Safety, PP, mITT, etc.
+    }
+
+    ValueObject AnalysisSetType {
+      String type  // ParticipantAnalysisSet, AnalysisDataSet
+    }
+
+    ValueObject SubjectId {
+      String id key
+    }
+
+    ValueObject TreatmentAssignment {
+      String treatmentArm
+      Date assignmentDate
+    }
+
+    ValueObject InclusionRule {
+      String rule
+    }
+
+    ValueObject ExclusionRule {
+      String rule
+    }
+
+    DomainEvent AnalysisSetLocked {
+      - AnalysisSetId analysisSetId
+      Date lockedAt
+    }
+
+    Service AnalysisSetDefinitionService {
+      @AnalysisSet defineFullAnalysisSet(@Protocol protocol);
+      @AnalysisSet defineSafetyAnalysisSet(@Protocol protocol);
+      @AnalysisSet definePerProtocolSet(@Protocol protocol);
+    }
+  }
+
+  Aggregate DerivedVariables {
+    responsibilities = "Variable derivation and transformation logic"
+
+    Entity DerivedVariable {
+      aggregateRoot
+
+      - VariableId id
+      - VariableName name
+      - VariableType type
+      - DerivationRule rule
+      - List<SourceVariable> sources
+      Date createdAt
+
+      Repository DerivedVariableRepository {
+        @DerivedVariable findById(@VariableId id);
+        List<@DerivedVariable> findByEndpoint(@EndpointId endpointId);
+      }
+    }
+
+    Entity DerivationRule {
+      - RuleId id
+      String formula
+      - List<TransformationStep> steps
+      String documentation
+    }
+
+    Entity SourceVariable {
+      - VariableId id
+      String datasetName
+      String variableName
+    }
+
+    Entity TransformationStep {
+      - StepId id
+      int stepNumber
+      String operation
+      String parameters
+    }
+
+    ValueObject VariableId {
+      String id key
+    }
+
+    ValueObject VariableName {
+      String name
+      String label
+    }
+
+    ValueObject VariableType {
+      String type  // Continuous, Categorical, Binary, Time-to-Event
+    }
+
+    ValueObject RuleId {
+      String id key
+    }
+
+    ValueObject StepId {
+      String id key
+    }
+
+    Service DerivedVariableComputationService {
+      @DerivedVariable computeChangeFromBaseline(@SourceVariable source, @BaselineDefinition baseline);
+      @DerivedVariable computeCompositeScore(List<@SourceVariable> components, @AggregationRule rule);
+    }
+
+    Service MissingDataHandlingService {
+      void imputeMissingValues(@DerivedVariable variable, @ImputationMethod method);
+      @MissingDataAssessment assessMechanism(@DerivedVariable variable);
+    }
+  }
+}
+
+BoundedContext SafetyMonitoringContext implements SafetyMonitoring {
+  type = APPLICATION
+  domainVisionStatement = "Captures, codes, analyzes, and reports safety data throughout the clinical trial lifecycle"
+  implementationTechnology = "SAS, MedDRA, CDISC SDTM/ADaM"
+  responsibilities = "Adverse event capture and coding", "Serious adverse event tracking", "Treatment-emergent determination", "Safety analysis and reporting"
+
+  Aggregate AdverseEvents {
+    responsibilities = "Adverse event lifecycle and safety signal detection"
+
+    Entity AdverseEvent {
+      aggregateRoot
+
+      - AEId id
+      - SubjectId subjectId
+      - AEStartDate startDate
+      - AEStopDate stopDate
+      String verbatimTerm
+      - MedDRACode meddraCoding
+      - Severity severity
+      - Relationship relationship
+      - Outcome outcome
+      boolean treatmentEmergent
+      boolean serious
+
+      Repository AdverseEventRepository {
+        @AdverseEvent findById(@AEId id);
+        List<@AdverseEvent> findBySubject(@SubjectId subjectId);
+        List<@AdverseEvent> findTreatmentEmergent(boolean emergent);
+      }
+    }
+
+    ValueObject AEId {
+      String id key
+    }
+
+    ValueObject AEStartDate {
+      Date date
+      boolean partial
+    }
+
+    ValueObject AEStopDate {
+      Date date
+      boolean partial
+      boolean ongoing
+    }
+
+    ValueObject MedDRACode {
+      String soc  // System Organ Class
+      String hlgt  // High Level Group Term
+      String hlt   // High Level Term
+      String pt    // Preferred Term
+      String llt   // Lowest Level Term
+      String meddraVersion
+    }
+
+    ValueObject Severity {
+      String level  // Mild, Moderate, Severe
+    }
+
+    ValueObject Relationship {
+      String relationship  // Not Related, Possibly Related, Probably Related, Related
+    }
+
+    ValueObject Outcome {
+      String outcome  // Recovered, Recovering, Not Recovered, Fatal, Unknown
+    }
+
+    DomainEvent AdverseEventReported {
+      - AEId aeId
+      - SubjectId subjectId
+      Date reportedAt
+    }
+
+    DomainEvent SeriousAdverseEventReported {
+      - AEId aeId
+      - SubjectId subjectId
+      Date reportedAt
+      String seriousnessCriteria
+    }
+
+    Service SafetyCodedDataService {
+      @MedDRACode codeAdverseEvent(String verbatimTerm);
+      void validateCoding(@AdverseEvent ae);
+    }
+
+    Service TreatmentEmergenceService {
+      boolean determineTreatmentEmergence(@AdverseEvent ae, @TreatmentPeriod period);
+    }
+  }
+}
+
+BoundedContext EfficacyAssessmentContext implements EfficacyEvaluation {
+  type = APPLICATION
+  domainVisionStatement = "Analyzes and evaluates treatment effects on efficacy endpoints"
+  implementationTechnology = "R, SAS, CDISC ADaM"
+  responsibilities = "Primary efficacy analyses", "Secondary efficacy analyses", "Treatment effect estimation", "Subgroup analyses", "Responder analyses"
+
+  Aggregate EfficacyAnalyses {
+    responsibilities = "Efficacy analysis execution and result management"
+
+    Entity EfficacyAnalysis {
+      aggregateRoot
+
+      - AnalysisId id
+      - SpecificationId specificationReference
+      - EndpointId endpointReference
+      - EstimandId estimandReference
+      - AnalysisResult result
+      Date executionDate
+      String analysisProgram
+
+      Repository EfficacyAnalysisRepository {
+        @EfficacyAnalysis findById(@AnalysisId id);
+        List<@EfficacyAnalysis> findByEndpoint(@EndpointId endpointId);
+      }
+    }
+
+    Entity AnalysisResult {
+      - ResultId id
+      - TreatmentEffect estimate
+      - ConfidenceInterval confidenceInterval
+      - PValue pValue
+      String conclusion
+    }
+
+    ValueObject AnalysisId {
+      String id key
+    }
+
+    ValueObject ResultId {
+      String id key
+    }
+
+    ValueObject TreatmentEffect {
+      BigDecimal pointEstimate
+      String measure  // mean difference, odds ratio, hazard ratio, etc.
+    }
+
+    ValueObject ConfidenceInterval {
+      BigDecimal lowerBound
+      BigDecimal upperBound
+      BigDecimal level
+    }
+
+    ValueObject PValue {
+      BigDecimal value
+      boolean significant
+    }
+
+    DomainEvent PrimaryAnalysisCompleted {
+      - AnalysisId analysisId
+      - AnalysisResult result
+      Date completedAt
+    }
+
+    Service SubgroupAnalysisService {
+      List<@AnalysisResult> performSubgroupAnalysis(@EfficacyAnalysis analysis, String subgroupVariable);
+    }
+  }
+}
+
+BoundedContext InterimAnalysisContext implements InterimAnalysisControl {
+  type = APPLICATION
+  domainVisionStatement = "Manages planned interim looks at accumulating data for adaptive decision-making"
+  implementationTechnology = "R, SAS, DMC Systems"
+  responsibilities = "DMC governance", "Stopping rules evaluation", "Alpha spending", "Conditional power", "Sample size re-estimation"
+
+  Aggregate InterimAnalyses {
+    responsibilities = "Interim analysis scheduling and decision management"
+
+    Entity InterimAnalysis {
+      aggregateRoot
+
+      - InterimId id
+      int analysisNumber
+      Date plannedDate
+      Date actualDate
+      - InterimDecision decision
+      - AlphaSpendingFunction spendingFunction
+      BigDecimal alphaSpent
+      boolean databaseLocked
+
+      Repository InterimAnalysisRepository {
+        @InterimAnalysis findById(@InterimId id);
+        List<@InterimAnalysis> findByProtocol(@ProtocolId protocolId);
+      }
+    }
+
+    Entity InterimDecision {
+      - DecisionId id
+      String decision  // Continue, Stop for Efficacy, Stop for Futility, Modify
+      String rationale
+      Date decisionDate
+    }
+
+    ValueObject InterimId {
+      String id key
+    }
+
+    ValueObject DecisionId {
+      String id key
+    }
+
+    ValueObject AlphaSpendingFunction {
+      String functionType  // O'Brien-Fleming, Pocock, Lan-DeMets
+      - List<AlphaLevel> boundaries
+    }
+
+    ValueObject AlphaLevel {
+      int analysisNumber
+      BigDecimal boundary
+    }
+
+    DomainEvent InterimAnalysisTriggered {
+      - InterimId interimId
+      Date triggeredAt
+    }
+
+    DomainEvent InterimDecisionMade {
+      - InterimId interimId
+      - InterimDecision decision
+      Date decidedAt
+    }
+
+    Service InterimAnalysisManagementService {
+      @InterimDecision evaluateStoppingRules(@InterimAnalysis analysis);
+      BigDecimal calculateConditionalPower(@InterimAnalysis analysis);
+    }
+  }
+}
+
+BoundedContext RegulatoryComplianceContext implements RegulatoryCompliance {
+  type = APPLICATION
+  domainVisionStatement = "Ensures SAP and analyses conform to regulatory guidelines and quality standards"
+  implementationTechnology = "Quality Management Systems, Validation Tools"
+  responsibilities = "ICH guideline adherence", "Protocol deviation tracking", "SAP change control", "Quality control", "Audit trail management"
+
+  Aggregate ComplianceAudits {
+    responsibilities = "Compliance verification and audit trail management"
+
+    Entity ComplianceAudit {
+      aggregateRoot
+
+      - AuditId id
+      - DocumentId documentReference
+      Date auditDate
+      String auditor
+      - List<Finding> findings
+      - AuditStatus status
+
+      Repository ComplianceAuditRepository {
+        @ComplianceAudit findById(@AuditId id);
+        List<@ComplianceAudit> findByDocument(@DocumentId documentId);
+      }
+    }
+
+    Entity Finding {
+      - FindingId id
+      String category  // Critical, Major, Minor
+      String description
+      String resolution
+      Date closedDate
+    }
+
+    ValueObject AuditId {
+      String id key
+    }
+
+    ValueObject DocumentId {
+      String id key
+    }
+
+    ValueObject AuditStatus {
+      String status  // Planned, In Progress, Completed
+    }
+
+    ValueObject FindingId {
+      String id key
+    }
+
+    DomainEvent AuditCompleted {
+      - AuditId auditId
+      int numberOfFindings
+      Date completedAt
+    }
+
+    Service OutputValidationService {
+      @ValidationReport validateOutput(@TFLId tflId);
+    }
+  }
+}
+
+BoundedContext ReportingContext implements OutputGeneration {
+  type = APPLICATION
+  domainVisionStatement = "Produces standardized Tables, Figures, and Listings (TFLs) for regulatory and scientific communication"
+  implementationTechnology = "SAS, R, CDISC ARS"
+  responsibilities = "TFL production", "Output formatting", "CONSORT diagrams", "Forest plots", "Output validation"
+
+  Aggregate TFLs {
+    responsibilities = "TFL specification and generation"
+
+    Entity TFL {
+      aggregateRoot
+
+      - TFLId id
+      - TFLNumber number
+      - TFLType type
+      String title
+      - TFLSpecification specification
+      - List<DataSource> dataSources
+      Date generatedDate
+      boolean validated
+
+      Repository TFLRepository {
+        @TFL findById(@TFLId id);
+        @TFL findByNumber(@TFLNumber number);
+        List<@TFL> findByType(@TFLType type);
+      }
+    }
+
+    Entity TFLSpecification {
+      - SpecId id
+      String shellTemplate
+      - OutputFormat format
+      - List<Column> columns
+      - List<Row> rows
+      - NumberFormat numberFormat
+    }
+
+    Entity DataSource {
+      - SourceId id
+      String datasetName
+      String analysisName
+      - AnalysisId analysisReference
+    }
+
+    ValueObject TFLId {
+      String id key
+    }
+
+    ValueObject TFLNumber {
+      String number  // e.g., "Table 14.2.1.1"
+    }
+
+    ValueObject TFLType {
+      String type  // Table, Figure, Listing
+    }
+
+    ValueObject SpecId {
+      String id key
+    }
+
+    ValueObject OutputFormat {
+      String format  // RTF, PDF, HTML
+    }
+
+    ValueObject Column {
+      String name
+      String label
+      int position
+    }
+
+    ValueObject Row {
+      String category
+      int position
+    }
+
+    ValueObject NumberFormat {
+      int decimalPlaces
+      String notation
+    }
+
+    ValueObject SourceId {
+      String id key
+    }
+
+    DomainEvent TFLGenerated {
+      - TFLId tflId
+      Date generatedAt
+    }
+
+    DomainEvent TFLValidated {
+      - TFLId tflId
+      Date validatedAt
+      String validator
+    }
+  }
+}
+
+/* ============================================
+ * CONTEXT MAP
+ * ============================================ */
+
+ContextMap eSAPContextMap {
+  type = SYSTEM_LANDSCAPE
+  state = AS_IS
+
+  contains StudyDesignContext
+  contains StatisticalAnalysisContext
+  contains DataManagementContext
+  contains SafetyMonitoringContext
+  contains EfficacyAssessmentContext
+  contains InterimAnalysisContext
+  contains RegulatoryComplianceContext
+  contains ReportingContext
+
+  /* Shared Kernel: Study Design and Statistical Analysis share Estimand framework */
+  StudyDesignContext [SK]<->[SK] StatisticalAnalysisContext {
+    implementationTechnology = "Shared Estimand Domain Model"
+  }
+
+  /* Customer-Supplier: Statistical Analysis consumes analysis datasets from Data Management */
+  StatisticalAnalysisContext [D,ACL]<-[U,OHS,PL] DataManagementContext {
+    implementationTechnology = "CDISC ADaM"
+    exposedAggregates = AnalysisSets, DerivedVariables
+    downstreamRights = VETO_RIGHT
+  }
+
+  /* Partnership: Statistical Analysis and Efficacy Assessment work closely together */
+  StatisticalAnalysisContext [P]<->[P] EfficacyAssessmentContext {
+    implementationTechnology = "Shared Statistical Infrastructure"
+  }
+
+  /* Customer-Supplier: Safety Monitoring consumes data from Data Management */
+  SafetyMonitoringContext [D,CF]<-[U,OHS] DataManagementContext {
+    implementationTechnology = "CDISC ADaM, MedDRA"
+    exposedAggregates = AnalysisSets
+  }
+
+  /* Customer-Supplier: Efficacy Assessment consumes data from Data Management */
+  EfficacyAssessmentContext [D,ACL]<-[U,OHS] DataManagementContext {
+    implementationTechnology = "CDISC ADaM"
+    exposedAggregates = AnalysisSets, DerivedVariables
+  }
+
+  /* Upstream-Downstream: Study Design feeds Data Management */
+  DataManagementContext [D]<-[U] StudyDesignContext {
+    implementationTechnology = "Protocol Specifications"
+  }
+
+  /* Orchestration: Interim Analysis coordinates multiple contexts */
+  InterimAnalysisContext [D]<-[U] DataManagementContext
+  InterimAnalysisContext [D]<-[U] StatisticalAnalysisContext
+  InterimAnalysisContext [U]->[D] StudyDesignContext
+
+  /* Conformist: All contexts conform to Regulatory Compliance */
+  StudyDesignContext [D,CF]<-[U,PL] RegulatoryComplianceContext
+  StatisticalAnalysisContext [D,CF]<-[U,PL] RegulatoryComplianceContext {
+    implementationTechnology = "ICH E9, ICH E9(R1)"
+  }
+  DataManagementContext [D,CF]<-[U,PL] RegulatoryComplianceContext
+  SafetyMonitoringContext [D,CF]<-[U,PL] RegulatoryComplianceContext {
+    implementationTechnology = "ICH E3"
+  }
+  EfficacyAssessmentContext [D,CF]<-[U,PL] RegulatoryComplianceContext
+  InterimAnalysisContext [D,CF]<-[U,PL] RegulatoryComplianceContext
+
+  /* Customer-Supplier: Reporting consumes outputs from all analytical contexts */
+  ReportingContext [D,ACL]<-[U,OHS] StatisticalAnalysisContext {
+    exposedAggregates = StatisticalAnalysisPlans
+  }
+  ReportingContext [D,ACL]<-[U,OHS] EfficacyAssessmentContext {
+    exposedAggregates = EfficacyAnalyses
+  }
+  ReportingContext [D,ACL]<-[U,OHS] SafetyMonitoringContext {
+    exposedAggregates = AdverseEvents
+  }
+  ReportingContext [D,CF]<-[U,PL] RegulatoryComplianceContext {
+    implementationTechnology = "ICH E3 Report Structure"
+  }
+}
