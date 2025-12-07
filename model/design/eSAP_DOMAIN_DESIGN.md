@@ -145,6 +145,31 @@ The eSAP domain represents a complex, highly regulated environment for planning 
 
 ---
 
+## Overview
+
+The eSAP domain is organized as eight bounded contexts that collaborate through well-defined relationships to support the complete lifecycle of statistical analysis planning and execution in clinical trials. The context map below visualizes these bounded contexts and their integration patterns, showing how data flows from study design through analysis execution to regulatory reporting.
+
+![eSAP Context Map](diagrams/eSAP_ContextMap.png)
+
+### Context Map Relationship Key
+
+The diagram uses Domain-Driven Design relationship patterns to show how contexts interact:
+
+**Symmetric Relationships:**
+- **[P] ↔ [P]** - Partnership: Contexts collaborate as equals with mutual dependency
+- **[SK] ↔ [SK]** - Shared Kernel: Contexts share a common subset of domain model
+
+**Asymmetric Relationships (Upstream → Downstream):**
+- **[U] → [D]** - Upstream/Downstream: Directional dependency relationship
+- **[U,OHS]** - Upstream with Open Host Service: Upstream defines well-specified service interface
+- **[U,PL]** - Upstream with Published Language: Upstream publishes shared language/protocol
+- **[D,CF]** - Downstream Conformist: Downstream conforms to upstream model without translation
+- **[D,ACL]** - Downstream Anticorruption Layer: Downstream translates upstream model to protect own domain
+
+The relationships define how contexts exchange data and coordinate activities while maintaining clear boundaries and responsibilities.
+
+---
+
 ## 1. Bounded Contexts
 
 ### 1.1 Study Design Context
