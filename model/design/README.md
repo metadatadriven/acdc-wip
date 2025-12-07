@@ -10,6 +10,13 @@ This directory contains formal Domain-Driven Design (DDD) models for the electro
   - Context map showing relationships
   - Tactical DDD patterns (entities, value objects, services)
 
+- **diagrams/** - Generated architecture visualizations:
+  - **eSAP_ContextMap.png** - Context map showing all bounded contexts and relationships (PNG)
+  - **eSAP_ContextMap.svg** - Context map (scalable vector graphics)
+  - **eSAP_ContextMap.puml** - Context map (PlantUML source)
+  - **eSAP_ContextMap.gv** - Context map (GraphViz source)
+  - **eSAP_BC_*_*.puml** - PlantUML class diagrams for each bounded context and aggregate
+
 ## Source Documentation
 
 The CML model is derived from:
@@ -156,28 +163,172 @@ ContextMapper can generate various outputs from CML models:
 
 **Architecture Diagrams:**
 ```bash
-# Generate PlantUML diagrams
-context-mapper generate --input eSAP.cml --output-type PLANTUML
+# Generate context map visualization
+~/bin/context-mapper-cli/bin/cm generate -i eSAP.cml -g context-map -o diagrams/
+
+# Generate PlantUML class diagrams
+~/bin/context-mapper-cli/bin/cm generate -i eSAP.cml -g plantuml -o diagrams/
 ```
 
 **API Contracts:**
 ```bash
 # Generate MDSL (Microservice Domain-Specific Language) contracts
-context-mapper generate --input eSAP.cml --output-type MDSL
+~/bin/context-mapper-cli/bin/cm generate -i eSAP.cml -g mdsl -o generated/
 ```
 
-**Service Decomposition:**
+**Custom Templates:**
 ```bash
-# Generate Service Cutter input for decomposition recommendations
-context-mapper generate --input eSAP.cml --output-type SERVICE_CUTTER
+# Generate custom output using Freemarker templates
+~/bin/context-mapper-cli/bin/cm generate -i eSAP.cml -g generic -t template.ftl -f output.txt
 ```
 
 ### Model Validation
 
 ContextMapper provides built-in validation:
-- Checks syntax correctness
-- Validates semantic rules (e.g., aggregate roots, relationship consistency)
-- Ensures context map completeness
+```bash
+# Validate the CML model
+~/bin/context-mapper-cli/bin/cm validate -i eSAP.cml
+```
+
+The validator checks:
+- Syntax correctness
+- Semantic rules (e.g., aggregate roots, relationship consistency)
+- Context map completeness
+
+## Regenerating the Model
+
+### From Source Documentation to CML
+
+The `eSAP.cml` file is generated from the comprehensive domain analysis document:
+
+**Source:** `model/analysis/eSAP_DOMAIN_DESIGN.md`
+
+**Process:**
+
+1. **Read the source analysis:**
+   ```bash
+   # Review the domain design document
+   less model/analysis/eSAP_DOMAIN_DESIGN.md
+   ```
+
+2. **Identify key DDD components:**
+   - Domains and Subdomains (Section 3)
+   - Bounded Contexts (Section 1)
+   - Context Relationships (Section 2)
+   - Aggregates and Entities (each context section)
+   - Value Objects, Services, Events
+
+3. **Translate to CML syntax:**
+   - Follow ContextMapper DSL patterns in `model/prompts/contextmapper.md`
+   - Use proper CML syntax for domains, contexts, aggregates
+   - Define context map with appropriate relationship patterns
+   - Avoid reserved keywords (`type`, `description`, `operation`, `level`, `event`)
+
+4. **Use naming conventions:**
+   - Attributes: use `-` prefix (e.g., `- CustomerId id`)
+   - Method parameters/returns: use `@` prefix (e.g., `@Customer findById(@CustomerId id)`)
+   - Reserved keywords: add suffix (e.g., `typeValue` instead of `type`)
+
+5. **Validate the generated CML:**
+   ```bash
+   ~/bin/context-mapper-cli/bin/cm validate -i eSAP.cml
+   ```
+
+**Example Translation:**
+
+From eSAP_DOMAIN_DESIGN.md:
+```markdown
+### Study Design Context
+- Manages protocol definitions, objectives, endpoints
+- Core aggregate: Protocol
+- Entities: StudyObjective, Endpoint, Estimand
+```
+
+To eSAP.cml:
+```cml
+BoundedContext StudyDesignContext implements StudyDesignManagement {
+  type = APPLICATION
+  implementationTechnology = "Java, Spring Boot, CDISC USDM"
+
+  Aggregate Protocols {
+    Entity Protocol {
+      aggregateRoot
+      - ProtocolId id
+      - List<StudyObjective> objectives
+      - List<Endpoint> endpoints
+    }
+  }
+}
+```
+
+### From CML to Diagrams
+
+Once the CML model is validated, generate visualizations:
+
+**1. Generate all diagrams:**
+```bash
+# From model/design directory
+cd model/design
+
+# Generate context map (PNG, SVG, PlantUML, GraphViz)
+~/bin/context-mapper-cli/bin/cm generate -i eSAP.cml -g context-map -o diagrams/
+
+# Generate PlantUML class diagrams (all contexts and aggregates)
+~/bin/context-mapper-cli/bin/cm generate -i eSAP.cml -g plantuml -o diagrams/
+```
+
+**2. Verify generated files:**
+```bash
+ls -l diagrams/
+```
+
+Expected output:
+- `eSAP_ContextMap.png` - Visual context map (high-level architecture)
+- `eSAP_ContextMap.svg` - Context map (vector format)
+- `eSAP_ContextMap.puml` - Context map (PlantUML source)
+- `eSAP_ContextMap.gv` - Context map (GraphViz DOT format)
+- `eSAP_BC_<ContextName>.puml` - Class diagram for each bounded context
+- `eSAP_BC_<ContextName>_<AggregateName>.puml` - Diagram for each aggregate
+
+**3. View diagrams:**
+
+Context Map (PNG):
+```bash
+# macOS
+open diagrams/eSAP_ContextMap.png
+
+# Linux
+xdg-open diagrams/eSAP_ContextMap.png
+```
+
+PlantUML diagrams (requires PlantUML):
+```bash
+# Install PlantUML if needed
+brew install plantuml  # macOS
+apt-get install plantuml  # Ubuntu/Debian
+
+# Generate PNG from PlantUML source
+plantuml diagrams/*.puml
+```
+
+**4. Regeneration workflow:**
+
+When updating the model:
+```bash
+# 1. Edit the CML file
+vi eSAP.cml
+
+# 2. Validate changes
+~/bin/context-mapper-cli/bin/cm validate -i eSAP.cml
+
+# 3. Regenerate diagrams
+~/bin/context-mapper-cli/bin/cm generate -i eSAP.cml -g context-map -o diagrams/
+~/bin/context-mapper-cli/bin/cm generate -i eSAP.cml -g plantuml -o diagrams/
+
+# 4. Commit changes
+git add eSAP.cml diagrams/
+git commit -m "Update domain model"
+```
 
 ## Model Evolution
 
