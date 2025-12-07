@@ -1,0 +1,154 @@
+@startuml
+
+skinparam componentStyle uml2
+
+package "'Protocols' Aggregate" <<Rectangle>> {
+	class Protocol <<(A,#fffab8) Aggregate Root>> {
+		String protocolTitle
+		Date approvalDate
+		ProtocolId id
+		ProtocolNumber protocolNumber
+		ProtocolVersion currentVersion
+		List<StudyObjective> objectives
+		List<Estimand> estimands
+		StudyDesign design
+	}
+	class StudyObjective <<(E,DarkSeaGreen) Entity>> {
+		String descriptionText
+		ObjectiveId id
+		ObjectiveType typeValue
+		List<Endpoint> endpoints
+	}
+	class Endpoint <<(E,DarkSeaGreen) Entity>> {
+		String name
+		String descriptionText
+		EndpointId id
+		EndpointType typeValue
+		MeasurementScale scale
+	}
+	class Estimand <<(E,DarkSeaGreen) Entity>> {
+		EstimandId id
+		PopulationDefinition population
+		TreatmentCondition treatment
+		Endpoint endpoint
+		List<IntercurrentEvent> intercurrentEvents
+		PopulationLevelSummary summary
+	}
+	class IntercurrentEvent <<(E,DarkSeaGreen) Entity>> {
+		String eventType
+		EventId id
+		HandlingStrategy strategy
+	}
+	class ProtocolId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class ProtocolNumber <<(V,DarkSeaGreen) Value Object>> {
+		String number
+	}
+	class ProtocolVersion <<(V,DarkSeaGreen) Value Object>> {
+		String version
+		Date versionDate
+		boolean finalized
+	}
+	class ObjectiveId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class ObjectiveType <<(V,DarkSeaGreen) Value Object>> {
+		String value
+	}
+	class EndpointId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class EndpointType <<(V,DarkSeaGreen) Value Object>> {
+		String value
+	}
+	class EstimandId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class EventId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class PopulationDefinition <<(V,DarkSeaGreen) Value Object>> {
+		String definition
+		List<InclusionCriteria> inclusions
+		List<ExclusionCriteria> exclusions
+	}
+	class TreatmentCondition <<(V,DarkSeaGreen) Value Object>> {
+		String treatmentArm
+		String dosing
+	}
+	class PopulationLevelSummary <<(V,DarkSeaGreen) Value Object>> {
+		String measure
+	}
+	class HandlingStrategy <<(V,DarkSeaGreen) Value Object>> {
+		String strategy
+	}
+	class MeasurementScale <<(V,DarkSeaGreen) Value Object>> {
+		String scale
+	}
+	class InclusionCriteria <<(V,DarkSeaGreen) Value Object>> {
+		String criterion
+	}
+	class ExclusionCriteria <<(V,DarkSeaGreen) Value Object>> {
+		String criterion
+	}
+	class StudyDesign <<(V,DarkSeaGreen) Value Object>> {
+		String designType
+		int numberOfArms
+		boolean blinded
+		String randomizationStrategy
+	}
+	class ProtocolFinalized <<(E,#ff9f4b) Domain Event>> {
+		Date finalizedAt
+		ProtocolId protocolId
+	}
+	class ProtocolAmended <<(E,#ff9f4b) Domain Event>> {
+		String amendmentReason
+		Date amendedAt
+		ProtocolId protocolId
+		ProtocolVersion newVersion
+	}
+	class EstimandDefined <<(E,#ff9f4b) Domain Event>> {
+		Date definedAt
+		EstimandId estimandId
+		ObjectiveId objectiveId
+	}
+	class EstimandSpecificationService <<(S,DarkSeaGreen) Service>> {
+		boolean validateEstimandCompleteness(Estimand estimand)
+		List<IntercurrentEvent> identifyIntercurrentEvents(Protocol protocol)
+		HandlingStrategy recommendStrategy(IntercurrentEvent intercurrentEvent)
+	}
+}
+Endpoint --> EndpointId : id
+Estimand --> TreatmentCondition : treatment
+StudyObjective --> ObjectiveType : typeValue
+PopulationDefinition "1" *--> "*" ExclusionCriteria : exclusions
+Estimand --> Endpoint : endpoint
+Protocol "1" *--> "*" Estimand : estimands
+Protocol --> ProtocolVersion : currentVersion
+Endpoint --> MeasurementScale : scale
+StudyObjective "1" *--> "*" Endpoint : endpoints
+Estimand --> EstimandId : id
+Protocol "1" *--> "*" StudyObjective : objectives
+EstimandDefined --> EstimandId : estimandId
+PopulationDefinition "1" *--> "*" InclusionCriteria : inclusions
+ProtocolFinalized --> ProtocolId : protocolId
+Estimand "1" *--> "*" IntercurrentEvent : intercurrentEvents
+Estimand --> PopulationLevelSummary : summary
+ProtocolAmended --> ProtocolId : protocolId
+ProtocolAmended --> ProtocolVersion : newVersion
+Protocol --> ProtocolId : id
+IntercurrentEvent --> EventId : id
+EstimandDefined --> ObjectiveId : objectiveId
+IntercurrentEvent --> HandlingStrategy : strategy
+StudyObjective --> ObjectiveId : id
+Endpoint --> EndpointType : typeValue
+Protocol --> ProtocolNumber : protocolNumber
+Estimand --> PopulationDefinition : population
+Protocol --> StudyDesign : design
+legend left
+  This bounded context implements the subdomain 'StudyDesignManagement'.
+end legend
+
+
+@enduml

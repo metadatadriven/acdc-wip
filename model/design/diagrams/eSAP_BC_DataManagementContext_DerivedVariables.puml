@@ -1,0 +1,67 @@
+@startuml
+
+skinparam componentStyle uml2
+
+package "'DerivedVariables' Aggregate" <<Rectangle>> {
+	class DerivedVariable <<(A,#fffab8) Aggregate Root>> {
+		Date createdAt
+		VariableId id
+		VariableName name
+		VariableType typeValue
+		DerivationRule rule
+		List<SourceVariable> sources
+	}
+	class DerivationRule <<(E,DarkSeaGreen) Entity>> {
+		String formula
+		String documentation
+		RuleId id
+		List<TransformationStep> steps
+	}
+	class SourceVariable <<(E,DarkSeaGreen) Entity>> {
+		String datasetName
+		String variableName
+		VariableId id
+	}
+	class TransformationStep <<(E,DarkSeaGreen) Entity>> {
+		int stepNumber
+		String operationName
+		String parameters
+		StepId id
+	}
+	class VariableId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class VariableName <<(V,DarkSeaGreen) Value Object>> {
+		String name
+		String label
+	}
+	class VariableType <<(V,DarkSeaGreen) Value Object>> {
+		String typeValue
+	}
+	class RuleId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class StepId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class DerivedVariableComputationService <<(S,DarkSeaGreen) Service>> {
+		DerivedVariable computeChangeFromBaseline(SourceVariable source, null baseline)
+		DerivedVariable computeCompositeScore(List<SourceVariable> components, null rule)
+	}
+	class MissingDataHandlingService <<(S,DarkSeaGreen) Service>> {
+		void imputeMissingValues(DerivedVariable variable, null method)
+		null assessMechanism(DerivedVariable variable)
+	}
+}
+TransformationStep --> StepId : id
+DerivedVariable "1" *--> "*" SourceVariable : sources
+DerivationRule --> RuleId : id
+SourceVariable --> VariableId : id
+DerivedVariable --> VariableType : typeValue
+DerivedVariable --> VariableId : id
+DerivedVariable --> DerivationRule : rule
+DerivationRule "1" *--> "*" TransformationStep : steps
+DerivedVariable --> VariableName : name
+
+
+@enduml

@@ -1,0 +1,130 @@
+@startuml
+
+skinparam componentStyle uml2
+
+package "'AnalysisSets' Aggregate" <<Rectangle>> {
+	class AnalysisSet <<(A,#fffab8) Aggregate Root>> {
+		Date assignmentDate
+		boolean locked
+		AnalysisSetId id
+		AnalysisSetName name
+		AnalysisSetType typeValue
+		List<SubjectAssignment> subjects
+		List<InclusionRule> inclusionRules
+		List<ExclusionRule> exclusionRules
+	}
+	class SubjectAssignment <<(E,DarkSeaGreen) Entity>> {
+		boolean included
+		String exclusionReason
+		SubjectId subjectId
+		TreatmentAssignment plannedTreatment
+		TreatmentAssignment actualTreatment
+	}
+	class AnalysisSetId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class AnalysisSetName <<(V,DarkSeaGreen) Value Object>> {
+		String name
+	}
+	class AnalysisSetType <<(V,DarkSeaGreen) Value Object>> {
+		String typeValue
+	}
+	class SubjectId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class TreatmentAssignment <<(V,DarkSeaGreen) Value Object>> {
+		String treatmentArm
+		Date assignmentDate
+	}
+	class InclusionRule <<(V,DarkSeaGreen) Value Object>> {
+		String rule
+	}
+	class ExclusionRule <<(V,DarkSeaGreen) Value Object>> {
+		String rule
+	}
+	class AnalysisSetLocked <<(E,#ff9f4b) Domain Event>> {
+		Date lockedAt
+		AnalysisSetId analysisSetId
+	}
+	class AnalysisSetDefinitionService <<(S,DarkSeaGreen) Service>> {
+		AnalysisSet defineFullAnalysisSet(Protocol protocol)
+		AnalysisSet defineSafetyAnalysisSet(Protocol protocol)
+		AnalysisSet definePerProtocolSet(Protocol protocol)
+	}
+}
+package "'DerivedVariables' Aggregate" <<Rectangle>> {
+	class DerivedVariable <<(A,#fffab8) Aggregate Root>> {
+		Date createdAt
+		VariableId id
+		VariableName name
+		VariableType typeValue
+		DerivationRule rule
+		List<SourceVariable> sources
+	}
+	class DerivationRule <<(E,DarkSeaGreen) Entity>> {
+		String formula
+		String documentation
+		RuleId id
+		List<TransformationStep> steps
+	}
+	class SourceVariable <<(E,DarkSeaGreen) Entity>> {
+		String datasetName
+		String variableName
+		VariableId id
+	}
+	class TransformationStep <<(E,DarkSeaGreen) Entity>> {
+		int stepNumber
+		String operationName
+		String parameters
+		StepId id
+	}
+	class VariableId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class VariableName <<(V,DarkSeaGreen) Value Object>> {
+		String name
+		String label
+	}
+	class VariableType <<(V,DarkSeaGreen) Value Object>> {
+		String typeValue
+	}
+	class RuleId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class StepId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class DerivedVariableComputationService <<(S,DarkSeaGreen) Service>> {
+		DerivedVariable computeChangeFromBaseline(SourceVariable source, null baseline)
+		DerivedVariable computeCompositeScore(List<SourceVariable> components, null rule)
+	}
+	class MissingDataHandlingService <<(S,DarkSeaGreen) Service>> {
+		void imputeMissingValues(DerivedVariable variable, null method)
+		null assessMechanism(DerivedVariable variable)
+	}
+}
+TransformationStep --> StepId : id
+DerivedVariable "1" *--> "*" SourceVariable : sources
+DerivationRule --> RuleId : id
+SubjectAssignment --> SubjectId : subjectId
+SourceVariable --> VariableId : id
+AnalysisSet --> AnalysisSetId : id
+AnalysisSet --> AnalysisSetName : name
+DerivedVariable --> VariableType : typeValue
+SubjectAssignment --> TreatmentAssignment : plannedTreatment
+DerivedVariable --> DerivationRule : rule
+AnalysisSet "1" *--> "*" SubjectAssignment : subjects
+AnalysisSet "1" *--> "*" InclusionRule : inclusionRules
+AnalysisSet "1" *--> "*" ExclusionRule : exclusionRules
+SubjectAssignment --> TreatmentAssignment : actualTreatment
+DerivedVariable --> VariableId : id
+AnalysisSetLocked --> AnalysisSetId : analysisSetId
+DerivationRule "1" *--> "*" TransformationStep : steps
+AnalysisSet --> AnalysisSetType : typeValue
+DerivedVariable --> VariableName : name
+legend left
+  This bounded context implements the subdomain 'DataManagement'.
+end legend
+
+
+@enduml

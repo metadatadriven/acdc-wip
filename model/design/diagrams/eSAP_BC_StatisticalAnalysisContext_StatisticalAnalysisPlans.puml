@@ -1,0 +1,121 @@
+@startuml
+
+skinparam componentStyle uml2
+
+package "'StatisticalAnalysisPlans' Aggregate" <<Rectangle>> {
+	class StatisticalAnalysisPlan <<(A,#fffab8) Aggregate Root>> {
+		Date creationDate
+		Date finalizationDate
+		SAPId id
+		ProtocolId protocolReference
+		SAPVersion currentVersion
+		SAPStatus status
+		List<AnalysisSpecification> specifications
+		SampleSizeCalculation sampleSize
+	}
+	class AnalysisSpecification <<(E,DarkSeaGreen) Entity>> {
+		SpecificationId id
+		ObjectiveId objectiveReference
+		EstimandId estimandReference
+		StatisticalModel model
+		HypothesisTest test
+		SignificanceLevel alpha
+		List<SensitivityAnalysis> sensitivities
+		List<SubgroupAnalysis> subgroups
+	}
+	class SensitivityAnalysis <<(E,DarkSeaGreen) Entity>> {
+		String descriptionText
+		SensitivityId id
+		StatisticalModel alternativeModel
+	}
+	class SubgroupAnalysis <<(E,DarkSeaGreen) Entity>> {
+		String subgroupVariable
+		boolean preplanned
+		SubgroupId id
+	}
+	class SampleSizeCalculation <<(E,DarkSeaGreen) Entity>> {
+		int targetSampleSize
+		BigDecimal power
+		BigDecimal effectSize
+		String assumptions
+		CalculationId id
+		SignificanceLevel alpha
+	}
+	class SAPId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class SAPVersion <<(V,DarkSeaGreen) Value Object>> {
+		String version
+		Date versionDate
+	}
+	class SAPStatus <<(V,DarkSeaGreen) Value Object>> {
+		String status
+	}
+	class SpecificationId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class StatisticalModel <<(V,DarkSeaGreen) Value Object>> {
+		String modelType
+		String formulaSyntax
+		List<Covariate> covariates
+	}
+	class HypothesisTest <<(V,DarkSeaGreen) Value Object>> {
+		String testType
+		String nullHypothesis
+		String alternativeHypothesis
+	}
+	class SignificanceLevel <<(V,DarkSeaGreen) Value Object>> {
+		BigDecimal alpha
+	}
+	class Covariate <<(V,DarkSeaGreen) Value Object>> {
+		String variable
+		String role
+	}
+	class SensitivityId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class SubgroupId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class CalculationId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class SAPFinalized <<(E,#ff9f4b) Domain Event>> {
+		Date finalizedAt
+		SAPId sapId
+	}
+	class SAPAmended <<(E,#ff9f4b) Domain Event>> {
+		String amendmentReason
+		Date amendedAt
+		SAPId sapId
+	}
+	class MultipleTestingControlService <<(S,DarkSeaGreen) Service>> {
+		null determineAdjustment(List<AnalysisSpecification> specs)
+		BigDecimal adjustAlpha(SignificanceLevel alpha, int numberOfTests)
+	}
+	class SampleSizeService <<(S,DarkSeaGreen) Service>> {
+		SampleSizeCalculation calculateSampleSize(null effect, SignificanceLevel alpha, BigDecimal power)
+	}
+}
+StatisticalAnalysisPlan --> SampleSizeCalculation : sampleSize
+AnalysisSpecification "1" *--> "*" SubgroupAnalysis : subgroups
+SampleSizeCalculation --> SignificanceLevel : alpha
+SensitivityAnalysis --> SensitivityId : id
+StatisticalModel "1" *--> "*" Covariate : covariates
+SampleSizeCalculation --> CalculationId : id
+AnalysisSpecification --> SpecificationId : id
+AnalysisSpecification --> SignificanceLevel : alpha
+StatisticalAnalysisPlan --> SAPVersion : currentVersion
+SubgroupAnalysis --> SubgroupId : id
+AnalysisSpecification --> StatisticalModel : model
+SAPAmended --> SAPId : sapId
+StatisticalAnalysisPlan --> SAPStatus : status
+StatisticalAnalysisPlan "1" *--> "*" AnalysisSpecification : specifications
+SensitivityAnalysis --> StatisticalModel : alternativeModel
+AnalysisSpecification "1" *--> "*" SensitivityAnalysis : sensitivities
+SAPFinalized --> SAPId : sapId
+StatisticalAnalysisPlan --> SAPId : id
+AnalysisSpecification --> HypothesisTest : test
+
+
+@enduml

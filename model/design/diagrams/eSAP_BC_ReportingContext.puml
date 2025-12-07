@@ -1,0 +1,89 @@
+@startuml
+
+skinparam componentStyle uml2
+
+package "'TFLs' Aggregate" <<Rectangle>> {
+	class TFL <<(A,#fffab8) Aggregate Root>> {
+		String title
+		Date generatedDate
+		boolean validated
+		TFLId id
+		TFLNumber number
+		TFLType typeValue
+		TFLSpecification specification
+		List<DataSource> dataSources
+	}
+	class TFLSpecification <<(E,DarkSeaGreen) Entity>> {
+		String shellTemplate
+		SpecId id
+		OutputFormat format
+		List<Column> columns
+		List<Row> rows
+		NumberFormat numberFormat
+	}
+	class DataSource <<(E,DarkSeaGreen) Entity>> {
+		String datasetName
+		String analysisName
+		SourceId id
+		AnalysisId analysisReference
+	}
+	class TFLId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class TFLNumber <<(V,DarkSeaGreen) Value Object>> {
+		String number
+	}
+	class TFLType <<(V,DarkSeaGreen) Value Object>> {
+		String typeValue
+	}
+	class SpecId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class OutputFormat <<(V,DarkSeaGreen) Value Object>> {
+		String format
+	}
+	class Column <<(V,DarkSeaGreen) Value Object>> {
+		String name
+		String label
+		int position
+	}
+	class Row <<(V,DarkSeaGreen) Value Object>> {
+		String category
+		int position
+	}
+	class NumberFormat <<(V,DarkSeaGreen) Value Object>> {
+		int decimalPlaces
+		String notation
+	}
+	class SourceId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class TFLGenerated <<(E,#ff9f4b) Domain Event>> {
+		Date generatedAt
+		TFLId tflId
+	}
+	class TFLValidated <<(E,#ff9f4b) Domain Event>> {
+		Date validatedAt
+		String validator
+		TFLId tflId
+	}
+}
+TFL --> TFLType : typeValue
+TFLSpecification --> OutputFormat : format
+TFL "1" *--> "*" DataSource : dataSources
+TFLSpecification "1" *--> "*" Row : rows
+TFL --> TFLNumber : number
+TFL --> TFLId : id
+TFLGenerated --> TFLId : tflId
+TFLValidated --> TFLId : tflId
+TFLSpecification "1" *--> "*" Column : columns
+DataSource --> SourceId : id
+TFL --> TFLSpecification : specification
+TFLSpecification --> SpecId : id
+TFLSpecification --> NumberFormat : numberFormat
+legend left
+  This bounded context implements the subdomain 'OutputGeneration'.
+end legend
+
+
+@enduml

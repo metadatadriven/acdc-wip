@@ -91,16 +91,16 @@ BoundedContext StudyDesignContext implements StudyDesignManagement {
 
     Entity StudyObjective {
       - ObjectiveId id
-      - ObjectiveType type
-      String description
+      - ObjectiveType typeValue
+      String descriptionText
       - List<Endpoint> endpoints
     }
 
     Entity Endpoint {
       - EndpointId id
       String name
-      String description
-      - EndpointType type
+      String descriptionText
+      - EndpointType typeValue
       - MeasurementScale scale
     }
 
@@ -216,7 +216,7 @@ BoundedContext StudyDesignContext implements StudyDesignManagement {
     Service EstimandSpecificationService {
       boolean validateEstimandCompleteness(@Estimand estimand);
       List<@IntercurrentEvent> identifyIntercurrentEvents(@Protocol protocol);
-      @HandlingStrategy recommendStrategy(@IntercurrentEvent event);
+      @HandlingStrategy recommendStrategy(@IntercurrentEvent intercurrentEvent);
     }
   }
 }
@@ -261,7 +261,7 @@ BoundedContext StatisticalAnalysisContext implements StatisticalMethodology {
 
     Entity SensitivityAnalysis {
       - SensitivityId id
-      String description
+      String descriptionText
       - StatisticalModel alternativeModel
     }
 
@@ -366,7 +366,7 @@ BoundedContext DataManagementContext implements DataManagement {
 
       - AnalysisSetId id
       - AnalysisSetName name
-      - AnalysisSetType type
+      - AnalysisSetType typeValue
       - List<SubjectAssignment> subjects
       - List<InclusionRule> inclusionRules
       - List<ExclusionRule> exclusionRules
@@ -375,7 +375,7 @@ BoundedContext DataManagementContext implements DataManagement {
 
       Repository AnalysisSetRepository {
         @AnalysisSet findById(@AnalysisSetId id);
-        List<@AnalysisSet> findByType(@AnalysisSetType type);
+        List<@AnalysisSet> findByType(@AnalysisSetType typeValue);
       }
     }
 
@@ -396,7 +396,7 @@ BoundedContext DataManagementContext implements DataManagement {
     }
 
     ValueObject AnalysisSetType {
-      String type  // ParticipantAnalysisSet, AnalysisDataSet
+      String typeValue  // ParticipantAnalysisSet, AnalysisDataSet
     }
 
     ValueObject SubjectId {
@@ -436,7 +436,7 @@ BoundedContext DataManagementContext implements DataManagement {
 
       - VariableId id
       - VariableName name
-      - VariableType type
+      - VariableType typeValue
       - DerivationRule rule
       - List<SourceVariable> sources
       Date createdAt
@@ -463,7 +463,7 @@ BoundedContext DataManagementContext implements DataManagement {
     Entity TransformationStep {
       - StepId id
       int stepNumber
-      String operation
+      String operationName
       String parameters
     }
 
@@ -477,7 +477,7 @@ BoundedContext DataManagementContext implements DataManagement {
     }
 
     ValueObject VariableType {
-      String type  // Continuous, Categorical, Binary, Time-to-Event
+      String typeValue  // Continuous, Categorical, Binary, Time-to-Event
     }
 
     ValueObject RuleId {
@@ -556,7 +556,7 @@ BoundedContext SafetyMonitoringContext implements SafetyMonitoring {
     }
 
     ValueObject Severity {
-      String level  // Mild, Moderate, Severe
+      String severityLevel  // Mild, Moderate, Severe
     }
 
     ValueObject Relationship {
@@ -641,7 +641,7 @@ BoundedContext EfficacyAssessmentContext implements EfficacyEvaluation {
     ValueObject ConfidenceInterval {
       BigDecimal lowerBound
       BigDecimal upperBound
-      BigDecimal level
+      BigDecimal confidenceLevel
     }
 
     ValueObject PValue {
@@ -759,7 +759,7 @@ BoundedContext RegulatoryComplianceContext implements RegulatoryCompliance {
     Entity Finding {
       - FindingId id
       String category  // Critical, Major, Minor
-      String description
+      String descriptionText
       String resolution
       Date closedDate
     }
@@ -806,7 +806,7 @@ BoundedContext ReportingContext implements OutputGeneration {
 
       - TFLId id
       - TFLNumber number
-      - TFLType type
+      - TFLType typeValue
       String title
       - TFLSpecification specification
       - List<DataSource> dataSources
@@ -816,7 +816,7 @@ BoundedContext ReportingContext implements OutputGeneration {
       Repository TFLRepository {
         @TFL findById(@TFLId id);
         @TFL findByNumber(@TFLNumber number);
-        List<@TFL> findByType(@TFLType type);
+        List<@TFL> findByType(@TFLType typeValue);
       }
     }
 
@@ -845,7 +845,7 @@ BoundedContext ReportingContext implements OutputGeneration {
     }
 
     ValueObject TFLType {
-      String type  // Table, Figure, Listing
+      String typeValue  // Table, Figure, Listing
     }
 
     ValueObject SpecId {

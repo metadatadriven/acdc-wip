@@ -1,0 +1,63 @@
+@startuml
+
+skinparam componentStyle uml2
+
+package "'EfficacyAnalyses' Aggregate" <<Rectangle>> {
+	class EfficacyAnalysis <<(A,#fffab8) Aggregate Root>> {
+		Date executionDate
+		String analysisProgram
+		AnalysisId id
+		SpecificationId specificationReference
+		EndpointId endpointReference
+		EstimandId estimandReference
+		AnalysisResult result
+	}
+	class AnalysisResult <<(E,DarkSeaGreen) Entity>> {
+		String conclusion
+		ResultId id
+		TreatmentEffect estimate
+		ConfidenceInterval confidenceInterval
+		PValue pValue
+	}
+	class AnalysisId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class ResultId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class TreatmentEffect <<(V,DarkSeaGreen) Value Object>> {
+		BigDecimal pointEstimate
+		String measure
+	}
+	class ConfidenceInterval <<(V,DarkSeaGreen) Value Object>> {
+		BigDecimal lowerBound
+		BigDecimal upperBound
+		BigDecimal confidenceLevel
+	}
+	class PValue <<(V,DarkSeaGreen) Value Object>> {
+		BigDecimal value
+		boolean significant
+	}
+	class PrimaryAnalysisCompleted <<(E,#ff9f4b) Domain Event>> {
+		Date completedAt
+		AnalysisId analysisId
+		AnalysisResult result
+	}
+	class SubgroupAnalysisService <<(S,DarkSeaGreen) Service>> {
+		List<AnalysisResult> performSubgroupAnalysis(EfficacyAnalysis analysis, String subgroupVariable)
+	}
+}
+AnalysisResult --> ConfidenceInterval : confidenceInterval
+EfficacyAnalysis --> AnalysisId : id
+PrimaryAnalysisCompleted --> AnalysisId : analysisId
+AnalysisResult --> PValue : pValue
+AnalysisResult --> ResultId : id
+PrimaryAnalysisCompleted --> AnalysisResult : result
+EfficacyAnalysis --> AnalysisResult : result
+AnalysisResult --> TreatmentEffect : estimate
+legend left
+  This bounded context implements the subdomain 'EfficacyEvaluation'.
+end legend
+
+
+@enduml

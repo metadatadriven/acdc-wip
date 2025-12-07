@@ -1,0 +1,81 @@
+@startuml
+
+skinparam componentStyle uml2
+
+package "'AdverseEvents' Aggregate" <<Rectangle>> {
+	class AdverseEvent <<(A,#fffab8) Aggregate Root>> {
+		String verbatimTerm
+		boolean treatmentEmergent
+		boolean serious
+		AEId id
+		SubjectId subjectId
+		AEStartDate startDate
+		AEStopDate stopDate
+		MedDRACode meddraCoding
+		Severity severity
+		Relationship relationship
+		Outcome outcome
+	}
+	class AEId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class AEStartDate <<(V,DarkSeaGreen) Value Object>> {
+		Date date
+		boolean partial
+	}
+	class AEStopDate <<(V,DarkSeaGreen) Value Object>> {
+		Date date
+		boolean partial
+		boolean ongoing
+	}
+	class MedDRACode <<(V,DarkSeaGreen) Value Object>> {
+		String soc
+		String hlgt
+		String hlt
+		String pt
+		String llt
+		String meddraVersion
+	}
+	class Severity <<(V,DarkSeaGreen) Value Object>> {
+		String severityLevel
+	}
+	class Relationship <<(V,DarkSeaGreen) Value Object>> {
+		String relationship
+	}
+	class Outcome <<(V,DarkSeaGreen) Value Object>> {
+		String outcome
+	}
+	class AdverseEventReported <<(E,#ff9f4b) Domain Event>> {
+		Date reportedAt
+		AEId aeId
+		SubjectId subjectId
+	}
+	class SeriousAdverseEventReported <<(E,#ff9f4b) Domain Event>> {
+		Date reportedAt
+		String seriousnessCriteria
+		AEId aeId
+		SubjectId subjectId
+	}
+	class SafetyCodedDataService <<(S,DarkSeaGreen) Service>> {
+		MedDRACode codeAdverseEvent(String verbatimTerm)
+		void validateCoding(AdverseEvent ae)
+	}
+	class TreatmentEmergenceService <<(S,DarkSeaGreen) Service>> {
+		boolean determineTreatmentEmergence(AdverseEvent ae, null period)
+	}
+}
+AdverseEvent --> AEStopDate : stopDate
+AdverseEvent --> MedDRACode : meddraCoding
+AdverseEvent --> AEId : id
+SeriousAdverseEventReported --> AEId : aeId
+AdverseEvent --> Outcome : outcome
+AdverseEvent --> AEStartDate : startDate
+AdverseEventReported --> AEId : aeId
+AdverseEvent --> Relationship : relationship
+AdverseEvent --> Severity : severity
+legend left
+  This bounded context implements the subdomain 'SafetyMonitoring'.
+end legend
+
+
+@enduml

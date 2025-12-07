@@ -1,0 +1,63 @@
+@startuml
+
+skinparam componentStyle uml2
+
+package "'InterimAnalyses' Aggregate" <<Rectangle>> {
+	class InterimAnalysis <<(A,#fffab8) Aggregate Root>> {
+		int analysisNumber
+		Date plannedDate
+		Date actualDate
+		BigDecimal alphaSpent
+		boolean databaseLocked
+		InterimId id
+		InterimDecision decision
+		AlphaSpendingFunction spendingFunction
+	}
+	class InterimDecision <<(E,DarkSeaGreen) Entity>> {
+		String decision
+		String rationale
+		Date decisionDate
+		DecisionId id
+	}
+	class InterimId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class DecisionId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class AlphaSpendingFunction <<(V,DarkSeaGreen) Value Object>> {
+		String functionType
+		List<AlphaLevel> boundaries
+	}
+	class AlphaLevel <<(V,DarkSeaGreen) Value Object>> {
+		int analysisNumber
+		BigDecimal boundary
+	}
+	class InterimAnalysisTriggered <<(E,#ff9f4b) Domain Event>> {
+		Date triggeredAt
+		InterimId interimId
+	}
+	class InterimDecisionMade <<(E,#ff9f4b) Domain Event>> {
+		Date decidedAt
+		InterimId interimId
+		InterimDecision decision
+	}
+	class InterimAnalysisManagementService <<(S,DarkSeaGreen) Service>> {
+		InterimDecision evaluateStoppingRules(InterimAnalysis analysis)
+		BigDecimal calculateConditionalPower(InterimAnalysis analysis)
+	}
+}
+InterimDecisionMade --> InterimDecision : decision
+InterimDecisionMade --> InterimId : interimId
+InterimDecision --> DecisionId : id
+InterimAnalysis --> InterimDecision : decision
+InterimAnalysisTriggered --> InterimId : interimId
+AlphaSpendingFunction "1" *--> "*" AlphaLevel : boundaries
+InterimAnalysis --> AlphaSpendingFunction : spendingFunction
+InterimAnalysis --> InterimId : id
+legend left
+  This bounded context implements the subdomain 'InterimAnalysisControl'.
+end legend
+
+
+@enduml

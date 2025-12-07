@@ -1,0 +1,50 @@
+@startuml
+
+skinparam componentStyle uml2
+
+package "'ComplianceAudits' Aggregate" <<Rectangle>> {
+	class ComplianceAudit <<(A,#fffab8) Aggregate Root>> {
+		Date auditDate
+		String auditor
+		AuditId id
+		DocumentId documentReference
+		List<Finding> findings
+		AuditStatus status
+	}
+	class Finding <<(E,DarkSeaGreen) Entity>> {
+		String category
+		String descriptionText
+		String resolution
+		Date closedDate
+		FindingId id
+	}
+	class AuditId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class DocumentId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class AuditStatus <<(V,DarkSeaGreen) Value Object>> {
+		String status
+	}
+	class FindingId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class AuditCompleted <<(E,#ff9f4b) Domain Event>> {
+		int numberOfFindings
+		Date completedAt
+		AuditId auditId
+	}
+	class OutputValidationService <<(S,DarkSeaGreen) Service>> {
+		null validateOutput(TFLId tflId)
+	}
+}
+ComplianceAudit --> AuditStatus : status
+ComplianceAudit "1" *--> "*" Finding : findings
+AuditCompleted --> AuditId : auditId
+ComplianceAudit --> AuditId : id
+Finding --> FindingId : id
+ComplianceAudit --> DocumentId : documentReference
+
+
+@enduml

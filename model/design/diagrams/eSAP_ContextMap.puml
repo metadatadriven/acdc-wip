@@ -1,0 +1,129 @@
+@startuml
+
+skinparam componentStyle uml2
+
+component [StudyDesignContext]
+note right of [StudyDesignContext]
+Defines the fundamental structure, 
+objectives, and methodology of 
+a clinical trial 
+end note
+component [StatisticalAnalysisContext]
+note right of [StatisticalAnalysisContext]
+Defines statistical methods, models, 
+and analytical approaches for 
+evaluating study objectives 
+end note
+component [DataManagementContext]
+note right of [DataManagementContext]
+Manages analysis datasets, data 
+derivations, missing data handling, 
+and data quality 
+end note
+component [SafetyMonitoringContext]
+note right of [SafetyMonitoringContext]
+Captures, codes, analyzes, and 
+reports safety data throughout 
+the clinical trial lifecycle 
+end note
+component [EfficacyAssessmentContext]
+note right of [EfficacyAssessmentContext]
+Analyzes and evaluates treatment 
+effects on efficacy endpoints 
+
+end note
+component [InterimAnalysisContext]
+note right of [InterimAnalysisContext]
+Manages planned interim looks 
+at accumulating data for adaptive 
+decision-making 
+end note
+component [RegulatoryComplianceContext]
+note right of [RegulatoryComplianceContext]
+Ensures SAP and analyses conform 
+to regulatory guidelines and quality 
+standards 
+end note
+component [ReportingContext]
+note right of [ReportingContext]
+Produces standardized Tables, 
+Figures, and Listings (TFLs) for 
+regulatory and scientific communication 
+
+end note
+
+[StudyDesignContext]<-->[StatisticalAnalysisContext] : Shared Kernel (Shared Estimand Domain Model)
+
+interface "CDISC ADaM" as StatisticalAnalysisContext_to_DataManagementContext
+[DataManagementContext] --> StatisticalAnalysisContext_to_DataManagementContext : OPEN_HOST_SERVICE, PUBLISHED_LANGUAGE
+StatisticalAnalysisContext_to_DataManagementContext <.. [StatisticalAnalysisContext] : use Aggregates AnalysisSets, DerivedVariables via ANTICORRUPTION_LAYER
+
+[StatisticalAnalysisContext]<-->[EfficacyAssessmentContext] : Partnership (Shared Statistical Infrastructure)
+
+interface "CDISC ADaM, MedDRA" as SafetyMonitoringContext_to_DataManagementContext
+[DataManagementContext] --> SafetyMonitoringContext_to_DataManagementContext : OPEN_HOST_SERVICE
+SafetyMonitoringContext_to_DataManagementContext <.. [SafetyMonitoringContext] : use Aggregate AnalysisSets as CONFORMIST
+
+interface "CDISC ADaM" as EfficacyAssessmentContext_to_DataManagementContext
+[DataManagementContext] --> EfficacyAssessmentContext_to_DataManagementContext : OPEN_HOST_SERVICE
+EfficacyAssessmentContext_to_DataManagementContext <.. [EfficacyAssessmentContext] : use Aggregates AnalysisSets, DerivedVariables via ANTICORRUPTION_LAYER
+
+interface "Protocol Specifications" as DataManagementContext_to_StudyDesignContext
+[StudyDesignContext] --> DataManagementContext_to_StudyDesignContext
+DataManagementContext_to_StudyDesignContext <.. [DataManagementContext] : consume
+
+interface "Upstream-Downstream" as InterimAnalysisContext_to_DataManagementContext
+[DataManagementContext] --> InterimAnalysisContext_to_DataManagementContext
+InterimAnalysisContext_to_DataManagementContext <.. [InterimAnalysisContext] : consume
+
+interface "Upstream-Downstream" as InterimAnalysisContext_to_StatisticalAnalysisContext
+[StatisticalAnalysisContext] --> InterimAnalysisContext_to_StatisticalAnalysisContext
+InterimAnalysisContext_to_StatisticalAnalysisContext <.. [InterimAnalysisContext] : consume
+
+interface "Upstream-Downstream" as StudyDesignContext_to_InterimAnalysisContext
+[InterimAnalysisContext] --> StudyDesignContext_to_InterimAnalysisContext
+StudyDesignContext_to_InterimAnalysisContext <.. [StudyDesignContext] : consume
+
+interface "Upstream-Downstream" as StudyDesignContext_to_RegulatoryComplianceContext
+[RegulatoryComplianceContext] --> StudyDesignContext_to_RegulatoryComplianceContext : PUBLISHED_LANGUAGE
+StudyDesignContext_to_RegulatoryComplianceContext <.. [StudyDesignContext] : use as CONFORMIST
+
+interface "ICH E9, ICH E9(R1)" as StatisticalAnalysisContext_to_RegulatoryComplianceContext
+[RegulatoryComplianceContext] --> StatisticalAnalysisContext_to_RegulatoryComplianceContext : PUBLISHED_LANGUAGE
+StatisticalAnalysisContext_to_RegulatoryComplianceContext <.. [StatisticalAnalysisContext] : use as CONFORMIST
+
+interface "Upstream-Downstream" as DataManagementContext_to_RegulatoryComplianceContext
+[RegulatoryComplianceContext] --> DataManagementContext_to_RegulatoryComplianceContext : PUBLISHED_LANGUAGE
+DataManagementContext_to_RegulatoryComplianceContext <.. [DataManagementContext] : use as CONFORMIST
+
+interface "ICH E3" as SafetyMonitoringContext_to_RegulatoryComplianceContext
+[RegulatoryComplianceContext] --> SafetyMonitoringContext_to_RegulatoryComplianceContext : PUBLISHED_LANGUAGE
+SafetyMonitoringContext_to_RegulatoryComplianceContext <.. [SafetyMonitoringContext] : use as CONFORMIST
+
+interface "Upstream-Downstream" as EfficacyAssessmentContext_to_RegulatoryComplianceContext
+[RegulatoryComplianceContext] --> EfficacyAssessmentContext_to_RegulatoryComplianceContext : PUBLISHED_LANGUAGE
+EfficacyAssessmentContext_to_RegulatoryComplianceContext <.. [EfficacyAssessmentContext] : use as CONFORMIST
+
+interface "Upstream-Downstream" as InterimAnalysisContext_to_RegulatoryComplianceContext
+[RegulatoryComplianceContext] --> InterimAnalysisContext_to_RegulatoryComplianceContext : PUBLISHED_LANGUAGE
+InterimAnalysisContext_to_RegulatoryComplianceContext <.. [InterimAnalysisContext] : use as CONFORMIST
+
+interface "Upstream-Downstream" as ReportingContext_to_StatisticalAnalysisContext
+[StatisticalAnalysisContext] --> ReportingContext_to_StatisticalAnalysisContext : OPEN_HOST_SERVICE
+ReportingContext_to_StatisticalAnalysisContext <.. [ReportingContext] : use Aggregate StatisticalAnalysisPlans via ANTICORRUPTION_LAYER
+
+interface "Upstream-Downstream" as ReportingContext_to_EfficacyAssessmentContext
+[EfficacyAssessmentContext] --> ReportingContext_to_EfficacyAssessmentContext : OPEN_HOST_SERVICE
+ReportingContext_to_EfficacyAssessmentContext <.. [ReportingContext] : use Aggregate EfficacyAnalyses via ANTICORRUPTION_LAYER
+
+interface "Upstream-Downstream" as ReportingContext_to_SafetyMonitoringContext
+[SafetyMonitoringContext] --> ReportingContext_to_SafetyMonitoringContext : OPEN_HOST_SERVICE
+ReportingContext_to_SafetyMonitoringContext <.. [ReportingContext] : use Aggregate AdverseEvents via ANTICORRUPTION_LAYER
+
+interface "ICH E3 Report Structure" as ReportingContext_to_RegulatoryComplianceContext
+[RegulatoryComplianceContext] --> ReportingContext_to_RegulatoryComplianceContext : PUBLISHED_LANGUAGE
+ReportingContext_to_RegulatoryComplianceContext <.. [ReportingContext] : use as CONFORMIST
+
+
+
+@enduml

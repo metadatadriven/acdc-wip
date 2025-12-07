@@ -1,0 +1,67 @@
+@startuml
+
+skinparam componentStyle uml2
+
+package "'AnalysisSets' Aggregate" <<Rectangle>> {
+	class AnalysisSet <<(A,#fffab8) Aggregate Root>> {
+		Date assignmentDate
+		boolean locked
+		AnalysisSetId id
+		AnalysisSetName name
+		AnalysisSetType typeValue
+		List<SubjectAssignment> subjects
+		List<InclusionRule> inclusionRules
+		List<ExclusionRule> exclusionRules
+	}
+	class SubjectAssignment <<(E,DarkSeaGreen) Entity>> {
+		boolean included
+		String exclusionReason
+		SubjectId subjectId
+		TreatmentAssignment plannedTreatment
+		TreatmentAssignment actualTreatment
+	}
+	class AnalysisSetId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class AnalysisSetName <<(V,DarkSeaGreen) Value Object>> {
+		String name
+	}
+	class AnalysisSetType <<(V,DarkSeaGreen) Value Object>> {
+		String typeValue
+	}
+	class SubjectId <<(V,DarkSeaGreen) Value Object>> {
+		String id
+	}
+	class TreatmentAssignment <<(V,DarkSeaGreen) Value Object>> {
+		String treatmentArm
+		Date assignmentDate
+	}
+	class InclusionRule <<(V,DarkSeaGreen) Value Object>> {
+		String rule
+	}
+	class ExclusionRule <<(V,DarkSeaGreen) Value Object>> {
+		String rule
+	}
+	class AnalysisSetLocked <<(E,#ff9f4b) Domain Event>> {
+		Date lockedAt
+		AnalysisSetId analysisSetId
+	}
+	class AnalysisSetDefinitionService <<(S,DarkSeaGreen) Service>> {
+		AnalysisSet defineFullAnalysisSet(Protocol protocol)
+		AnalysisSet defineSafetyAnalysisSet(Protocol protocol)
+		AnalysisSet definePerProtocolSet(Protocol protocol)
+	}
+}
+AnalysisSet "1" *--> "*" InclusionRule : inclusionRules
+SubjectAssignment --> SubjectId : subjectId
+AnalysisSet --> AnalysisSetId : id
+AnalysisSet --> AnalysisSetName : name
+AnalysisSet "1" *--> "*" ExclusionRule : exclusionRules
+SubjectAssignment --> TreatmentAssignment : actualTreatment
+SubjectAssignment --> TreatmentAssignment : plannedTreatment
+AnalysisSetLocked --> AnalysisSetId : analysisSetId
+AnalysisSet --> AnalysisSetType : typeValue
+AnalysisSet "1" *--> "*" SubjectAssignment : subjects
+
+
+@enduml
