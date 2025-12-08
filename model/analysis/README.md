@@ -19,13 +19,13 @@ Business objectives and strategic requirements for the AC/DC metamodel, includin
 
 ### Design Principles
 
-**Model_PRINCIPLES.md**
-Core architectural and design principles guiding AC/DC metamodel development:
-- Three-tier architecture (Display ↔ Logical ↔ Physical)
-- Unidirectional dependencies
-- Immutability of physical tier
+**Moved to ../Model_PRINCIPLES.md**
+Core architectural and design principles guiding AC/DC metamodel development have been moved to the parent model/ directory. See ../Model_PRINCIPLES.md (v5.0) for:
+- Eight guiding principles (GP-1 through GP-8)
+- Layered architecture with unidirectional dependencies
+- Analysis reproducibility and provenance
 - CDISC standards alignment
-- Separation of concerns
+- Declarative analysis specification
 
 ### Comparative Analysis
 
@@ -82,7 +82,7 @@ Initial prompts and guidance used to generate model documentation, preserving th
 ## Document Relationships
 
 ```
-Model_PRINCIPLES.md
+../Model_PRINCIPLES.md (moved to parent directory)
        ↓ (guides)
 Model_REQUIREMENTS.md ← (consolidates) ← Model_USER_REQUIREMENTS.md
        ↓                                   Model_BUSINESS_REQUIREMENTS.md
@@ -105,7 +105,7 @@ All documentation aligns with:
 ## Usage
 
 1. **For Requirements Analysis**: Start with Model_REQUIREMENTS.md for complete specification
-2. **For Architecture Design**: Review Model_PRINCIPLES.md for design constraints and patterns
+2. **For Architecture Design**: Review ../Model_PRINCIPLES.md for design constraints and patterns
 3. **For Standards Comparison**: Consult Model_COMPARISON.md for cross-model insights
 4. **For Domain Modeling**: See ../design/eSAP_DOMAIN_DESIGN.md for DDD analysis and ../design/eSAP.cml for formal ContextMapper DSL model
 5. **For Implementation Examples**: Examine Model_ex*.md files for concrete use cases
@@ -126,7 +126,7 @@ When adding new analysis documentation:
 1. Follow the established naming convention: `Model_ex##_ShortName.md`
 2. Include clear use case description, data structures, and CDISC mappings
 3. Update this README with the new document description
-4. Reference relevant sections of Model_REQUIREMENTS.md and Model_PRINCIPLES.md
+4. Reference relevant sections of Model_REQUIREMENTS.md and ../Model_PRINCIPLES.md
 
 ---
 

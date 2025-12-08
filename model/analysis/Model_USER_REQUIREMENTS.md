@@ -871,5 +871,5 @@ PASSED:
 
 **END OF DOCUMENT**
 
-*For guiding principles, see Model_PRINCIPLES.md*
+*For guiding principles, see ../Model_PRINCIPLES.md*
 *For business requirements, see Model_BUSINESS_REQUIREMENTS.md*

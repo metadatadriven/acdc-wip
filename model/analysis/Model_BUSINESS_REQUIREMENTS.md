@@ -706,5 +706,5 @@ These requirements specify what the AC/DC metamodel must enable from a business 
 
 **END OF DOCUMENT**
 
-*For guiding principles, see Model_PRINCIPLES.md*
+*For guiding principles, see ../Model_PRINCIPLES.md*
 *For user requirements, see Model_USER_REQUIREMENTS.md*
