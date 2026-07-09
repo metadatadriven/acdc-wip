@@ -1,0 +1,302 @@
+// ============================================================================
+// End-to-End Example: Kaplan-Meier Time-to-Event Analysis
+// ============================================================================
+//
+// PURPOSE
+// -------
+// This file is a *complete, single-file walkthrough* of a time-to-event (TTE)
+// analysis expressed in Thunderstruck. Where the other examples each isolate
+// one construct (see example-concept.tsk, example-model.tsk, example-display.tsk),
+// this one threads the whole chain together so you can see how the three layers
+// of the AC/DC model connect for a survival analysis:
+//
+//     Concepts   (WHAT is being measured)      - bottom layer, self-contained
+//         |  realised by
+//     Structures (WHERE the data lives: cubes)  - middle layer
+//         |  operated on by
+//     Derivations (HOW it is analysed)          - top layer: slice, model,
+//                                                 aggregate, display
+//
+// Dependencies only ever point DOWNWARD (Derivations -> Structures -> Concepts),
+// which is Guiding Principle GP-1. As you read top-to-bottom, each block cites
+// the block(s) it depends on, so the traceability chain (GP-3) is explicit:
+//
+//     OverallSurvival concept
+//         -> ADTTE cube (AVAL/CNSR realise the concept)
+//             -> OS_ITT slice (the analysis population)
+//                 -> KaplanMeier model (estimates the survival curve)
+//                     -> KMEstimates cube (the estimated curve + CIs)
+//                         -> KM figure (Figure 14.2.1)
+//                 -> MedianSurvival aggregate (descriptive counts)
+//
+// CLINICAL SCENARIO
+// -----------------
+// Oncology study, primary endpoint = Overall Survival (OS): time from
+// randomization to death from any cause. Two arms (active vs. placebo),
+// analysed on the ITT population. We estimate the KM survival function per
+// arm, plot it, and summarise events and median survival.
+//
+// ============================================================================
+
+
+// Declare the standards versions this specification is written against.
+// This anchors the whole file to specific CDISC / W3C releases (GP-4).
+standards {
+    SDTM: "3.4",
+    ADaM: "1.3",
+    W3C_Cube: "2014-01-16"
+}
+
+
+// ============================================================================
+// LAYER 1 - CONCEPTS  (the "WHAT")
+// ============================================================================
+//
+// Concepts are the semantic bedrock. They know nothing about cubes or data
+// layout - they are pure meaning, and they reference NOTHING above them.
+// Every measure in the cubes below is tied back to one of these concepts,
+// which is what makes the analysis traceable to its clinical intent.
+
+// --- Biomedical concepts: the raw quantities being observed ---
+
+// The time value itself. In ADaM this becomes the AVAL of an ADTTE parameter.
+concept SurvivalTime "Survival Time" type_of BiomedicalConcept {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Elapsed time from a defined time-zero (randomization) to the event of interest or to censoring, measured in days.",
+    unit: "days"
+}
+
+// The censoring indicator. ADaM convention: CNSR = 0 means the event was
+// observed; CNSR = 1 means the subject was censored (event not yet observed).
+concept CensoringStatus "Censoring Status" type_of BiomedicalConcept {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Indicator of whether the survival time ends in the event of interest (0) or is censored (1), following the ADaM ADTTE convention.",
+    codeLists: [
+        CDISC.CT.CNSR: "TIME TO EVENT CENSORING"
+    ]
+}
+
+// --- Analysis concept: the endpoint these quantities serve ---
+
+// Overall Survival is the *analysis* concept - the endpoint the SurvivalTime /
+// CensoringStatus pair exists to support. (Compare stdlib/concepts/efficacy.tsk,
+// which defines the same OverallSurvival concept in the shared library.)
+concept OverallSurvival "Overall Survival" type_of AnalysisConcept {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Time from randomization to death from any cause. Subjects alive at data cutoff are censored at their last-known-alive date.",
+    unit: "days",
+    codeLists: [
+        CDISC.CT.PARAMCD: "OS"
+    ]
+}
+
+// --- Derivation concept: the estimator applied to the endpoint ---
+
+// The Kaplan-Meier product-limit estimator is a *derivation* concept: it
+// describes a transformation (subject-level times -> a step-function survival
+// curve), independent of any particular dataset.
+concept KaplanMeierEstimator "Kaplan-Meier Estimator" type_of DerivationConcept {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Non-parametric product-limit estimator of the survival function S(t) = P(T > t) from right-censored time-to-event data, with Greenwood-based confidence limits."
+}
+
+// The survival probability produced by the estimator above - the quantity that
+// gets plotted on the y-axis of a KM curve.
+concept SurvivalProbability "Survival Probability" type_of AnalysisConcept {
+    namespace: CDISC.Glossary,
+    category: Efficacy,
+    definition: "Estimated probability S(t) that a subject survives beyond time t, as produced by the Kaplan-Meier estimator. Ranges from 1.0 at time zero to 0.0.",
+    unit: "probability"
+}
+
+
+// ============================================================================
+// LAYER 2 - STRUCTURES  (the "WHERE")
+// ============================================================================
+//
+// Cubes realise the concepts as concrete, multidimensional data. Note the
+// `is_a` links on individual components: they bind a physical column (e.g.
+// AVAL) to the concept it represents (SurvivalTime). That binding is the
+// bridge from Layer 2 down to Layer 1.
+
+// --- Input cube: subject-level time-to-event data (ADaM ADTTE, BDS) ---
+//
+// One row per subject per parameter. This is the analysis-ready input; how it
+// was built from SDTM (death dates, last-contact dates, etc.) is upstream and
+// out of scope here.
+cube ADTTE "Time-to-Event Analysis Dataset" {
+    namespace: "http://example.org/study/onc001/adtte#",
+
+    structure: {
+        dimensions: [
+            // Who and which endpoint / arm - these identify each observation.
+            USUBJID: Identifier,
+            PARAMCD: CodedValue,
+            TRT01P: CodedValue
+        ],
+
+        measures: [
+            // AVAL carries the SurvivalTime concept; CNSR carries CensoringStatus.
+            // These `is_a` links are the traceability hooks back to Layer 1.
+            AVAL: Numeric is_a SurvivalTime,
+            CNSR: Flag is_a CensoringStatus
+        ],
+
+        attributes: [
+            // Population flags used to define the analysis set in the slice below.
+            ITTFL: Flag,
+            SAFFL: Flag
+        ]
+    }
+}
+
+// --- Output cube: the estimated Kaplan-Meier survival curve ---
+//
+// This holds the *result* of the KM estimation: one row per treatment arm per
+// event/censoring time, giving the step-function survival probability and its
+// confidence band, plus the numbers needed for the at-risk table. It is
+// populated by the `model` block further down, not by hand.
+cube KMEstimates "Kaplan-Meier Survival Estimates" {
+    namespace: "http://example.org/study/onc001/km#",
+
+    structure: {
+        dimensions: [
+            TRT01P: CodedValue,
+            // Time axis of the survival curve (event/censoring times).
+            ADT: Numeric
+        ],
+
+        measures: [
+            // SURVPROB is the plotted S(t); it realises SurvivalProbability.
+            SURVPROB: Numeric is_a SurvivalProbability,
+            LOWERCI: Numeric,
+            UPPERCI: Numeric,
+            // At-risk-table quantities at each time point.
+            NRISK: Integer,
+            NEVENT: Integer,
+            NCENSOR: Integer
+        ]
+    }
+}
+
+
+// ============================================================================
+// LAYER 3 - DERIVATIONS  (the "HOW")
+// ============================================================================
+//
+// Everything below operates on the cubes above. Each derivation is immutable:
+// it consumes input cubes/slices and produces NEW outputs, never mutating in
+// place (GP-2), so the dependency graph stays a clean DAG.
+
+// --- Step 1: define the analysis population as a slice of ADTTE ---
+//
+// A slice fixes some dimensions and lets others vary, carving out exactly the
+// data the model will see: the OS parameter, ITT population only, one row per
+// subject per arm.
+slice OS_ITT from ADTTE "Overall Survival, ITT population" {
+    fix: {
+        PARAMCD: "OS",
+        ITTFL: "Y"
+    },
+    vary: [USUBJID, TRT01P],
+    measures: [AVAL, CNSR]
+}
+
+// --- Step 2: estimate the survival curve with Kaplan-Meier ---
+//
+// The survival "response" is written with the Surv(time, censor) constructor
+// on the left of the Wilkinson formula, stratified by treatment arm on the
+// right. The estimated curve is written into the KMEstimates cube defined above.
+//
+//   input   : the OS_ITT slice (Layer-3 -> Layer-3 dependency)
+//   formula : Surv(AVAL, CNSR) ~ TRT01P   (KM survival by arm)
+//   output  : the KMEstimates cube        (Layer-3 -> Layer-2)
+//
+// NOTE (known limitation): the current grammar's `model` block only supports
+// GLM families (Gaussian/Binomial/Poisson/Gamma/InverseGaussian) and their
+// links - there is no first-class survival/Cox family, and no way to name the
+// Kaplan-Meier *estimator* or attach the log-rank p-value / hazard ratio as
+// structured outputs. Here the estimator is implied by the Surv() response and
+// the KaplanMeierEstimator concept. Making statistical methods first-class is
+// precisely the refinement work tracked under model/ and GitHub issue #27.
+model KaplanMeier "Kaplan-Meier estimate of OS by arm" {
+    input: OS_ITT,
+    formula: Surv(AVAL, CNSR) ~ TRT01P,
+    output: KMEstimates
+}
+
+// --- Step 2b (illustrative): the treatment comparison would live here ---
+//
+// A log-rank test and/or Cox proportional-hazards model for the hazard ratio
+// share the same Surv(AVAL, CNSR) ~ TRT01P shape. They are intentionally
+// omitted as runnable blocks because the grammar cannot yet express the
+// estimator choice (log-rank vs. Cox) or capture HR / 95% CI / p-value as
+// typed results - see the NOTE above.
+
+// --- Step 3: descriptive event summary per arm ---
+//
+// An aggregate gives the plain counts that accompany a KM analysis. Because
+// CNSR = 1 flags a *censored* subject, sum(CNSR) is the number censored;
+// the event count is (N_SUBJ - N_CENSORED).
+//
+// NOTE (known limitation): the aggregate function list is fixed
+// (count/sum/median/quantile/...), so we cannot express "events = N - sum(CNSR)"
+// as one statistic, nor a proper *KM* median survival (median(AVAL) below is a
+// naive median that ignores censoring - the censoring-aware median comes from
+// the KaplanMeier model, not from here). Both are noted rather than faked.
+aggregate MedianSurvival "OS event summary by arm" {
+    input: OS_ITT,
+    groupBy: [TRT01P],
+    statistics: [
+        N_SUBJ = count(USUBJID),
+        N_CENSORED = sum(CNSR),
+        MEDIAN_NAIVE = median(AVAL),
+        Q1_TIME = quantile(AVAL),
+        Q3_TIME = quantile(AVAL)
+    ]
+}
+
+// --- Step 4: present the survival curve ---
+//
+// The KM figure reads directly from the KMEstimates cube: time on the x-axis,
+// estimated survival probability on the y-axis, one step-function line per
+// treatment arm, with the Greenwood confidence band and the at-risk table
+// switched on. This is the same figure shape as Display 9 in example-display.tsk,
+// but here every input is *derived* by the blocks above rather than assumed.
+display figure "Figure 14.2.1" "Kaplan-Meier Curve - Overall Survival" {
+    source: KMEstimates,
+    xAxis: ADT,
+    yAxis: SURVPROB,
+    groupBy: TRT01P,
+    aesthetics: {
+        plotType: "step",
+        confidenceBand: "true",
+        atRiskTable: "true"
+    },
+    footnotes: [
+        "Survival probabilities estimated by the Kaplan-Meier product-limit method.",
+        "Confidence band based on Greenwood's formula.",
+        "Subjects alive at data cutoff are censored at last-known-alive date."
+    ]
+}
+
+// ============================================================================
+// END-TO-END RECAP
+// ============================================================================
+//
+// Reading bottom-up, the trace for any point on the plotted curve is:
+//
+//   Figure 14.2.1 . SURVPROB
+//     <- KMEstimates cube (SURVPROB measure)
+//        <- KaplanMeier model (Surv(AVAL, CNSR) ~ TRT01P)
+//           <- OS_ITT slice (PARAMCD = OS, ITTFL = Y)
+//              <- ADTTE cube (AVAL is_a SurvivalTime, CNSR is_a CensoringStatus)
+//                 <- OverallSurvival / SurvivalTime / CensoringStatus concepts
+//
+// Every arrow points downward, no cycles, fully reproducible from concepts to
+// display - which is the whole point of the three-layer AC/DC model.
+// ============================================================================

@@ -72,6 +72,36 @@ These standalone examples demonstrate specific Thunderstruck language constructs
   - Footnotes and metadata
   - Clinical study report formatting
 
+### End-to-End Walkthrough
+
+- **[example-kaplan-meier.tsk](example-kaplan-meier.tsk)** - Kaplan-Meier time-to-event analysis
+  - A single file that threads all three AC/DC layers together for one analysis
+  - Concepts (Overall Survival, censoring, KM estimator) -> Structures (ADTTE +
+    KM estimates cubes) -> Derivations (population slice, KM model, event
+    summary, survival-curve figure)
+  - Inline narrative on every block explaining how it links to the layer above/below,
+    with an explicit bottom-up traceability recap
+  - Honestly annotates the current statistical-method limitations (no first-class
+    survival family, no log-rank/hazard-ratio outputs) rather than inventing syntax
+
+- **[example-kaplan-meier.md](example-kaplan-meier.md)** - Walkthrough + syntax proposal
+  - Companion to the `.tsk` file above; steps through the same KM analysis stage by stage
+  - For each stage: what you write today, where it falls short, and the **proposed**
+    (not-yet-implemented) syntax that would fix it
+  - Proposes first-class `method` (estimators), `test` (log-rank), extended `model`
+    (Cox PH family + structured hazard-ratio output), and named/composable results
+  - Includes the concrete Langium grammar delta and open questions for the issue #27 review
+
+- **[example-kaplan-meier-syntax-primer.md](example-kaplan-meier-syntax-primer.md)** - TL;DR for statisticians
+  - Fast orientation for reviewers who know survival analysis but not Thunderstruck
+  - Maps each construct to its R/ADaM equivalent (`survfit`, `survdiff`, `coxph`, …)
+  - Gets a reviewer proposal-ready in ~5 minutes
+
+- **[example-kaplan-meier-cubes-and-methods.md](example-kaplan-meier-cubes-and-methods.md)** - For library developers
+  - Deep dive on how a statistical method relates to the cubes around it
+  - Treats a method as a typed transformation between cube shapes (its signature)
+  - Pattern + checklist for defining a reusable standard library of statistical methods
+
 ## Complete Analysis Examples
 
 These examples implement full analyses from CDISC ADaM Examples:
