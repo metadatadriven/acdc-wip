@@ -361,3 +361,9 @@ lib/
 src-gen/
 generated/
 
+# ...except the Langium-generated sources committed in this repo: the language
+# package's `build` script does not run `langium:generate`, so these files are
+# versioned and required for a fresh checkout to compile. Keep them tracked.
+!thunderstruck/packages/thunderstruck-language/src/generated/
+!thunderstruck/packages/thunderstruck-language/src/generated/**
+
